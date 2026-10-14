@@ -45,10 +45,11 @@
       .obj .shadow { position: absolute; left: 70px; top: 372px; width: 280px; height: 44px; border-radius: 50%;
         background: radial-gradient(rgba(60, 40, 20, 0.45), rgba(60, 40, 20, 0) 70%); }
       .obj .bob { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; }
-      .obj img { width: 400px; height: 400px; display: block; }
+      .obj img { width: 400px; height: 400px; display: block; object-fit: contain; object-position: 50% 100%; }
       #garlic img { filter: sepia(0) saturate(1) hue-rotate(0deg) brightness(1); }
-      #shallot img { transform: scale(0.84, 1.06); transform-origin: 50% 100%;
-        filter: sepia(0.15) saturate(1.05) hue-rotate(-14deg) brightness(0.97); }
+      #garlic img { height: 370px; }
+      #shallot img { height: 450px; filter: sepia(0) saturate(1) hue-rotate(0deg) brightness(1); }
+      #shallot .shadow { left: 110px; width: 200px; }
 
       .ico { position: absolute; opacity: 0; display: block; }
       .chip { position: absolute; width: 170px; height: 170px; border-radius: 50%; opacity: 0;
@@ -99,8 +100,8 @@
 
       <img class="ico" id="seedling" src="assets/img/seedling.png" style="left: 470px; top: 1060px; width: 140px; height: 140px" alt="" />
 
-      <div class="obj" id="garlic"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic.png" alt="ail" /></div></div>
-      <div class="obj" id="shallot"><div class="shadow"></div><div class="bob"><img src="assets/img/onion.png" alt="échalote" /></div></div>
+      <div class="obj" id="garlic"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic_photo.png" alt="ail" /></div></div>
+      <div class="obj" id="shallot"><div class="shadow"></div><div class="bob"><img src="assets/img/shallot_photo.png" alt="échalote" /></div></div>
 
       <!-- clay scene -->
       <img class="ico" id="cloud" src="assets/img/cloud_with_rain.png" style="left: 720px; top: 560px; width: 210px; height: 210px" alt="" />
@@ -268,7 +269,7 @@
       hide("#m15", C.fix_depth - 0.1);
       move("#shallot", C.fix_depth, 540, 935, 0.8, 0.7);
       tl.to("#pocket", { y: -320, duration: 0.7, ease: "power3.inOut" }, C.fix_depth);
-      tl.to("#shallot img", { filter: "sepia(0.15) saturate(1.05) hue-rotate(-14deg) brightness(0.97)", duration: 0.6 }, C.fix_depth + 0.1);
+      tl.to("#shallot img", { filter: "sepia(0) saturate(1) hue-rotate(0deg) brightness(1)", duration: 0.6 }, C.fix_depth + 0.1);
       show("#m23", C.fix_depth + 0.5, { rot: -3 });
       show("#okChip", C.fix_check);
       title("#tTip", C.fix_check, C.b3);
@@ -332,7 +333,7 @@
 
       // ---------- s10 : shallot varieties
       tl.to("#garlic", { x: -760, opacity: 0, duration: 0.45, ease: "power3.in" }, C.ech);
-      tl.fromTo("#shallot", { ...at(1400, 985), scale: 1.15, opacity: 1 }, { ...at(540, 985), duration: 0.55, ease: "power3.out", immediateRender: false }, C.ech + 0.1);
+      tl.fromTo("#shallot", { ...at(1400, 1015), scale: 0.95, opacity: 1 }, { ...at(540, 1015), duration: 0.55, ease: "power3.out", immediateRender: false }, C.ech + 0.1);
       title("#tEch", C.ech + 0.15, C.out);
       show("#tagE1", C.tagE1, { from: -6, rot: -2 });
       show("#tagE2", C.tagE2, { from: 6, rot: 2 });
