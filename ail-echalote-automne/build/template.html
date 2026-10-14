@@ -46,16 +46,18 @@
         background: radial-gradient(rgba(60, 40, 20, 0.45), rgba(60, 40, 20, 0) 70%); }
       .obj .bob { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; }
       .obj img { width: 400px; height: 400px; display: block; object-fit: contain; object-position: 50% 100%; }
-      #garlic img { filter: sepia(0) saturate(1) hue-rotate(0deg) brightness(1); }
-      #garlic img { height: 370px; }
-      #shallot img { height: 450px; filter: sepia(0) saturate(1) hue-rotate(0deg) brightness(1); }
-      #shallot .shadow { left: 110px; width: 200px; }
+      .obj img { filter: sepia(0) saturate(1) hue-rotate(0deg) brightness(1); }
+      .obj.g img { height: 370px; }
+      .obj.s img { height: 450px; }
+      .obj.s .shadow { left: 110px; width: 200px; }
+      .obj.sp img { height: 330px; }
+      .obj.sp .shadow { left: 40px; width: 340px; }
+      #vole img { width: 300px; height: 342px; display: block; transform: scaleX(-1); }
 
       .ico { position: absolute; opacity: 0; display: block; }
       .chip { position: absolute; width: 170px; height: 170px; border-radius: 50%; opacity: 0;
         background: #f6eedc; border: 7px solid #213a26; display: flex; align-items: center; justify-content: center;
         box-shadow: 0 8px 0 rgba(33, 58, 38, 0.9); }
-      .chip img { width: 112px; height: 112px; }
 
       /* ---- type ---- */
       .title { position: absolute; left: 0; top: 410px; width: 1080px; text-align: center; opacity: 0; }
@@ -98,19 +100,21 @@
       <div class="ground" id="soil" data-layout-allow-overflow>%SOIL_SPECKS%</div>
       <div class="pocket" id="pocket"></div>
 
-      <img class="ico" id="seedling" src="assets/img/seedling.png" style="left: 470px; top: 1060px; width: 140px; height: 140px" alt="" />
+      <div class="obj sp" id="sprout"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic_sprout.png" alt="ail germé" /></div></div>
 
-      <div class="obj" id="garlic"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic_photo.png" alt="ail" /></div></div>
-      <div class="obj" id="shallot"><div class="shadow"></div><div class="bob"><img src="assets/img/shallot_photo.png" alt="échalote" /></div></div>
+      <div class="obj g" id="garlic"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic_photo.png" alt="ail" /><svg class="mold" id="gmold" width="420" height="420" viewBox="0 0 420 420" style="position: absolute; left: 0; top: 0; opacity: 0"><defs><filter id="gmoldf"><feGaussianBlur stdDeviation="3"/></filter></defs><g filter="url(#gmoldf)"><ellipse cx="150" cy="300" rx="30" ry="24" fill="rgba(62,74,28,0.88)"/><ellipse cx="142" cy="294" rx="14" ry="10" fill="rgba(160,170,95,0.75)"/><ellipse cx="250" cy="250" rx="24" ry="19" fill="rgba(62,74,28,0.88)"/><ellipse cx="244" cy="245" rx="11" ry="8" fill="rgba(160,170,95,0.75)"/><ellipse cx="300" cy="340" rx="34" ry="27" fill="rgba(62,74,28,0.88)"/><ellipse cx="292" cy="333" rx="15" ry="12" fill="rgba(160,170,95,0.75)"/><ellipse cx="190" cy="380" rx="18" ry="14" fill="rgba(62,74,28,0.88)"/><ellipse cx="186" cy="376" rx="8" ry="6" fill="rgba(160,170,95,0.75)"/><ellipse cx="120" cy="230" rx="16" ry="13" fill="rgba(62,74,28,0.88)"/><ellipse cx="116" cy="227" rx="7" ry="6" fill="rgba(160,170,95,0.75)"/></g></svg></div></div>
+      <div class="obj s" id="shallot"><div class="shadow"></div><div class="bob"><img src="assets/img/shallot_photo.png" alt="échalote" /><svg class="mold" id="smold" width="420" height="420" viewBox="0 0 420 420" style="position: absolute; left: 0; top: 0; opacity: 0"><defs><filter id="smoldf"><feGaussianBlur stdDeviation="3"/></filter></defs><g filter="url(#smoldf)"><ellipse cx="190" cy="330" rx="22" ry="18" fill="rgba(62,74,28,0.88)"/><ellipse cx="184" cy="326" rx="10" ry="8" fill="rgba(160,170,95,0.75)"/><ellipse cx="235" cy="270" rx="16" ry="13" fill="rgba(62,74,28,0.88)"/><ellipse cx="231" cy="267" rx="7" ry="6" fill="rgba(160,170,95,0.75)"/><ellipse cx="230" cy="375" rx="20" ry="16" fill="rgba(62,74,28,0.88)"/><ellipse cx="225" cy="371" rx="9" ry="7" fill="rgba(160,170,95,0.75)"/><ellipse cx="175" cy="255" rx="12" ry="10" fill="rgba(62,74,28,0.88)"/><ellipse cx="172" cy="253" rx="5" ry="4" fill="rgba(160,170,95,0.75)"/></g></svg></div></div>
+      <div class="obj g" id="g2"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic_photo.png" alt="ail" /></div></div>
+      <div class="obj s" id="s2"><div class="shadow"></div><div class="bob"><img src="assets/img/shallot_photo.png" alt="échalote" /></div></div>
+      <div class="obj g" id="g3"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic_photo.png" alt="ail" /></div></div>
 
       <!-- clay scene -->
-      <img class="ico" id="cloud" src="assets/img/cloud_with_rain.png" style="left: 720px; top: 560px; width: 210px; height: 210px" alt="" />
-      <img class="ico drop" id="d1" src="assets/img/droplet.png" style="left: 760px; top: 700px; width: 46px; height: 46px" alt="" />
-      <img class="ico drop" id="d2" src="assets/img/droplet.png" style="left: 830px; top: 700px; width: 46px; height: 46px" alt="" />
-      <img class="ico drop" id="d3" src="assets/img/droplet.png" style="left: 890px; top: 700px; width: 46px; height: 46px" alt="" />
-      <img class="ico" id="sweat" src="assets/img/sweat_droplets.png" style="left: 690px; top: 830px; width: 130px; height: 130px" alt="" />
-      <img class="ico" id="mic1" src="assets/img/microbe.png" style="left: 300px; top: 860px; width: 120px; height: 120px" alt="" />
-      <img class="ico" id="mic2" src="assets/img/microbe.png" style="left: 680px; top: 1030px; width: 105px; height: 105px" alt="" />
+      <svg class="ico" id="cloud" style="left: 700px; top: 575px" width="240" height="150" viewBox="0 0 240 150"><path d="M50 130 A 38 38 0 0 1 46 54 A 50 50 0 0 1 138 34 A 44 44 0 0 1 206 70 A 32 32 0 0 1 196 130 Z" fill="#f6eedc" stroke="#213a26" stroke-width="8" stroke-linejoin="round"/><path d="M70 104 A 26 26 0 0 1 90 80" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/></svg>
+      <svg class="ico drop" id="d1" style="left: 750px; top: 700px" width="40" height="56" viewBox="0 0 40 56"><path d="M20 3 C 28 18 36 28 36 38 A 16 16 0 0 1 4 38 C 4 28 12 18 20 3 Z" fill="#5fb3e8" stroke="#213a26" stroke-width="4" stroke-linejoin="round"/><path d="M12 38 A 8 8 0 0 0 18 46" fill="none" stroke="#d6f0ff" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg class="ico drop" id="d2" style="left: 815px; top: 700px" width="40" height="56" viewBox="0 0 40 56"><path d="M20 3 C 28 18 36 28 36 38 A 16 16 0 0 1 4 38 C 4 28 12 18 20 3 Z" fill="#5fb3e8" stroke="#213a26" stroke-width="4" stroke-linejoin="round"/><path d="M12 38 A 8 8 0 0 0 18 46" fill="none" stroke="#d6f0ff" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg class="ico drop" id="d3" style="left: 880px; top: 700px" width="40" height="56" viewBox="0 0 40 56"><path d="M20 3 C 28 18 36 28 36 38 A 16 16 0 0 1 4 38 C 4 28 12 18 20 3 Z" fill="#5fb3e8" stroke="#213a26" stroke-width="4" stroke-linejoin="round"/><path d="M12 38 A 8 8 0 0 0 18 46" fill="none" stroke="#d6f0ff" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg class="ico drop" id="sweat" style="left: 700px; top: 850px" width="46" height="64" viewBox="0 0 40 56"><path d="M20 3 C 28 18 36 28 36 38 A 16 16 0 0 1 4 38 C 4 28 12 18 20 3 Z" fill="#5fb3e8" stroke="#213a26" stroke-width="4" stroke-linejoin="round"/><path d="M12 38 A 8 8 0 0 0 18 46" fill="none" stroke="#d6f0ff" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg class="ico drop" id="sweat2" style="left: 330px; top: 890px" width="36" height="50" viewBox="0 0 40 56"><path d="M20 3 C 28 18 36 28 36 38 A 16 16 0 0 1 4 38 C 4 28 12 18 20 3 Z" fill="#5fb3e8" stroke="#213a26" stroke-width="4" stroke-linejoin="round"/><path d="M12 38 A 8 8 0 0 0 18 46" fill="none" stroke="#d6f0ff" stroke-width="3" stroke-linecap="round"/></svg>
 
       <!-- depth scene -->
       <svg class="ico" id="arrowLong" style="left: 730px; top: 772px" width="60" height="330" viewBox="0 0 60 330">
@@ -118,22 +122,20 @@
         <path d="M30 14 V316 M10 36 L30 12 L50 36 M10 294 L30 318 L50 294" fill="none" stroke="#f7c843" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       <div class="measure" id="m15" style="left: 800px; top: 890px">15 CM</div>
-      <div class="chip" id="crossChip" style="left: 820px; top: 990px"><img src="assets/img/cross_mark.png" alt="" /></div>
+      <div class="chip" id="crossChip" style="left: 820px; top: 990px"><svg width="110" height="110" viewBox="0 0 110 110"><path d="M28 28 L82 82 M82 28 L28 82" fill="none" stroke="#213a26" stroke-width="24" stroke-linecap="round"/><path d="M28 28 L82 82 M82 28 L28 82" fill="none" stroke="#e5483b" stroke-width="13" stroke-linecap="round"/></svg></div>
       <div class="measure" id="m23" style="left: 735px; top: 640px">2–3 CM</div>
-      <div class="chip" id="okChip" style="left: 820px; top: 960px"><img src="assets/img/check_mark_button.png" alt="" /></div>
-      <img class="ico" id="mic3" src="assets/img/microbe.png" style="left: 330px; top: 1120px; width: 110px; height: 110px" alt="" />
+      <div class="chip" id="okChip" style="left: 820px; top: 960px"><svg width="110" height="110" viewBox="0 0 110 110"><path d="M22 58 L46 80 L90 30" fill="none" stroke="#213a26" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 58 L46 80 L90 30" fill="none" stroke="#4caf50" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
 
       <!-- pests -->
-      <img class="ico" id="mouse" src="assets/img/mouse.png" style="left: 790px; top: 975px; width: 250px; height: 250px" alt="" />
-      <img class="ico" id="fly" src="assets/img/fly.png" style="left: 180px; top: 740px; width: 110px; height: 110px" alt="" />
-      <img class="ico snow" id="sn1" src="assets/img/snowflake.png" style="left: 120px; top: 600px; width: 80px; height: 80px" alt="" />
-      <img class="ico snow" id="sn2" src="assets/img/snowflake.png" style="left: 470px; top: 570px; width: 64px; height: 64px" alt="" />
-      <img class="ico snow" id="sn3" src="assets/img/snowflake.png" style="left: 860px; top: 610px; width: 74px; height: 74px" alt="" />
+      <div class="ico" id="vole" style="left: 735px; top: 873px; width: 300px; height: 342px"><img src="assets/img/vole_photo.png" alt="campagnol" /></div>
+      <svg class="ico snow" id="sn1" style="left: 120px; top: 600px" width="80" height="80" viewBox="0 0 80 80"><g fill="none" stroke="#213a26" stroke-width="11" stroke-linecap="round"><g transform="rotate(0 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(60 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(120 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g></g><g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"><g transform="rotate(0 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(60 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(120 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g></g></svg>
+      <svg class="ico snow" id="sn2" style="left: 470px; top: 570px" width="64" height="64" viewBox="0 0 80 80"><g fill="none" stroke="#213a26" stroke-width="11" stroke-linecap="round"><g transform="rotate(0 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(60 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(120 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g></g><g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"><g transform="rotate(0 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(60 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(120 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g></g></svg>
+      <svg class="ico snow" id="sn3" style="left: 860px; top: 610px" width="74" height="74" viewBox="0 0 80 80"><g fill="none" stroke="#213a26" stroke-width="11" stroke-linecap="round"><g transform="rotate(0 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(60 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(120 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g></g><g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"><g transform="rotate(0 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(60 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g><g transform="rotate(120 40 40)"><path d="M40 8 V72 M40 20 L30 12 M40 20 L50 12 M40 60 L30 68 M40 60 L50 68"/></g></g></svg>
 
       <!-- intro / solution -->
-      <div class="chip" id="checkChip" style="left: 455px; top: 600px"><img src="assets/img/check_mark_button.png" alt="" /></div>
-      <div class="chip" id="warnChip" style="left: 455px; top: 600px"><img src="assets/img/warning.png" alt="" /></div>
-      <img class="ico" id="sun" src="assets/img/sun.png" style="left: 60px; top: 170px; width: 200px; height: 200px" alt="" />
+      <div class="chip" id="checkChip" style="left: 455px; top: 600px"><svg width="110" height="110" viewBox="0 0 110 110"><path d="M22 58 L46 80 L90 30" fill="none" stroke="#213a26" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 58 L46 80 L90 30" fill="none" stroke="#4caf50" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="chip" id="warnChip" style="left: 455px; top: 600px"><svg width="120" height="110" viewBox="0 0 120 110"><path d="M60 10 L112 100 H8 Z" fill="#f7c843" stroke="#213a26" stroke-width="8" stroke-linejoin="round"/><path d="M60 40 V70" stroke="#213a26" stroke-width="12" stroke-linecap="round"/><circle cx="60" cy="86" r="7" fill="#213a26"/></svg></div>
+      <svg class="ico" id="sun" style="left: 60px; top: 170px" width="200" height="200" viewBox="0 0 200 200"><g stroke="#213a26" stroke-width="9" stroke-linecap="round"><path d="M100 14 V40" transform="rotate(0 100 100)"/><path d="M100 14 V40" transform="rotate(45 100 100)"/><path d="M100 14 V40" transform="rotate(90 100 100)"/><path d="M100 14 V40" transform="rotate(135 100 100)"/><path d="M100 14 V40" transform="rotate(180 100 100)"/><path d="M100 14 V40" transform="rotate(225 100 100)"/><path d="M100 14 V40" transform="rotate(270 100 100)"/><path d="M100 14 V40" transform="rotate(315 100 100)"/></g><circle cx="100" cy="100" r="46" fill="#f7c843" stroke="#213a26" stroke-width="8"/></svg>
 
       <div class="pills" id="pills1"><div class="row"><span>SEPT</span><span class="on">OCT</span><span class="on">NOV</span><span>DÉC</span></div></div>
       <div class="pills" id="pills2"><div class="row"><span>JANV</span><span class="on">FÉV</span><span class="on">MARS</span><span>AVR</span></div></div>
@@ -238,14 +240,13 @@
       tl.set("#water", { opacity: 1 }, C.water);
       tl.fromTo("#water", { scaleY: 0 }, { scaleY: 1, duration: 1.4, ease: "power2.out", immediateRender: false }, C.water);
       show("#sweat", C.humid);
+      show("#sweat2", C.humid + 0.15);
       hide("#cloud", C.rot1 - 0.2);
       hide("#sweat", C.rot1);
+      hide("#sweat2", C.rot1);
       tl.to("#garlic img", { filter: "sepia(0.85) saturate(1.5) hue-rotate(28deg) brightness(0.55)", duration: 0.6 }, C.rot1);
       title("#tRot", C.rot1, C.b2);
-      show("#mic1", C.rot1 + 0.1);
-      show("#mic2", C.rot1 + 0.25);
-      hide("#mic1", C.b2 - 0.1);
-      hide("#mic2", C.b2 - 0.1);
+      tl.to("#gmold", { opacity: 1, duration: 0.7 }, C.rot1 + 0.15);
 
       // ---------- s5–s6 : bulb planted too deep
       badge("#b2", C.b2, C.b3);
@@ -262,9 +263,9 @@
       title("#tDeep", C.title_deep, C.fix_depth);
       tl.to("#shallot img", { filter: "sepia(0.85) saturate(1.4) hue-rotate(20deg) brightness(0.5)", duration: 0.6 }, C.choke);
       show("#crossChip", C.rot2);
-      show("#mic3", C.rot2 + 0.1);
+      tl.to("#smold", { opacity: 1, duration: 0.6 }, C.rot2 + 0.1);
       hide("#crossChip", C.fix_depth - 0.1);
-      hide("#mic3", C.fix_depth - 0.1);
+      tl.to("#smold", { opacity: 0, duration: 0.5 }, C.fix_depth + 0.1);
       hide("#arrowLong", C.fix_depth - 0.1);
       hide("#m15", C.fix_depth - 0.1);
       move("#shallot", C.fix_depth, 540, 935, 0.8, 0.7);
@@ -280,37 +281,25 @@
       badge("#b3", C.b3, C.sol);
       tl.to("#soil", { y: 1160, duration: 0.55, ease: "power3.in" }, C.b3);
       tl.to("#pocket", { opacity: 0, duration: 0.2 }, C.b3);
-      move("#shallot", C.b3 + 0.1, 600, 1015, 1.0);
+      move("#shallot", C.b3 + 0.1, 560, 1015, 1.0);
       tl.to("#shallot .shadow", { opacity: 1, duration: 0.3 }, C.b3 + 0.4);
       tl.set("#garlic img", { filter: "sepia(0) saturate(1) hue-rotate(0deg) brightness(1)" }, C.b3);
       tl.set("#garlic .shadow", { opacity: 1 }, C.b3);
+      tl.set("#gmold", { opacity: 0 }, C.b3);
       enter("#garlic", C.b3 + 0.35, 230, 1015, 1.0);
       title("#tPests", C.title_pests, C.sol);
-      tl.fromTo("#mouse", { x: 420, opacity: 1 }, { x: 0, duration: 0.55, ease: "power2.out", immediateRender: false }, C.mouse);
-      tl.to("#mouse", { keyframes: [{ x: -24, duration: 0.12 }, { x: 0, duration: 0.12 }, { x: -24, duration: 0.12 }, { x: 0, duration: 0.12 }] }, C.nibble);
+      tl.fromTo("#vole", { x: 420, opacity: 1 }, { x: 0, duration: 0.55, ease: "power2.out", immediateRender: false }, C.mouse);
+      tl.to("#vole", { keyframes: [{ x: -26, duration: 0.12 }, { x: 0, duration: 0.12 }, { x: -26, duration: 0.12 }, { x: 0, duration: 0.12 }] }, C.nibble);
       tl.to("#shallot", { keyframes: [{ rotation: 5, duration: 0.1 }, { rotation: -5, duration: 0.1 }, { rotation: 4, duration: 0.1 }, { rotation: 0, duration: 0.1 }] }, C.nibble + 0.05);
-      tl.set("#fly", { opacity: 1 }, C.fly);
-      tl.fromTo("#fly", { x: -260, y: -60, rotation: 20 }, {
-        immediateRender: false,
-        keyframes: [
-          { x: 0, y: 0, rotation: 0, duration: 0.6 },
-          { x: 90, y: 50, rotation: 15, duration: 0.5 },
-          { x: 20, y: 110, rotation: -10, duration: 0.5 },
-          { x: -60, y: 40, rotation: 8, duration: 0.5 },
-          { x: 40, y: -10, rotation: -6, duration: 0.5 },
-          { x: 110, y: 70, rotation: 12, duration: 0.5 },
-          { x: 0, y: 30, rotation: 0, duration: 0.6 },
-        ],
-      }, C.fly);
       ["#sn1", "#sn2", "#sn3"].forEach((s, j) => {
         tl.set(s, { opacity: 1 }, C.winter + j * 0.15);
         tl.fromTo(s, { y: -40, rotation: 0 }, { y: 120, rotation: 90, duration: 1.6, ease: "none", immediateRender: false }, C.winter + j * 0.15);
       });
-      ["#mouse", "#fly", "#sn1", "#sn2", "#sn3"].forEach((s) => hide(s, C.sol));
+      ["#vole", "#sn1", "#sn2", "#sn3"].forEach((s) => hide(s, C.sol));
 
       // ---------- s8 : plant in early spring
-      move("#garlic", C.sol + 0.1, 300, 1015, 1.0);
-      move("#shallot", C.sol + 0.1, 780, 1015, 1.0);
+      move("#garlic", C.sol + 0.1, 190, 1037, 0.85);
+      move("#shallot", C.sol + 0.1, 900, 1037, 0.85);
       title("#tSol", C.title_sol, C.spring);
       show("#pills2", C.pills2);
       title("#tSpring", C.spring, C.adapted);
@@ -318,8 +307,8 @@
       tl.fromTo("#sun", { rotation: 0 }, { rotation: 40, duration: 8, ease: "none", immediateRender: false }, C.spring + 0.45);
       hide("#pills2", C.adapted - 0.1);
       title("#tVar", C.adapted, C.ail);
-      show("#seedling", C.adapted + 0.15);
-      hide("#seedling", C.ail);
+      enter("#sprout", C.spring + 0.1, 540, 1026, 0.9);
+      hide("#sprout", C.ail);
       hide("#sun", C.ail);
 
       // ---------- s9 : garlic varieties
@@ -341,9 +330,12 @@
       hide("#tagE2", C.out - 0.1);
 
       // ---------- s11 : outro
-      move("#shallot", C.out, 780, 1015, 1.0);
-      tl.fromTo("#garlic", { ...at(-300, 1015), scale: 1.0, opacity: 1 }, { ...at(300, 1015), duration: 0.55, ease: "power3.out", immediateRender: false }, C.out + 0.05);
-      show("#seedling", C.out_humid);
+      // harvest row, like the potato line-up in the reference
+      move("#shallot", C.out, 345, 1085, 0.62);
+      tl.fromTo("#garlic", { ...at(-300, 1085), scale: 0.62, opacity: 1 }, { ...at(150, 1085), duration: 0.55, ease: "power3.out", immediateRender: false }, C.out + 0.05);
+      enter("#g2", C.out_title, 540, 1085, 0.62);
+      enter("#s2", C.out_title + 0.12, 735, 1085, 0.62);
+      enter("#g3", C.out_title + 0.24, 930, 1085, 0.62);
       show("#sun", C.out_humid + 0.2);
       tl.fromTo("#sun", { rotation: 0 }, { rotation: 30, duration: 4, ease: "none", immediateRender: false }, C.out_humid + 0.65);
       title("#tEnd", C.out_title, null);

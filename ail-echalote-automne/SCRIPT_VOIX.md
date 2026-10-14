@@ -1,6 +1,6 @@
 # Texte de la voix off – Ail & échalote à l'automne
 
-À coller tel quel dans ton outil de voix IA, avec la même voix que la vidéo des pommes de terre.
+À coller tel quel dans ton outil de voix IA (par ex. ElevenLabs), avec une voix d'homme jeune, très dynamique et réaliste.
 Le plus simple : une phrase par fichier (s1 à s11), ou un seul fichier avec un vrai blanc d'environ une demi-seconde entre chaque ligne.
 
 | # | Texte |

@@ -3,7 +3,7 @@
 Run after build/tts.py:  python3 -I build/build.py .
 Every visual cue is pinned to a spoken word, so re-generating the voice re-times the video.
 """
-import json, re, random, sys
+import json, re, random, subprocess, sys
 import numpy as np, soundfile as sf
 
 P = sys.argv[1]
@@ -62,16 +62,21 @@ def LE(line):
 
 
 # ---------------------------------------------------------------- voiceover track
-sr = 24000
+sr = voice[0]["sample_rate"]
 track = np.zeros(int(DURATION * sr), dtype=np.float32)
 for ln in voice:
     a, r = sf.read(f"{P}/assets/audio/{ln['id']}.wav", dtype="float32")
-    assert r == sr
+    assert r == sr, (ln["id"], r)
     i = int(starts[ln["id"]] * sr)
     track[i:i + len(a)] += a
 peak = np.max(np.abs(track))
 track = track / peak * 0.89
-sf.write(f"{P}/assets/audio/voiceover.wav", track, sr)
+sf.write(f"{P}/build/voiceover_raw.wav", track, sr)
+# punchier, social-media loudness: light compression, presence lift, then -14 LUFS
+subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", f"{P}/build/voiceover_raw.wav", "-af",
+                "acompressor=threshold=-20dB:ratio=3:attack=5:release=80:makeup=4,"
+                "equalizer=f=3500:t=q:w=1.2:g=2.5,loudnorm=I=-12:TP=-1.5:LRA=7",
+                "-ar", str(sr), f"{P}/assets/audio/voiceover.wav"], check=True)
 
 # ---------------------------------------------------------------- captions (2–3 word groups)
 groups = []
@@ -146,16 +151,17 @@ sfx = [  # (file, time, volume)
     ("pop", c["rot1"], .25),
     ("whoosh-short", c["b2"], .35), ("pop", c["choke"], .22), ("whoosh-short", c["fix_depth"], .22),
     ("pop", c["fix_check"], .3),
-    ("whoosh-short", c["b3"], .35), ("pop", c["mouse"], .28), ("pop", c["nibble"], .2),
+    ("whoosh-short", c["b3"], .35), ("whoosh-short", c["mouse"], .22), ("pop", c["nibble"], .2),
     ("whoosh-short", c["sol"], .35), ("click-soft", c["pills2"], .45), ("sparkle", c["spring"], .22),
     ("whoosh-short", c["ail"], .3), ("pop", c["tagA1"], .28), ("pop", c["tagA2"], .28),
     ("whoosh-short", c["ech"], .3), ("pop", c["tagE1"], .28), ("pop", c["tagE2"], .28),
-    ("whoosh-short", c["out"], .3), ("chime", c["out_title"], .2),
+    ("whoosh-short", c["out"], .3), ("pop", c["out_title"], .25), ("pop", c["out_title"] + .12, .25),
+    ("pop", c["out_title"] + .24, .25), ("chime", c["out_title"] + .3, .2),
 ]
 durs = {"pop": .72, "whoosh-short": .57, "click-soft": .37, "sparkle": 1.8, "chime": 2.54}
 sfx_html = "\n".join(
     f'      <audio id="sfx{i}" src="assets/audio/{f}.mp3" data-start="{t:.3f}" data-duration="{min(durs[f], DURATION - t):.2f}" '
-    f'data-track-index="{3 + i % 2}" data-volume="{v}"></audio>'
+    f'data-track-index="{3 + i % 4}" data-volume="{v}"></audio>'
     for i, (f, t, v) in enumerate(sfx))
 
 html = open(f"{P}/build/template.html").read()
