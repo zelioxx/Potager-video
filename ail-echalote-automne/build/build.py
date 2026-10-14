@@ -5,6 +5,8 @@ Every visual cue is pinned to a spoken word, so re-generating the voice re-times
 """
 import json, re, random, subprocess, sys
 import numpy as np, soundfile as sf
+sys.path.insert(0, f"{sys.argv[1]}/build")
+from music import make_music
 
 P = sys.argv[1]
 voice = json.load(open(f"{P}/build/voice.json"))
@@ -12,7 +14,7 @@ voice = json.load(open(f"{P}/build/voice.json"))
 # ---------------------------------------------------------------- timing
 LEAD = 0.25
 GAP = 0.32
-SECTION_GAP = {"s3": 0.55, "s5": 0.55, "s7": 0.55, "s8": 0.55, "s9": 0.35, "s10": 0.75, "s11": 0.9}
+SECTION_GAP = {"s3": 0.55, "s5": 1.15, "s7": 0.55, "s8": 0.55, "s9": 0.35, "s10": 0.75, "s11": 0.9}
 TAIL = 1.4
 
 starts, t = {}, LEAD
@@ -163,6 +165,8 @@ sfx_html = "\n".join(
     f'      <audio id="sfx{i}" src="assets/audio/{f}.mp3" data-start="{t:.3f}" data-duration="{min(durs[f], DURATION - t):.2f}" '
     f'data-track-index="{3 + i % 4}" data-volume="{v}"></audio>'
     for i, (f, t, v) in enumerate(sfx))
+
+make_music(f"{P}/assets/audio/music.wav", DURATION)
 
 html = open(f"{P}/build/template.html").read()
 html = (html.replace("%DURATION%", str(DURATION))

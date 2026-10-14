@@ -31,12 +31,25 @@
       .ground { position: absolute; left: 0; top: 760px; width: 1080px; height: 1160px; opacity: 0; overflow: hidden; }
       .ground::before { content: ""; position: absolute; left: 0; top: 0; width: 1080px; height: 10px; background: #2c2016; }
       .ground .specks { position: absolute; left: 0; top: 0; }
-      #soil { background: linear-gradient(#4f3324, #3e281b 60%, #33200f); }
-      #clay { background: linear-gradient(#a8643f, #93542f 55%, #7d4425); }
       #water { position: absolute; left: 0; top: 70px; width: 1080px; height: 1090px; opacity: 0;
         background: linear-gradient(rgba(96, 170, 230, 0.62), rgba(60, 120, 200, 0.55)); }
       #water::before { content: ""; position: absolute; left: 0; top: -6px; width: 1080px; height: 12px;
         background: rgba(200, 235, 255, 0.85); border-radius: 6px; }
+      #cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #soil { background: #3e281b url("assets/img/soil_texture.jpg") 0 0 / 1080px 1160px no-repeat; }
+      #clay { background: #93542f url("assets/img/clay_texture.jpg") 0 0 / 1080px 1160px no-repeat; }
+      .ground .shade { position: absolute; left: 0; top: 0; width: 1080px; height: 1160px;
+        background: linear-gradient(rgba(20, 12, 6, 0.45), rgba(20, 12, 6, 0) 160px), linear-gradient(rgba(0, 0, 0, 0), rgba(20, 12, 6, 0.35)); }
+      .mag { position: absolute; width: 380px; height: 380px; border-radius: 50%; overflow: hidden; opacity: 0;
+        border: 8px solid #213a26; box-shadow: 0 10px 0 rgba(33, 58, 38, 0.85); background: #93542f; }
+      .mag img { position: absolute; left: -78px; top: -78px; width: 520px; height: 520px; }
+      #magwater { position: absolute; left: 0; top: 0; width: 364px; height: 364px; opacity: 0.85;
+        background: linear-gradient(rgba(70, 150, 220, 0.55), rgba(40, 100, 190, 0.75)); }
+      .lbl { position: absolute; width: 600px; display: flex; justify-content: center; opacity: 0; }
+      .lbl span { font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 38px; letter-spacing: 1px; color: #213a26;
+        background: #f6eedc; border: 5px solid #213a26; border-radius: 12px; padding: 4px 18px 2px; box-shadow: 0 5px 0 #213a26; }
+      .qm { position: absolute; opacity: 0; font-family: "Lilita One", sans-serif; font-size: 78px; color: #213a26; }
+      #thermo img { width: 96px; height: 343px; display: block; }
       .pocket { position: absolute; left: 380px; top: 1080px; width: 320px; height: 340px; opacity: 0;
         border-radius: 46% 46% 40% 40%; background: radial-gradient(rgba(20, 12, 6, 0.75), rgba(20, 12, 6, 0) 70%); }
 
@@ -94,10 +107,11 @@
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="%DURATION%" data-width="1080" data-height="1920">
+      <div id="cam">
       <img id="bg" src="assets/img/bg.png" alt="" />
 
-      <div class="ground" id="clay" data-layout-allow-overflow>%CLAY_SPECKS%<div id="water"></div></div>
-      <div class="ground" id="soil" data-layout-allow-overflow>%SOIL_SPECKS%</div>
+      <div class="ground" id="clay" data-layout-allow-overflow><div id="water"></div><div class="shade"></div></div>
+      <div class="ground" id="soil" data-layout-allow-overflow><div class="shade"></div></div>
       <div class="pocket" id="pocket"></div>
 
       <div class="obj sp" id="sprout"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic_sprout.png" alt="ail germé" /></div></div>
@@ -136,6 +150,18 @@
       <div class="chip" id="checkChip" style="left: 455px; top: 600px"><svg width="110" height="110" viewBox="0 0 110 110"><path d="M22 58 L46 80 L90 30" fill="none" stroke="#213a26" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 58 L46 80 L90 30" fill="none" stroke="#4caf50" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="chip" id="warnChip" style="left: 455px; top: 600px"><svg width="120" height="110" viewBox="0 0 120 110"><path d="M60 10 L112 100 H8 Z" fill="#f7c843" stroke="#213a26" stroke-width="8" stroke-linejoin="round"/><path d="M60 40 V70" stroke="#213a26" stroke-width="12" stroke-linecap="round"/><circle cx="60" cy="86" r="7" fill="#213a26"/></svg></div>
       <svg class="ico" id="sun" style="left: 60px; top: 170px" width="200" height="200" viewBox="0 0 200 200"><g stroke="#213a26" stroke-width="9" stroke-linecap="round"><path d="M100 14 V40" transform="rotate(0 100 100)"/><path d="M100 14 V40" transform="rotate(45 100 100)"/><path d="M100 14 V40" transform="rotate(90 100 100)"/><path d="M100 14 V40" transform="rotate(135 100 100)"/><path d="M100 14 V40" transform="rotate(180 100 100)"/><path d="M100 14 V40" transform="rotate(225 100 100)"/><path d="M100 14 V40" transform="rotate(270 100 100)"/><path d="M100 14 V40" transform="rotate(315 100 100)"/></g><circle cx="100" cy="100" r="46" fill="#f7c843" stroke="#213a26" stroke-width="8"/></svg>
+      <div class="mag" id="mag" style="left: 610px; top: 935px"><img src="assets/img/clay_zoom.jpg" alt="argile" /><div id="magwater"></div><svg id="magbub" width="364" height="364" viewBox="0 0 364 364" style="position: absolute; left: 0; top: 0"><circle class="bub" cx="90" cy="300" r="14" fill="#ffffff" fill-opacity="0.9" stroke="#213a26" stroke-width="2"/><circle class="bub" cx="170" cy="250" r="10" fill="#ffffff" fill-opacity="0.9" stroke="#213a26" stroke-width="2"/><circle class="bub" cx="250" cy="320" r="16" fill="#ffffff" fill-opacity="0.9" stroke="#213a26" stroke-width="2"/><circle class="bub" cx="300" cy="230" r="9" fill="#ffffff" fill-opacity="0.9" stroke="#213a26" stroke-width="2"/><circle class="bub" cx="130" cy="200" r="8" fill="#ffffff" fill-opacity="0.9" stroke="#213a26" stroke-width="2"/><circle class="bub" cx="220" cy="170" r="12" fill="#ffffff" fill-opacity="0.9" stroke="#213a26" stroke-width="2"/><circle class="bub" cx="60" cy="220" r="7" fill="#ffffff" fill-opacity="0.9" stroke="#213a26" stroke-width="2"/></svg></div><svg class="ico" id="magline" style="left: 470px; top: 1040px" width="160" height="80" viewBox="0 0 160 80"><path d="M6 60 L150 20" stroke="#213a26" stroke-width="6" stroke-linecap="round"/></svg>
+      <div class="lbl" id="lblWater" style="left: 500px; top: 1330px"><span>GORGÉE D'EAU</span></div>
+      <svg class="ico ring" id="rotRing" style="left: 315px; top: 795px" width="450" height="450" viewBox="0 0 450 450"><circle cx="225.0" cy="225.0" r="215" fill="none" stroke="#213a26" stroke-width="5" stroke-dasharray="16 12" stroke-linecap="round"/></svg>
+      <div class="lbl" id="lblG" style="left: 0px; top: 1232px"><span>AIL</span></div>
+      <div class="lbl" id="lblS" style="left: 480px; top: 1232px"><span>ÉCHALOTE</span></div>
+      <div class="qm" id="q0" style="left: 470px; top: 735px">?</div><div class="qm" id="q1" style="left: 530px; top: 690px">?</div><div class="qm" id="q2" style="left: 600px; top: 745px">?</div>
+      <div class="ico" id="thermo" style="left: 955px; top: 545px"><img src="assets/img/thermometer_photo.png" alt="thermomètre" /></div>
+      <svg class="ico ring" id="voleRing" style="left: 695px; top: 860px" width="380" height="380" viewBox="0 0 380 380"><circle cx="190.0" cy="190.0" r="180" fill="none" stroke="#213a26" stroke-width="5" stroke-dasharray="16 12" stroke-linecap="round"/></svg>
+      <div class="lbl" id="lblVole" style="left: 585px; top: 1232px"><span>CAMPAGNOL</span></div>
+      <div class="lbl" id="lblSprout" style="left: 240px; top: 1232px"><span>PLANTÉ AU PRINTEMPS</span></div>
+      <div class="lbl" id="lblHarvest" style="left: 240px; top: 1232px"><span>RÉCOLTE EN ÉTÉ</span></div>
+      </div>
 
       <div class="pills" id="pills1"><div class="row"><span>SEPT</span><span class="on">OCT</span><span class="on">NOV</span><span>DÉC</span></div></div>
       <div class="pills" id="pills2"><div class="row"><span>JANV</span><span class="on">FÉV</span><span class="on">MARS</span><span>AVR</span></div></div>
@@ -166,6 +192,7 @@
 
       %CAPTIONS%
 
+      <audio id="music" src="assets/audio/music.wav" data-start="0" data-duration="%DURATION%" data-track-index="7" data-volume="0.13"></audio>
       <audio id="vo" src="assets/audio/voiceover.wav" data-start="0" data-duration="%DURATION%" data-track-index="2" data-volume="1"></audio>
 %SFX%
     </div>
@@ -204,6 +231,22 @@
         });
       };
 
+      // camera: zoom-through "pulse" on scene changes, slow punch-ins on key beats (like the references)
+      tl.set("#cam", { scale: 1, filter: "blur(0px)", transformOrigin: "540px 1000px" }, 0);
+      const pulse = (t) => {
+        tl.set("#cam", { transformOrigin: "540px 1000px" }, t - 0.17);
+        tl.to("#cam", { scale: 1.08, filter: "blur(6px)", duration: 0.17, ease: "power2.in" }, t - 0.17);
+        tl.to("#cam", { scale: 1, filter: "blur(0px)", duration: 0.34, ease: "power2.out" }, t);
+      };
+      const punch = (a, b, ox, oy, sc) => {
+        const d = Math.min(0.65, b - 0.52 - a);
+        tl.set("#cam", { transformOrigin: ox + "px " + oy + "px" }, a);
+        tl.to("#cam", { scale: sc, duration: d, ease: "power3.inOut" }, a);
+        tl.to("#cam", { scale: 1, duration: 0.3, ease: "power2.inOut" }, b - 0.5);
+      };
+      [C.b1, C.b2, C.b3, C.sol, C.ail, C.ech, C.out].forEach(pulse);
+      tl.set("#magwater", { scaleY: 0, transformOrigin: "50% 100%" }, 0);
+
       tl.set(".obj .bob", { rotation: 0 }, 0);
       tl.fromTo(".obj .bob", { rotation: -1.6 }, { rotation: 1.6, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: Math.floor(D / 1.4), immediateRender: false }, 0);
       tl.set("#water", { scaleY: 0, transformOrigin: "50% 100%" }, 0);
@@ -212,6 +255,11 @@
       enter("#garlic", C.garlic_in, 300, 1015, 1.0);
       enter("#shallot", C.shallot_in, 780, 1015, 1.0);
       title("#tHook", C.garlic_in + 0.1, C.title_autumn);
+      show("#lblG", C.garlic_in + 0.35);
+      show("#lblS", C.shallot_in + 0.35);
+      hide("#lblG", C.b1 - 0.15);
+      hide("#lblS", C.b1 - 0.15);
+      ["#q0", "#q1", "#q2"].forEach((q, k) => { show(q, C.garlic_in + 0.55 + k * 0.12, { from: -20, rot: (k - 1) * 12 }); hide(q, C.pills1 - 0.05); });
       show("#pills1", C.pills1);
       title("#tAutumn", C.title_autumn, C.check);
       hide("#pills1", C.check - 0.12);
@@ -237,6 +285,18 @@
           tl.set(d, { opacity: 0 }, t0 + 0.32);
         });
       });
+      move("#garlic", C.water - 0.15, 360, 1000, 0.9, 0.5);
+      show("#mag", C.water + 0.05);
+      show("#magline", C.water + 0.25);
+      tl.to("#magwater", { scaleY: 1, duration: 1.3, ease: "power2.out" }, C.water + 0.35);
+      tl.fromTo(".bub", { y: 0, opacity: 1 }, { y: -220, opacity: 0, duration: 1.1, stagger: 0.11, ease: "power1.in", immediateRender: false }, C.water + 0.5);
+      show("#lblWater", C.humid - 0.1);
+      ["#mag", "#magline", "#lblWater"].forEach((m) => hide(m, C.rot1 - 0.2));
+      move("#garlic", C.rot1 - 0.1, 540, 1000, 0.9, 0.45);
+      show("#rotRing", C.rot1 + 0.35);
+      tl.to("#rotRing", { rotation: 25, duration: 1.2, ease: "none" }, C.rot1 + 0.8);
+      hide("#rotRing", C.b2 - 0.55);
+      punch(C.rot1 + 0.1, C.b2, 540, 1020, 1.25);
       tl.set("#water", { opacity: 1 }, C.water);
       tl.fromTo("#water", { scaleY: 0 }, { scaleY: 1, duration: 1.4, ease: "power2.out", immediateRender: false }, C.water);
       show("#sweat", C.humid);
@@ -263,6 +323,7 @@
       title("#tDeep", C.title_deep, C.fix_depth);
       tl.to("#shallot img", { filter: "sepia(0.85) saturate(1.4) hue-rotate(20deg) brightness(0.5)", duration: 0.6 }, C.choke);
       show("#crossChip", C.rot2);
+      punch(C.choke - 0.1, C.fix_depth + 0.2, 540, 1235, 1.18);
       tl.to("#smold", { opacity: 1, duration: 0.6 }, C.rot2 + 0.1);
       hide("#crossChip", C.fix_depth - 0.1);
       tl.to("#smold", { opacity: 0, duration: 0.5 }, C.fix_depth + 0.1);
@@ -288,6 +349,11 @@
       tl.set("#gmold", { opacity: 0 }, C.b3);
       enter("#garlic", C.b3 + 0.35, 230, 1015, 1.0);
       title("#tPests", C.title_pests, C.sol);
+      show("#lblVole", C.mouse + 0.35);
+      show("#voleRing", C.mouse + 0.5);
+      tl.to("#voleRing", { rotation: 30, duration: 2.0, ease: "none" }, C.mouse + 0.95);
+      show("#thermo", C.winter - 0.1);
+      punch(C.nibble - 0.15, C.sol, 720, 1050, 1.2);
       tl.fromTo("#vole", { x: 420, opacity: 1 }, { x: 0, duration: 0.55, ease: "power2.out", immediateRender: false }, C.mouse);
       tl.to("#vole", { keyframes: [{ x: -26, duration: 0.12 }, { x: 0, duration: 0.12 }, { x: -26, duration: 0.12 }, { x: 0, duration: 0.12 }] }, C.nibble);
       tl.to("#shallot", { keyframes: [{ rotation: 5, duration: 0.1 }, { rotation: -5, duration: 0.1 }, { rotation: 4, duration: 0.1 }, { rotation: 0, duration: 0.1 }] }, C.nibble + 0.05);
@@ -295,7 +361,7 @@
         tl.set(s, { opacity: 1 }, C.winter + j * 0.15);
         tl.fromTo(s, { y: -40, rotation: 0 }, { y: 120, rotation: 90, duration: 1.6, ease: "none", immediateRender: false }, C.winter + j * 0.15);
       });
-      ["#vole", "#sn1", "#sn2", "#sn3"].forEach((s) => hide(s, C.sol));
+      ["#vole", "#sn1", "#sn2", "#sn3", "#lblVole", "#voleRing", "#thermo"].forEach((s) => hide(s, C.sol - 0.1));
 
       // ---------- s8 : plant in early spring
       move("#garlic", C.sol + 0.1, 190, 1037, 0.85);
@@ -309,6 +375,8 @@
       title("#tVar", C.adapted, C.ail);
       enter("#sprout", C.spring + 0.1, 540, 1026, 0.9);
       hide("#sprout", C.ail);
+      show("#lblSprout", C.spring + 0.5);
+      hide("#lblSprout", C.ail - 0.1);
       hide("#sun", C.ail);
 
       // ---------- s9 : garlic varieties
@@ -339,6 +407,7 @@
       show("#sun", C.out_humid + 0.2);
       tl.fromTo("#sun", { rotation: 0 }, { rotation: 30, duration: 4, ease: "none", immediateRender: false }, C.out_humid + 0.65);
       title("#tEnd", C.out_title, null);
+      show("#lblHarvest", C.out_title + 0.5);
 
       // ---------- captions
       %CAPTION_JS%
