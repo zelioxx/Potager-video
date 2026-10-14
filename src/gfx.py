@@ -228,12 +228,17 @@ def shadow_blob():
     return s
 
 
+# l'échalote fournie est fine et haute : on l'agrandit pour garder une masse visuelle proche de l'ail
+ASSET_SCALE = {"shallot_red": 1.3}
+
+
 def spr(c, name, x, base_y, h, s=1.0, rot=0.0, alpha=1.0, rotten=0.0, shadow=True,
         flip=False, sx=1.0, sy=1.0, anchor="bottom", bite=0.0):
     """Pose une photo détourée. (x, base_y) = centre-bas (ou centre si anchor='center')."""
     if s <= 0.01 or alpha <= 0.01:
         return None
     a = asset(name)
+    h = h * ASSET_SCALE.get(name, 1.0)
     th = h * s * sy
     tw = a.width * h / a.height * s * sx
     if th < 2 or tw < 2:
