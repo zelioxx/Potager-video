@@ -1,0 +1,244 @@
+[
+ {
+  "id": "s1",
+  "text": "L'ail et l'échalote, on peut les planter à l'automne.",
+  "duration": 2.845,
+  "clauses": [
+   {
+    "text": "L'ail et l'échalote,",
+    "start": 0.0,
+    "end": 1.131
+   },
+   {
+    "text": "on peut les planter à l'automne.",
+    "start": 1.331,
+    "end": 2.845
+   }
+  ]
+ },
+ {
+  "id": "s2",
+  "text": "Et ça peut marcher ! Mais attention à trois pièges.",
+  "duration": 3.029,
+  "clauses": [
+   {
+    "text": "Et ça peut marcher !",
+    "start": 0.0,
+    "end": 1.109
+   },
+   {
+    "text": "Mais attention à trois pièges.",
+    "start": 1.429,
+    "end": 3.029
+   }
+  ]
+ },
+ {
+  "id": "s3",
+  "text": "Premier piège : une terre trop argileuse.",
+  "duration": 2.76,
+  "clauses": [
+   {
+    "text": "Premier piège :",
+    "start": 0.0,
+    "end": 1.088
+   },
+   {
+    "text": "une terre trop argileuse.",
+    "start": 1.288,
+    "end": 2.76
+   }
+  ]
+ },
+ {
+  "id": "s4",
+  "text": "L'argile garde l'eau tout l'hiver, le bulbe baigne dans l'humidité… et il pourrit.",
+  "duration": 4.595,
+  "clauses": [
+   {
+    "text": "L'argile garde l'eau tout l'hiver,",
+    "start": 0.0,
+    "end": 1.728
+   },
+   {
+    "text": "le bulbe baigne dans l'humidité…",
+    "start": 1.928,
+    "end": 3.443
+   },
+   {
+    "text": "et il pourrit.",
+    "start": 3.763,
+    "end": 4.595
+   }
+  ]
+ },
+ {
+  "id": "s5",
+  "text": "Deuxième piège : un bulbe trop enfoncé.",
+  "duration": 2.717,
+  "clauses": [
+   {
+    "text": "Deuxième piège :",
+    "start": 0.0,
+    "end": 1.152
+   },
+   {
+    "text": "un bulbe trop enfoncé.",
+    "start": 1.352,
+    "end": 2.717
+   }
+  ]
+ },
+ {
+  "id": "s6",
+  "text": "Trop profond, il étouffe, et pourrit lui aussi. Pointe en haut, à peine recouverte !",
+  "duration": 5.848,
+  "clauses": [
+   {
+    "text": "Trop profond,",
+    "start": 0.0,
+    "end": 0.875
+   },
+   {
+    "text": "il étouffe,",
+    "start": 1.075,
+    "end": 1.928
+   },
+   {
+    "text": "et pourrit lui aussi.",
+    "start": 2.128,
+    "end": 3.237
+   },
+   {
+    "text": "Pointe en haut,",
+    "start": 3.557,
+    "end": 4.368
+   },
+   {
+    "text": "à peine recouverte !",
+    "start": 4.568,
+    "end": 5.848
+   }
+  ]
+ },
+ {
+  "id": "s7",
+  "text": "Troisième piège : les nuisibles. Les campagnols, par exemple, adorent les grignoter pendant l'hiver.",
+  "duration": 6.893,
+  "clauses": [
+   {
+    "text": "Troisième piège :",
+    "start": 0.0,
+    "end": 1.131
+   },
+   {
+    "text": "les nuisibles.",
+    "start": 1.331,
+    "end": 2.312
+   },
+   {
+    "text": "Les campagnols,",
+    "start": 2.632,
+    "end": 3.656
+   },
+   {
+    "text": "par exemple,",
+    "start": 3.856,
+    "end": 4.837
+   },
+   {
+    "text": "adorent les grignoter pendant l'hiver.",
+    "start": 5.037,
+    "end": 6.893
+   }
+  ]
+ },
+ {
+  "id": "s8",
+  "text": "La solution ? Plantez-les au début du printemps, avec des variétés adaptées.",
+  "duration": 4.68,
+  "clauses": [
+   {
+    "text": "La solution ?",
+    "start": 0.0,
+    "end": 0.981
+   },
+   {
+    "text": "Plantez-les au début du printemps,",
+    "start": 1.301,
+    "end": 2.923
+   },
+   {
+    "text": "avec des variétés adaptées.",
+    "start": 3.123,
+    "end": 4.68
+   }
+  ]
+ },
+ {
+  "id": "s9",
+  "text": "Côté ail : Printanor, ou Rose de Lautrec.",
+  "duration": 3.472,
+  "clauses": [
+   {
+    "text": "Côté ail :",
+    "start": 0.0,
+    "end": 1.003
+   },
+   {
+    "text": "Printanor,",
+    "start": 1.203,
+    "end": 2.077
+   },
+   {
+    "text": "ou Rose de Lautrec.",
+    "start": 2.277,
+    "end": 3.472
+   }
+  ]
+ },
+ {
+  "id": "s10",
+  "text": "Côté échalote : Jermor, ou Longor.",
+  "duration": 3.131,
+  "clauses": [
+   {
+    "text": "Côté échalote :",
+    "start": 0.0,
+    "end": 1.067
+   },
+   {
+    "text": "Jermor,",
+    "start": 1.267,
+    "end": 2.056
+   },
+   {
+    "text": "ou Longor.",
+    "start": 2.256,
+    "end": 3.131
+   }
+  ]
+ },
+ {
+  "id": "s11",
+  "text": "Moins d'humidité, moins de temps sous terre… et de beaux bulbes cet été !",
+  "duration": 4.168,
+  "clauses": [
+   {
+    "text": "Moins d'humidité,",
+    "start": 0.0,
+    "end": 1.024
+   },
+   {
+    "text": "moins de temps sous terre…",
+    "start": 1.224,
+    "end": 2.461
+   },
+   {
+    "text": "et de beaux bulbes cet été !",
+    "start": 2.781,
+    "end": 4.168
+   }
+  ]
+ }
+]

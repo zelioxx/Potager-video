@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="fr" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Ail et échalote à l'automne</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Lilita One";
+        src: url("assets/fonts/lilita-one-latin-400-normal.woff2") format("woff2");
+        font-weight: 400;
+      }
+      @font-face {
+        font-family: "Fredoka";
+        src: url("assets/fonts/fredoka-latin-600-normal.woff2") format("woff2");
+        font-weight: 600;
+      }
+      @font-face {
+        font-family: "Fredoka";
+        src: url("assets/fonts/fredoka-latin-700-normal.woff2") format("woff2");
+        font-weight: 700;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #e6d9bf; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Fredoka", sans-serif; }
+
+      #bg { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+
+      /* ---- ground cross-sections (floor turns into soil) ---- */
+      .ground { position: absolute; left: 0; top: 760px; width: 1080px; height: 1160px; opacity: 0; overflow: hidden; }
+      .ground::before { content: ""; position: absolute; left: 0; top: 0; width: 1080px; height: 10px; background: #2c2016; }
+      .ground .specks { position: absolute; left: 0; top: 0; }
+      #soil { background: linear-gradient(#4f3324, #3e281b 60%, #33200f); }
+      #clay { background: linear-gradient(#a8643f, #93542f 55%, #7d4425); }
+      #water { position: absolute; left: 0; top: 70px; width: 1080px; height: 1090px; opacity: 0;
+        background: linear-gradient(rgba(96, 170, 230, 0.62), rgba(60, 120, 200, 0.55)); }
+      #water::before { content: ""; position: absolute; left: 0; top: -6px; width: 1080px; height: 12px;
+        background: rgba(200, 235, 255, 0.85); border-radius: 6px; }
+      .pocket { position: absolute; left: 380px; top: 1080px; width: 320px; height: 340px; opacity: 0;
+        border-radius: 46% 46% 40% 40%; background: radial-gradient(rgba(20, 12, 6, 0.75), rgba(20, 12, 6, 0) 70%); }
+
+      /* ---- hero objects ---- */
+      .obj { position: absolute; left: 330px; top: 790px; width: 420px; height: 420px; opacity: 0; }
+      .obj .shadow { position: absolute; left: 70px; top: 372px; width: 280px; height: 44px; border-radius: 50%;
+        background: radial-gradient(rgba(60, 40, 20, 0.45), rgba(60, 40, 20, 0) 70%); }
+      .obj .bob { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; }
+      .obj img { width: 400px; height: 400px; display: block; }
+      #garlic img { filter: sepia(0) saturate(1) hue-rotate(0deg) brightness(1); }
+      #shallot img { transform: scale(0.84, 1.06); transform-origin: 50% 100%;
+        filter: sepia(0.15) saturate(1.05) hue-rotate(-14deg) brightness(0.97); }
+
+      .ico { position: absolute; opacity: 0; display: block; }
+      .chip { position: absolute; width: 170px; height: 170px; border-radius: 50%; opacity: 0;
+        background: #f6eedc; border: 7px solid #213a26; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 8px 0 rgba(33, 58, 38, 0.9); }
+      .chip img { width: 112px; height: 112px; }
+
+      /* ---- type ---- */
+      .title { position: absolute; left: 0; top: 410px; width: 1080px; text-align: center; opacity: 0; }
+      .title span { font-family: "Lilita One", sans-serif; font-size: 122px; line-height: 1.05; color: #f7c843;
+        -webkit-text-stroke: 16px #213a26; paint-order: stroke fill; text-shadow: 0 10px 0 #213a26; letter-spacing: 1px; }
+      .title.sm span { font-size: 96px; -webkit-text-stroke: 14px #213a26; }
+      .tag { position: absolute; left: 0; width: 1080px; display: flex; justify-content: center; opacity: 0; }
+      .tag span { font-family: "Lilita One", sans-serif; font-size: 66px; color: #213a26; background: #f6eedc;
+        border: 7px solid #213a26; border-radius: 22px; padding: 8px 34px 4px; box-shadow: 0 8px 0 #213a26; }
+      .tag.y span { background: #f7c843; }
+      .measure { position: absolute; opacity: 0; font-family: "Lilita One", sans-serif; font-size: 70px; color: #f7c843;
+        -webkit-text-stroke: 12px #213a26; paint-order: stroke fill; text-shadow: 0 7px 0 #213a26; white-space: nowrap; }
+
+      .pills { position: absolute; left: 0; top: 600px; width: 1080px; display: flex; justify-content: center; opacity: 0; }
+      .pills .row { display: flex; background: #213a26; border-radius: 18px; padding: 7px; gap: 7px; box-shadow: 0 7px 0 rgba(33, 58, 38, 0.55); }
+      .pills span { font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 44px; color: #213a26;
+        background: #f6eedc; border-radius: 12px; padding: 4px 18px 2px; }
+      .pills span.on { background: #f7c843; }
+
+      .badge { position: absolute; left: 420px; top: 400px; width: 240px; height: 240px; opacity: 0; }
+      .badge svg { position: absolute; inset: 0; }
+      .badge .face { position: absolute; left: 22px; top: 22px; width: 196px; height: 196px; border-radius: 50%;
+        background: #f6eedc; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        box-shadow: inset 0 0 0 5px rgba(33, 58, 38, 0.18); }
+      .badge .bt, .badge .bn { display: block; font-family: "Lilita One", sans-serif; color: #f7c843;
+        -webkit-text-stroke: 9px #213a26; paint-order: stroke fill; line-height: 1; }
+      .badge .bt { font-size: 50px; }
+      .badge .bn { font-size: 86px; }
+
+      .cap { position: absolute; left: 60px; top: 1440px; width: 960px; text-align: center; opacity: 0; }
+      .cap .w { display: inline-block; margin: 0 9px; font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 70px; color: #ffffff;
+        -webkit-text-stroke: 11px #2a2b20; paint-order: stroke fill; text-shadow: 0 6px 0 #2a2b20; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="%DURATION%" data-width="1080" data-height="1920">
+      <img id="bg" src="assets/img/bg.png" alt="" />
+
+      <div class="ground" id="clay" data-layout-allow-overflow>%CLAY_SPECKS%<div id="water"></div></div>
+      <div class="ground" id="soil" data-layout-allow-overflow>%SOIL_SPECKS%</div>
+      <div class="pocket" id="pocket"></div>
+
+      <img class="ico" id="seedling" src="assets/img/seedling.png" style="left: 470px; top: 1060px; width: 140px; height: 140px" alt="" />
+
+      <div class="obj" id="garlic"><div class="shadow"></div><div class="bob"><img src="assets/img/garlic.png" alt="ail" /></div></div>
+      <div class="obj" id="shallot"><div class="shadow"></div><div class="bob"><img src="assets/img/onion.png" alt="échalote" /></div></div>
+
+      <!-- clay scene -->
+      <img class="ico" id="cloud" src="assets/img/cloud_with_rain.png" style="left: 720px; top: 560px; width: 210px; height: 210px" alt="" />
+      <img class="ico drop" id="d1" src="assets/img/droplet.png" style="left: 760px; top: 700px; width: 46px; height: 46px" alt="" />
+      <img class="ico drop" id="d2" src="assets/img/droplet.png" style="left: 830px; top: 700px; width: 46px; height: 46px" alt="" />
+      <img class="ico drop" id="d3" src="assets/img/droplet.png" style="left: 890px; top: 700px; width: 46px; height: 46px" alt="" />
+      <img class="ico" id="sweat" src="assets/img/sweat_droplets.png" style="left: 690px; top: 830px; width: 130px; height: 130px" alt="" />
+      <img class="ico" id="mic1" src="assets/img/microbe.png" style="left: 300px; top: 860px; width: 120px; height: 120px" alt="" />
+      <img class="ico" id="mic2" src="assets/img/microbe.png" style="left: 680px; top: 1030px; width: 105px; height: 105px" alt="" />
+
+      <!-- depth scene -->
+      <svg class="ico" id="arrowLong" style="left: 730px; top: 772px" width="60" height="330" viewBox="0 0 60 330">
+        <path d="M30 14 V316 M10 36 L30 12 L50 36 M10 294 L30 318 L50 294" fill="none" stroke="#213a26" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M30 14 V316 M10 36 L30 12 L50 36 M10 294 L30 318 L50 294" fill="none" stroke="#f7c843" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <div class="measure" id="m15" style="left: 800px; top: 890px">15 CM</div>
+      <div class="chip" id="crossChip" style="left: 820px; top: 990px"><img src="assets/img/cross_mark.png" alt="" /></div>
+      <div class="measure" id="m23" style="left: 735px; top: 640px">2–3 CM</div>
+      <div class="chip" id="okChip" style="left: 820px; top: 960px"><img src="assets/img/check_mark_button.png" alt="" /></div>
+      <img class="ico" id="mic3" src="assets/img/microbe.png" style="left: 330px; top: 1120px; width: 110px; height: 110px" alt="" />
+
+      <!-- pests -->
+      <img class="ico" id="mouse" src="assets/img/mouse.png" style="left: 790px; top: 975px; width: 250px; height: 250px" alt="" />
+      <img class="ico" id="fly" src="assets/img/fly.png" style="left: 180px; top: 740px; width: 110px; height: 110px" alt="" />
+      <img class="ico snow" id="sn1" src="assets/img/snowflake.png" style="left: 120px; top: 600px; width: 80px; height: 80px" alt="" />
+      <img class="ico snow" id="sn2" src="assets/img/snowflake.png" style="left: 470px; top: 570px; width: 64px; height: 64px" alt="" />
+      <img class="ico snow" id="sn3" src="assets/img/snowflake.png" style="left: 860px; top: 610px; width: 74px; height: 74px" alt="" />
+
+      <!-- intro / solution -->
+      <div class="chip" id="checkChip" style="left: 455px; top: 600px"><img src="assets/img/check_mark_button.png" alt="" /></div>
+      <div class="chip" id="warnChip" style="left: 455px; top: 600px"><img src="assets/img/warning.png" alt="" /></div>
+      <img class="ico" id="sun" src="assets/img/sun.png" style="left: 60px; top: 170px; width: 200px; height: 200px" alt="" />
+
+      <div class="pills" id="pills1"><div class="row"><span>SEPT</span><span class="on">OCT</span><span class="on">NOV</span><span>DÉC</span></div></div>
+      <div class="pills" id="pills2"><div class="row"><span>JANV</span><span class="on">FÉV</span><span class="on">MARS</span><span>AVR</span></div></div>
+
+      <div class="title sm" id="tHook"><span>AIL &amp; ÉCHALOTE</span></div>
+      <div class="title" id="tAutumn"><span>À L'AUTOMNE</span></div>
+      <div class="title" id="t3"><span>3 PIÈGES</span></div>
+      <div class="title sm" id="tClay"><span>TERRE ARGILEUSE</span></div>
+      <div class="title" id="tRot"><span>ÇA POURRIT !</span></div>
+      <div class="title" id="tDeep"><span>TROP PROFOND</span></div>
+      <div class="title sm" id="tTip"><span>À PEINE RECOUVERT</span></div>
+      <div class="title" id="tPests"><span>NUISIBLES</span></div>
+      <div class="title sm" id="tSol"><span>LA SOLUTION ?</span></div>
+      <div class="title" id="tSpring"><span>LE PRINTEMPS</span></div>
+      <div class="title sm" id="tVar"><span>VARIÉTÉS ADAPTÉES</span></div>
+      <div class="title" id="tAil"><span>AIL</span></div>
+      <div class="title" id="tEch"><span>ÉCHALOTE</span></div>
+      <div class="title" id="tEnd"><span>CET ÉTÉ !</span></div>
+
+      <div class="tag y" id="tagA1" style="top: 555px"><span>PRINTANOR</span></div>
+      <div class="tag" id="tagA2" style="top: 665px"><span>ROSE DE LAUTREC</span></div>
+      <div class="tag y" id="tagE1" style="top: 555px"><span>JERMOR</span></div>
+      <div class="tag" id="tagE2" style="top: 665px"><span>LONGOR</span></div>
+
+      <div class="badge" id="b1"><svg viewBox="0 0 240 240" width="240" height="240"><circle cx="120" cy="120" r="108" fill="#213a26" /><circle class="ring" cx="120" cy="120" r="102" fill="none" stroke="#f7c843" stroke-width="12" stroke-dasharray="641" stroke-dashoffset="641" transform="rotate(-90 120 120)" /></svg><div class="face"><span class="bt">PIÈGE</span><span class="bn">1</span></div></div>
+      <div class="badge" id="b2"><svg viewBox="0 0 240 240" width="240" height="240"><circle cx="120" cy="120" r="108" fill="#213a26" /><circle class="ring" cx="120" cy="120" r="102" fill="none" stroke="#f7c843" stroke-width="12" stroke-dasharray="641" stroke-dashoffset="641" transform="rotate(-90 120 120)" /></svg><div class="face"><span class="bt">PIÈGE</span><span class="bn">2</span></div></div>
+      <div class="badge" id="b3"><svg viewBox="0 0 240 240" width="240" height="240"><circle cx="120" cy="120" r="108" fill="#213a26" /><circle class="ring" cx="120" cy="120" r="102" fill="none" stroke="#f7c843" stroke-width="12" stroke-dasharray="641" stroke-dashoffset="641" transform="rotate(-90 120 120)" /></svg><div class="face"><span class="bt">PIÈGE</span><span class="bn">3</span></div></div>
+
+      %CAPTIONS%
+
+      <audio id="vo" src="assets/audio/voiceover.wav" data-start="0" data-duration="%DURATION%" data-track-index="2" data-volume="1"></audio>
+%SFX%
+    </div>
+    <script>
+      %CUES%
+      const D = parseFloat(document.getElementById("root").dataset.duration);
+      const tl = gsap.timeline({ paused: true });
+      const Y = "#f7c843";
+
+      // Objects are laid out around (540, 1000); positions are given as frame-centre coordinates.
+      const at = (cx, cy) => ({ x: cx - 540, y: cy - 1000 });
+      const show = (sel, t, v = {}) => {
+        tl.fromTo(sel, { scale: 0.2, opacity: 0, rotation: v.from || 0 },
+          { scale: v.s || 1, opacity: 1, rotation: v.rot || 0, duration: 0.42, ease: "back.out(2.2)", immediateRender: false }, t);
+      };
+      const hide = (sel, t) => tl.to(sel, { scale: 0, opacity: 0, duration: 0.26, ease: "back.in(1.8)" }, t);
+      const title = (sel, a, b) => { show(sel, a, { from: -9, rot: -3 }); if (b) hide(sel, b - 0.3); };
+      const place = (sel, t, cx, cy, s) => tl.set(sel, { ...at(cx, cy), scale: s }, t);
+      const move = (sel, t, cx, cy, s, d = 0.55) => tl.to(sel, { ...at(cx, cy), scale: s, duration: d, ease: "power3.inOut" }, t);
+      const enter = (sel, t, cx, cy, s) => { place(sel, t, cx, cy, s); show(sel, t, { s }); };
+      const badge = (id, a, b) => {
+        tl.set(id, { x: 0, y: 0 }, a);
+        show(id, a, { s: 1 });
+        tl.to(id + " .ring", { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, a + 0.1);
+        tl.to(id, { x: 415, y: -355, scale: 0.5, duration: 0.55, ease: "power3.inOut" }, a + 0.95);
+        hide(id, b);
+      };
+      const cap = (sel, a, b, ws) => {
+        tl.set(sel, { opacity: 1 }, a);
+        tl.fromTo(sel, { scale: 0.9 }, { scale: 1, duration: 0.14, ease: "back.out(2)", immediateRender: false }, a);
+        tl.set(sel, { opacity: 0 }, b);
+        const spans = document.querySelectorAll(sel + " .w");
+        spans.forEach((w, i) => {
+          tl.set(w, { color: Y }, ws[i]);
+          tl.set(w, { color: "#ffffff" }, i + 1 < ws.length ? ws[i + 1] : b);
+        });
+      };
+
+      tl.set(".obj .bob", { rotation: 0 }, 0);
+      tl.fromTo(".obj .bob", { rotation: -1.6 }, { rotation: 1.6, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: Math.floor(D / 1.4), immediateRender: false }, 0);
+      tl.set("#water", { scaleY: 0, transformOrigin: "50% 100%" }, 0);
+
+      // ---------- s1–s2 : autumn planting can work
+      enter("#garlic", C.garlic_in, 300, 1015, 1.0);
+      enter("#shallot", C.shallot_in, 780, 1015, 1.0);
+      title("#tHook", C.garlic_in + 0.1, C.title_autumn);
+      show("#pills1", C.pills1);
+      title("#tAutumn", C.title_autumn, C.check);
+      hide("#pills1", C.check - 0.12);
+      show("#checkChip", C.check);
+      hide("#checkChip", C.title3 - 0.1);
+      title("#t3", C.title3, C.b1);
+      show("#warnChip", C.warn);
+      hide("#warnChip", C.b1 - 0.12);
+
+      // ---------- s3–s4 : clay soil keeps water -> rot
+      badge("#b1", C.b1, C.b2);
+      hide("#shallot", C.b1 + 0.2);
+      move("#garlic", C.b1 + 0.3, 540, 975, 1.2);
+      tl.fromTo("#clay", { y: 402, opacity: 0 }, { y: 0, opacity: 1, duration: 0.65, ease: "power3.inOut", immediateRender: false }, C.clay_up);
+      move("#garlic", C.clay_up + 0.15, 540, 1000, 0.9, 0.65);
+      tl.to("#garlic .shadow", { opacity: 0, duration: 0.3 }, C.clay_up + 0.2);
+      title("#tClay", C.title_clay, C.rain);
+      show("#cloud", C.rain);
+      [0, 0.45, 0.9, 1.35].forEach((o, k) => {
+        ["#d1", "#d2", "#d3"].forEach((d, j) => {
+          const t0 = C.rain + 0.3 + o + j * 0.14;
+          tl.fromTo(d, { y: 0, opacity: 1 }, { y: 90, duration: 0.32, ease: "power1.in", immediateRender: false }, t0);
+          tl.set(d, { opacity: 0 }, t0 + 0.32);
+        });
+      });
+      tl.set("#water", { opacity: 1 }, C.water);
+      tl.fromTo("#water", { scaleY: 0 }, { scaleY: 1, duration: 1.4, ease: "power2.out", immediateRender: false }, C.water);
+      show("#sweat", C.humid);
+      hide("#cloud", C.rot1 - 0.2);
+      hide("#sweat", C.rot1);
+      tl.to("#garlic img", { filter: "sepia(0.85) saturate(1.5) hue-rotate(28deg) brightness(0.55)", duration: 0.6 }, C.rot1);
+      title("#tRot", C.rot1, C.b2);
+      show("#mic1", C.rot1 + 0.1);
+      show("#mic2", C.rot1 + 0.25);
+      hide("#mic1", C.b2 - 0.1);
+      hide("#mic2", C.b2 - 0.1);
+
+      // ---------- s5–s6 : bulb planted too deep
+      badge("#b2", C.b2, C.b3);
+      hide("#garlic", C.b2);
+      tl.to("#water", { opacity: 0, duration: 0.3 }, C.b2);
+      tl.fromTo("#soil", { opacity: 0 }, { opacity: 1, duration: 0.35, immediateRender: false }, C.b2 + 0.05);
+      tl.set("#clay", { opacity: 0 }, C.b2 + 0.4);
+      tl.set("#shallot .shadow", { opacity: 0 }, C.b2);
+      tl.set("#pocket", { y: 0 }, C.b2);
+      tl.to("#pocket", { opacity: 1, duration: 0.3 }, C.deep);
+      enter("#shallot", C.deep, 540, 1235, 0.8);
+      show("#arrowLong", C.deep + 0.2);
+      show("#m15", C.deep + 0.35);
+      title("#tDeep", C.title_deep, C.fix_depth);
+      tl.to("#shallot img", { filter: "sepia(0.85) saturate(1.4) hue-rotate(20deg) brightness(0.5)", duration: 0.6 }, C.choke);
+      show("#crossChip", C.rot2);
+      show("#mic3", C.rot2 + 0.1);
+      hide("#crossChip", C.fix_depth - 0.1);
+      hide("#mic3", C.fix_depth - 0.1);
+      hide("#arrowLong", C.fix_depth - 0.1);
+      hide("#m15", C.fix_depth - 0.1);
+      move("#shallot", C.fix_depth, 540, 935, 0.8, 0.7);
+      tl.to("#pocket", { y: -320, duration: 0.7, ease: "power3.inOut" }, C.fix_depth);
+      tl.to("#shallot img", { filter: "sepia(0.15) saturate(1.05) hue-rotate(-14deg) brightness(0.97)", duration: 0.6 }, C.fix_depth + 0.1);
+      show("#m23", C.fix_depth + 0.5, { rot: -3 });
+      show("#okChip", C.fix_check);
+      title("#tTip", C.fix_check, C.b3);
+      hide("#m23", C.b3 - 0.12);
+      hide("#okChip", C.b3 - 0.12);
+
+      // ---------- s7 : pests
+      badge("#b3", C.b3, C.sol);
+      tl.to("#soil", { y: 1160, duration: 0.55, ease: "power3.in" }, C.b3);
+      tl.to("#pocket", { opacity: 0, duration: 0.2 }, C.b3);
+      move("#shallot", C.b3 + 0.1, 600, 1015, 1.0);
+      tl.to("#shallot .shadow", { opacity: 1, duration: 0.3 }, C.b3 + 0.4);
+      tl.set("#garlic img", { filter: "sepia(0) saturate(1) hue-rotate(0deg) brightness(1)" }, C.b3);
+      tl.set("#garlic .shadow", { opacity: 1 }, C.b3);
+      enter("#garlic", C.b3 + 0.35, 230, 1015, 1.0);
+      title("#tPests", C.title_pests, C.sol);
+      tl.fromTo("#mouse", { x: 420, opacity: 1 }, { x: 0, duration: 0.55, ease: "power2.out", immediateRender: false }, C.mouse);
+      tl.to("#mouse", { keyframes: [{ x: -24, duration: 0.12 }, { x: 0, duration: 0.12 }, { x: -24, duration: 0.12 }, { x: 0, duration: 0.12 }] }, C.nibble);
+      tl.to("#shallot", { keyframes: [{ rotation: 5, duration: 0.1 }, { rotation: -5, duration: 0.1 }, { rotation: 4, duration: 0.1 }, { rotation: 0, duration: 0.1 }] }, C.nibble + 0.05);
+      tl.set("#fly", { opacity: 1 }, C.fly);
+      tl.fromTo("#fly", { x: -260, y: -60, rotation: 20 }, {
+        immediateRender: false,
+        keyframes: [
+          { x: 0, y: 0, rotation: 0, duration: 0.6 },
+          { x: 90, y: 50, rotation: 15, duration: 0.5 },
+          { x: 20, y: 110, rotation: -10, duration: 0.5 },
+          { x: -60, y: 40, rotation: 8, duration: 0.5 },
+          { x: 40, y: -10, rotation: -6, duration: 0.5 },
+          { x: 110, y: 70, rotation: 12, duration: 0.5 },
+          { x: 0, y: 30, rotation: 0, duration: 0.6 },
+        ],
+      }, C.fly);
+      ["#sn1", "#sn2", "#sn3"].forEach((s, j) => {
+        tl.set(s, { opacity: 1 }, C.winter + j * 0.15);
+        tl.fromTo(s, { y: -40, rotation: 0 }, { y: 120, rotation: 90, duration: 1.6, ease: "none", immediateRender: false }, C.winter + j * 0.15);
+      });
+      ["#mouse", "#fly", "#sn1", "#sn2", "#sn3"].forEach((s) => hide(s, C.sol));
+
+      // ---------- s8 : plant in early spring
+      move("#garlic", C.sol + 0.1, 300, 1015, 1.0);
+      move("#shallot", C.sol + 0.1, 780, 1015, 1.0);
+      title("#tSol", C.title_sol, C.spring);
+      show("#pills2", C.pills2);
+      title("#tSpring", C.spring, C.adapted);
+      show("#sun", C.spring);
+      tl.fromTo("#sun", { rotation: 0 }, { rotation: 40, duration: 8, ease: "none", immediateRender: false }, C.spring + 0.45);
+      hide("#pills2", C.adapted - 0.1);
+      title("#tVar", C.adapted, C.ail);
+      show("#seedling", C.adapted + 0.15);
+      hide("#seedling", C.ail);
+      hide("#sun", C.ail);
+
+      // ---------- s9 : garlic varieties
+      tl.to("#shallot", { x: 760, opacity: 0, duration: 0.45, ease: "power3.in" }, C.ail);
+      move("#garlic", C.ail + 0.1, 540, 985, 1.15);
+      title("#tAil", C.ail + 0.15, C.ech);
+      show("#tagA1", C.tagA1, { from: -6, rot: -2 });
+      show("#tagA2", C.tagA2, { from: 6, rot: 2 });
+      hide("#tagA1", C.ech - 0.1);
+      hide("#tagA2", C.ech - 0.1);
+
+      // ---------- s10 : shallot varieties
+      tl.to("#garlic", { x: -760, opacity: 0, duration: 0.45, ease: "power3.in" }, C.ech);
+      tl.fromTo("#shallot", { ...at(1400, 985), scale: 1.15, opacity: 1 }, { ...at(540, 985), duration: 0.55, ease: "power3.out", immediateRender: false }, C.ech + 0.1);
+      title("#tEch", C.ech + 0.15, C.out);
+      show("#tagE1", C.tagE1, { from: -6, rot: -2 });
+      show("#tagE2", C.tagE2, { from: 6, rot: 2 });
+      hide("#tagE1", C.out - 0.1);
+      hide("#tagE2", C.out - 0.1);
+
+      // ---------- s11 : outro
+      move("#shallot", C.out, 780, 1015, 1.0);
+      tl.fromTo("#garlic", { ...at(-300, 1015), scale: 1.0, opacity: 1 }, { ...at(300, 1015), duration: 0.55, ease: "power3.out", immediateRender: false }, C.out + 0.05);
+      show("#seedling", C.out_humid);
+      show("#sun", C.out_humid + 0.2);
+      tl.fromTo("#sun", { rotation: 0 }, { rotation: 30, duration: 4, ease: "none", immediateRender: false }, C.out_humid + 0.65);
+      title("#tEnd", C.out_title, null);
+
+      // ---------- captions
+      %CAPTION_JS%
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
