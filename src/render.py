@@ -42,6 +42,14 @@ toi commentaire abonne-toi potager"""),
 bas astuce couvrir pourrit fenêtre lumineuse change deux jours propre attend centre pousse verte semaine grandi
 loin blanches longues replante-le pot potager terre nourrir grossir légume récoltes zéro gaspillage abonne-toi
 commentaire repousser"""),
+    "arrosage": dict(
+        scenes="scenes_arrosage", dur=76.8, voice=os.path.join(AUD, "arrosage", "voix.mp3"),
+        words=os.path.join(AUD, "arrosage", "voix_mots.json"), out="arrosage_plantes_1080x1920.mp4",
+        highlight="""plante d'intérieur jaunit ramollit l'arroses plus mauvaise idée tue t'explique racines d'eau d'air
+trop souvent gorgée étouffent l'excès d'humidité pourrir pourrie boit pieds l'eau meurt soif savoir feuilles
+jaunes molles terre humide odeur marécage temps stop arrête d'arroser sécher sèche 2 3 centimètres test doigt
+imparable tard rempote sors coupe noires saines fermes claires mélange respire tiers perlite fibres chips coco
+terreau drainant respirer pot percé stagne soucoupe abonne-toi astuces commentaire plantes sauvetage"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
