@@ -720,3 +720,88 @@ def particles(c, t, t0, x, y, n=14, seed=3, col=(96, 64, 40), spread=360, up=520
         py = y + vy * k + 1400 * k * k
         s = size * r.uniform(0.6, 1.3) * (1 - k / dur)
         d.ellipse([px - s, py - s, px + s, py + s], fill=col + (255,))
+
+
+# ------------------------------------------------------------- verre d'eau & fenêtre
+def _glass_poly(cx, base_y, w, h, inset=0.0):
+    bw = w * 0.8
+    return [(cx - w / 2 + inset, base_y - h), (cx + w / 2 - inset, base_y - h),
+            (cx + bw / 2 - inset, base_y), (cx - bw / 2 + inset, base_y)]
+
+
+def glass_back(c, cx, base_y, w=380, h=480, s=1.0):
+    if s <= 0.01:
+        return
+    w, h = w * s, h * s
+    ov = Image.new("RGBA", c.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    d.polygon(_glass_poly(cx, base_y, w, h), fill=(255, 255, 255, 40))
+    d.ellipse([cx - w / 2, base_y - h - w * 0.07, cx + w / 2, base_y - h + w * 0.07], outline=(255, 255, 255, 120), width=4)
+    c.alpha_composite(ov)
+
+
+def glass_front(c, cx, base_y, water, t, w=380, h=480, s=1.0, murky=0.0):
+    """water = niveau d'eau (0..1 de la hauteur intérieure)."""
+    if s <= 0.01:
+        return
+    w, h = w * s, h * s
+    ov = Image.new("RGBA", c.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    inner_h = h - 26 * s
+    if water > 0.01:
+        wy = base_y - 26 * s - inner_h * water
+        frac = (base_y - wy) / h
+        half_top = (w * 0.8 + (w - w * 0.8) * frac) / 2 - 8 * s
+        col = (int(lerp(110, 120, murky)), int(lerp(180, 130, murky)), int(lerp(225, 70, murky)), int(lerp(80, 150, murky)))
+        d.polygon([(cx - half_top, wy), (cx + half_top, wy), (cx + w * 0.4 - 8 * s, base_y - 22 * s),
+                   (cx - w * 0.4 + 8 * s, base_y - 22 * s)], fill=col)
+        wave = 3 * math.sin(t * 5)
+        d.ellipse([cx - half_top, wy - 12 * s + wave, cx + half_top, wy + 12 * s + wave], fill=(200, 232, 250, 150),
+                  outline=(255, 255, 255, 200), width=3)
+    poly = _glass_poly(cx, base_y, w, h)
+    d.line([poly[0], poly[3]], fill=(90, 110, 120, 140), width=int(9 * s))
+    d.line([poly[1], poly[2]], fill=(90, 110, 120, 140), width=int(9 * s))
+    d.line([poly[0], poly[3]], fill=(255, 255, 255, 230), width=int(5 * s))
+    d.line([poly[1], poly[2]], fill=(255, 255, 255, 230), width=int(5 * s))
+    d.rounded_rectangle([cx - w * 0.4, base_y - 26 * s, cx + w * 0.4, base_y], radius=10 * s, fill=(235, 245, 248, 150),
+                        outline=(255, 255, 255, 220), width=3)
+    d.arc([cx - w / 2, base_y - h - w * 0.07, cx + w / 2, base_y - h + w * 0.07], 0, 180, fill=(255, 255, 255, 230), width=int(6 * s))
+    d.line([(cx - w * 0.36, base_y - h * 0.9), (cx - w * 0.3, base_y - h * 0.15)], fill=(255, 255, 255, 110), width=int(16 * s))
+    d.line([(cx + w * 0.3, base_y - h * 0.85), (cx + w * 0.27, base_y - h * 0.5)], fill=(255, 255, 255, 80), width=int(8 * s))
+    c.alpha_composite(ov)
+
+
+@lru_cache(None)
+def window_img(w=620, h=760):
+    k = 2
+
+    def f(d, kk, im):
+        W_, H_ = w * kk, h * kk
+        d.rounded_rectangle([0, 0, W_, H_ - 40 * kk], radius=18 * kk, fill=DARK)
+        d.rounded_rectangle([8 * kk, 8 * kk, W_ - 8 * kk, H_ - 48 * kk], radius=12 * kk, fill=(176, 124, 78))
+        fw = 34 * kk
+        panes = [(fw, fw, W_ / 2 - fw / 2, (H_ - 40 * kk) / 2 - fw / 2), (W_ / 2 + fw / 2, fw, W_ - fw, (H_ - 40 * kk) / 2 - fw / 2),
+                 (fw, (H_ - 40 * kk) / 2 + fw / 2, W_ / 2 - fw / 2, H_ - 40 * kk - fw), (W_ / 2 + fw / 2, (H_ - 40 * kk) / 2 + fw / 2, W_ - fw, H_ - 40 * kk - fw)]
+        for x0, y0, x1, y1 in panes:
+            d.rectangle([x0 - 4 * kk, y0 - 4 * kk, x1 + 4 * kk, y1 + 4 * kk], fill=DARK)
+            steps = 30
+            for i in range(steps):
+                yy0 = y0 + (y1 - y0) * i / steps
+                col = (int(lerp(150, 214, i / steps)), int(lerp(206, 236, i / steps)), int(lerp(240, 250, i / steps)))
+                d.rectangle([x0, yy0, x1, yy0 + (y1 - y0) / steps + 1], fill=col)
+            d.line([(x0 + (x1 - x0) * 0.15, y1 - (y1 - y0) * 0.1), (x0 + (x1 - x0) * 0.55, y0 + (y1 - y0) * 0.1)], fill=(255, 255, 255), width=int(10 * kk))
+        d.rounded_rectangle([-0, H_ - 52 * kk, W_, H_], radius=10 * kk, fill=DARK)
+        d.rounded_rectangle([6 * kk, H_ - 46 * kk, W_ - 6 * kk, H_ - 6 * kk], radius=8 * kk, fill=(196, 146, 96))
+    return aa(w, h, f, k)
+
+
+def light_rays(c, x, y, t, a=1.0):
+    if a <= 0.01:
+        return
+    ov = Image.new("RGBA", c.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    for i in range(4):
+        off = i * 120 - 180 + 20 * math.sin(t * 1.3 + i)
+        d.polygon([(x + off, y), (x + off + 70, y), (x + off + 380, y + 900), (x + off + 220, y + 900)],
+                  fill=(255, 236, 160, int(45 * a)))
+    c.alpha_composite(ov.filter(ImageFilter.GaussianBlur(12)))

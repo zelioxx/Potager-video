@@ -1,4 +1,7 @@
-"""Rendu de la vidéo verticale 1080x1920 : python3 src/render.py [--preview t1,t2,...]"""
+"""Rendu des vidéos verticales 1080x1920.
+
+    python3 src/render.py [ail|poireau] [--preview t1,t2,...]
+"""
 import json
 import math
 import os
@@ -15,23 +18,41 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gfx import (W, H, YEL, WHITE, DARK, F_CAP, text_img, put, ring_badge, clamp, ease_out_back, ease_io,  # noqa: E402
                  life, ROOT)
-import scenes  # noqa: E402
+import importlib  # noqa: E402
 import sfx  # noqa: E402
 
 FPS = 30
-DUR = 71.6
 WHIP = 0.24  # durée de la transition « whip » floutée
 OUT = os.path.join(ROOT, "output")
-VOICE = os.path.join(ROOT, "assets", "audio", "voix.mp3")
-WORDS = json.load(open(os.path.join(ROOT, "assets", "audio", "voix_mots.json")))
+AUD = os.path.join(ROOT, "assets", "audio")
 
-CAP_Y = 1545
-CAP_SIZE = 76
-HIGHLIGHT = """échalotes automne pourrissent printemps pourquoi expliquer l'ail l'échalote bien racines tête
+PROJECTS = {
+    "ail": dict(
+        scenes="scenes", dur=71.6, voice=os.path.join(AUD, "voix.mp3"),
+        words=os.path.join(AUD, "voix_mots.json"), out="ail_echalote_printemps_1080x1920.mp4",
+        highlight="""échalotes automne pourrissent printemps pourquoi expliquer l'ail l'échalote bien racines tête
 trois pièges 1 terre argileuse l'eau l'hiver bulbe l'humide pourrit 2 l'enfonces profond pareil étouffe bon
 geste pointe affleurer surface 3 gourmands oiseaux picorer déterrer caïeux nuisibles régalent solution plante mars
 réchauffe s'égoutte variétés ail printanor rose lautrec échalote jermor longor mikor humidité pourriture récolte
-toi commentaire abonne-toi potager""".split()
+toi commentaire abonne-toi potager"""),
+    "poireau": dict(
+        scenes="scenes_poireau", dur=60.7, voice=os.path.join(AUD, "poireau", "voix.mp3"),
+        words=os.path.join(AUD, "poireau", "voix_mots.json"), out="poireau_repousse_1080x1920.mp4",
+        highlight="""stop jette poireau pousser montre cuisines pied racines coupe-le 4 5 cm moins verre d'eau pose
+bas astuce couvrir pourrit fenêtre lumineuse change deux jours propre attend centre pousse verte semaine grandi
+loin blanches longues replante-le pot potager terre nourrir grossir légume récoltes zéro gaspillage abonne-toi
+commentaire repousser"""),
+}
+PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
+CFG = PROJECTS[PROJECT]
+scenes = importlib.import_module(CFG["scenes"])
+DUR = CFG["dur"]
+VOICE = CFG["voice"]
+WORDS = json.load(open(CFG["words"]))
+
+CAP_Y = 1545
+CAP_SIZE = 76
+HIGHLIGHT = CFG["highlight"].split()
 
 
 def key(wd):
@@ -192,11 +213,11 @@ def build_audio(path):
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    if len(sys.argv) > 2 and sys.argv[1] == "--preview":
-        for ts in sys.argv[2].split(","):
+    if "--preview" in sys.argv:
+        for ts in sys.argv[sys.argv.index("--preview") + 1].split(","):
             frame(float(ts)).save(os.path.join(OUT, f"preview_{float(ts):05.2f}.jpg"), quality=88)
         return
-    tmp = os.path.join(OUT, "tmp")
+    tmp = os.path.join(OUT, "tmp_" + PROJECT)
     os.makedirs(tmp, exist_ok=True)
     wav = os.path.join(tmp, "mix.wav")
     build_audio(wav)
@@ -209,7 +230,7 @@ def main():
     lst = os.path.join(tmp, "parts.txt")
     with open(lst, "w") as f:
         f.writelines(f"file '{p}'\n" for p in parts)
-    final = os.path.join(OUT, "ail_echalote_printemps_1080x1920.mp4")
+    final = os.path.join(OUT, CFG["out"])
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-i", wav,
                     "-c:v", "copy", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k",
                     "-ar", "48000", "-shortest", "-movflags", "+faststart", final], check=True)

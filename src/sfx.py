@@ -222,6 +222,36 @@ def page_slide():
     return whoosh(0.3, up=True)
 
 
+def chop():
+    """Coup de couteau sur planche : attaque claquée + petit bois."""
+    t = _t(0.22)
+    snap = _bp(rng.standard_normal(len(t)), 2000, 9000) * np.exp(-t * 90)
+    knock = np.sin(2 * np.pi * (180 * np.exp(-t * 15) + 90) * t) * np.exp(-t * 28)
+    return norm(snap * 0.8 + knock, 0.95)
+
+
+def pour(d=1.1):
+    n = int(d * SR)
+    t = np.arange(n) / SR
+    x = _bp(rng.standard_normal(n), 300, 2500) * 0.5
+    for _ in range(int(d * 40)):
+        o = rng.integers(0, n - 4000)
+        tt = _t(0.04)
+        f = rng.uniform(400, 1100)
+        x[o: o + len(tt)] += np.sin(2 * np.pi * (f + 3000 * tt) * tt) * np.exp(-tt * 70) * rng.uniform(0.3, 0.8)
+    env = np.minimum(1, t / 0.08) * np.minimum(1, (d - t) / 0.25)
+    return norm(x * env, 0.7)
+
+
+def splash():
+    out = np.zeros(int(0.6 * SR), np.float32)
+    p = plop()
+    out[: len(p)] += p
+    t = _t(0.5)
+    out[: len(t)] += _bp(rng.standard_normal(len(t)), 800, 7000) * np.exp(-t * 9) * 0.6
+    return norm(out, 0.85)
+
+
 BANK = {
     "whoosh": lambda: whoosh(0.42),
     "whoosh_up": lambda: whoosh(0.38, up=True),
@@ -244,6 +274,9 @@ BANK = {
     "click": mouse_click,
     "bell": bell_notif,
     "rise": rise,
+    "chop": chop,
+    "pour": pour,
+    "splash": splash,
 }
 
 

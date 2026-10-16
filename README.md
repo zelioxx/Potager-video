@@ -1,6 +1,11 @@
 # Potager-video
 
-Vidéo motion design verticale (TikTok / YouTube Shorts) : **planter l'ail et l'échalote — automne ou printemps ?**
+Vidéos motion design verticales (TikTok / YouTube Shorts), même direction artistique (fond beige, photos réelles détourées) :
+
+1. **Ail & échalote : automne ou printemps ?** — `output/ail_echalote_printemps_1080x1920.mp4`
+2. **Refaire pousser un poireau à partir du pied** — `output/poireau_repousse_1080x1920.mp4` (60,7 s ; voix `assets/audio/poireau/`, photos `assets/images/poireau/`)
+
+## Vidéo ail & échalote
 
 - Rendu final : `output/ail_echalote_printemps_1080x1920.mp4` (1080×1920, 30 i/s, 71,6 s, AAC 48 kHz, −14 LUFS)
 - Voix off : `assets/audio/voix.mp3` (+ horodatage mot à mot `voix_mots.json`)
@@ -11,11 +16,12 @@ Vidéo motion design verticale (TikTok / YouTube Shorts) : **planter l'ail et l'
 
 ```bash
 pip install pillow numpy scipy soundfile
-python3 src/render.py                      # vidéo complète -> output/
-python3 src/render.py --preview 3.2,20.9   # images de contrôle
+python3 src/render.py ail                      # vidéo ail & échalote -> output/
+python3 src/render.py poireau                  # vidéo poireau -> output/
+python3 src/render.py poireau --preview 3,20   # images de contrôle
 ```
 
-- `src/scenes.py` : storyboard (14 scènes, temps calés sur la voix) + effets sonores associés
+- `src/scenes.py` / `src/scenes_poireau.py` : storyboards (temps calés sur la voix) + effets sonores associés
 - `src/gfx.py` : décor beige, table / terre, textes, icônes, badges, calendriers
 - `src/sfx.py` : effets sonores synthétisés (whoosh, pop, ding, oiseaux, pluie, clic…)
 - `src/render.py` : sous-titres mot à mot, transitions « whip », mixage et encodage
