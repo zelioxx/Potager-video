@@ -21,9 +21,9 @@ def cue(t, name, gain=0.5):
 
 
 P = "poireau/"
-FULL_H, TOP_H, BASE_H = 1132, 890, 242   # proportions de la photo du poireau entier (px)
-LONG_H = 358                              # pied aux racines allongées
-ROOT_FRAC = 0.46                          # part des racines en bas du pied
+FULL_H, TOP_H, BASE_H = 881, 446, 435   # proportions de la photo du poireau entier (px)
+LONG_H = 556                              # pied aux racines allongées
+ROOT_FRAC = 0.59                          # part des racines en bas du pied
 
 
 def leek(c, x, ground, h, top_dx=0.0, top_dy=0.0, top_rot=0.0, top_alpha=1.0, base=True, top=True,
@@ -48,7 +48,9 @@ def pied(c, x, ground, k, g=0.0, long=False, rotten=0.0, shadow=True, s=1.0):
     hh = (LONG_H if long else BASE_H) * k * s
     top_y = ground - hh
     if g > 0.01 and s > 0.01:
-        spr(c, P + "leek_top", x, top_y + 8 * k * s, TOP_H * k * s * g, shadow=False, rotten=rotten)
+        # une jeune pousse reste plus fine que le pied : on plafonne sa largeur
+        spr(c, P + "leek_top", x, top_y + 8 * k * s, TOP_H * k * s * g, shadow=False, rotten=rotten,
+            sx=min(1.0, 0.8 / g) if g > 0.8 else 1.0)
     spr(c, P + ("leek_base_long" if long else "leek_base"), x, ground, hh, shadow=shadow, rotten=rotten)
     return top_y
 
@@ -275,7 +277,7 @@ for _k in range(4):
 # ============================================================ 9. LA POUSSE (33.0 → 37.8)
 def s_shoot(t):
     w, u = new_layers(background("table"))
-    g = ease_out((t - 35.9) / 1.6) * 0.2
+    g = ease_out((t - 35.9) / 1.6) * 0.5
     glass_scene(w, t, 0.3, shoot=g)
     top_y = TABLE - 24 - BH_G
     hl_ellipse(w, GX, top_y + 10, 110, 70, life(t, 34.4, 35.85))
@@ -296,7 +298,7 @@ cue(36.0, "sparkle", 0.35)
 # ============================================================ 10. UNE SEMAINE PLUS TARD (37.8 → 40.5)
 def s_week(t):
     w, u = new_layers(background("table"))
-    g = lerp(0.2, 0.45, ease_out((t - 38.3) / 1.6))
+    g = lerp(0.5, 1.5, ease_out((t - 38.3) / 1.6))
     glass_scene(w, t, 0.3, shoot=g)
     sparkles(w, t, 39.7, GX, 600, 260, 8, 12)
     pills(u, ["J1", "J4", "J7"], 2 if t > 38.5 else -1, t, 38.35, None, y=1380, pw=150)
@@ -319,14 +321,14 @@ def s_further(t):
         lift = ease_io((t - 41.9) / 0.45)          # on sort le pied du verre pour voir les racines
         ground = TABLE - 24 - 260 * lift
         glass_back(w, gx, TABLE, GW, GH)
-        pied(w, gx, ground, KG, 0.45, long=t > 42.55, shadow=False, s=1 + 0.06 * life(t, 42.55, 42.9))
+        pied(w, gx, ground, KG, 1.5, long=t > 42.55, shadow=False, s=1 + 0.06 * life(t, 42.55, 42.9))
         glass_front(w, gx, TABLE, 0.3, t, GW, GH)
         hl_ellipse(w, gx, ground - 85, 190, 110, life(t, 42.9, 44.3))
     if t > 44.4:
         bx = lerp(1400, 540, to_pot)
         y = drop(t, 44.8, TABLE - 200, 700, 0.4)
         if y is not None:
-            pied(w, bx, y, KG, 0.4, long=True, shadow=False)
+            pied(w, bx, y, KG, 1.3, long=True, shadow=False)
         spr(w, P + "barrel", bx, TABLE + 10, 560)
         # terre visible en haut du bac
         put(u, text_img("EN POT", F_TITLE, 80, YEL, 9, DARK, 7, DARK), 220, 960, life(t, 45.26), -4)
@@ -352,8 +354,8 @@ def s_soil(t):
     w, u = new_layers(background("none", soil_y))
     grow = ease_io((t - 48.5) / 1.3)
     roots(w, 540, soil_y + 420, clamp((t - 47.0) / 0.8), 51, length=170, n=12)
-    k = KG * lerp(1.0, 1.35, grow)                 # il grossit
-    pied(w, 540, soil_y - 20 + LONG_H * k, k, lerp(0.45, 0.55, grow), long=True, shadow=False)
+    k = KG * lerp(1.6, 2.0, grow)                  # il grossit
+    pied(w, 540, soil_y - 20 + LONG_H * k, k, lerp(0.8, 1.0, grow), long=True, shadow=False)
     # nutriments qui remontent vers les racines
     if 47.9 < t < 49.6:
         r = np.random.default_rng(3)
