@@ -21,8 +21,9 @@ def cue(t, name, gain=0.5):
 
 
 P = "poireau/"
-FULL_H, TOP_H, BASE_H = 1013, 628, 385   # proportions de la photo du poireau entier
-ROOT_FRAC = 0.39                          # part des racines en bas du pied
+FULL_H, TOP_H, BASE_H = 1132, 890, 242   # proportions de la photo du poireau entier (px)
+LONG_H = 358                              # pied aux racines allongées
+ROOT_FRAC = 0.46                          # part des racines en bas du pied
 
 
 def leek(c, x, ground, h, top_dx=0.0, top_dy=0.0, top_rot=0.0, top_alpha=1.0, base=True, top=True,
@@ -41,19 +42,15 @@ def base_piece(c, x, ground, bh, s=1.0, rotten=0.0, shadow=True, name="leek_base
     spr(c, P + name, x, ground, bh, s, shadow=shadow, rotten=rotten, sy=sy)
 
 
-def shoots_real(c, x, top_y, g, h=420, n=3, spread=13, width=0.75):
-    """Pousses vertes (vraie texture de feuille de poireau) qui sortent du cœur, en éventail."""
-    if g <= 0.01:
-        return
-    for i in range(n):
-        frac = [1.0, 0.8, 0.68][i % 3]
-        hh = h * g * frac
-        if hh < 6:
-            continue
-        rot = [0, spread, -spread][i % 3]
-        dx = -math.sin(math.radians(rot)) * hh / 2  # garde la base de la feuille au cœur du pied
-        spr(c, P + "leek_shoot", x + dx, top_y + 14, hh, rot=rot, shadow=False,
-            sx=width * min(1.0, 0.35 + hh / 260))
+def pied(c, x, ground, k, g=0.0, long=False, rotten=0.0, shadow=True, s=1.0):
+    """Pied coupé (+ repousse). La repousse est la vraie partie verte du même poireau, réduite
+    d'un facteur g et ancrée au cœur du pied : tige et feuilles restent parfaitement alignées."""
+    hh = (LONG_H if long else BASE_H) * k * s
+    top_y = ground - hh
+    if g > 0.01 and s > 0.01:
+        spr(c, P + "leek_top", x, top_y + 8 * k * s, TOP_H * k * s * g, shadow=False, rotten=rotten)
+    spr(c, P + ("leek_base_long" if long else "leek_base"), x, ground, hh, shadow=shadow, rotten=rotten)
+    return top_y
 
 
 # ============================================================ 1. STOP ! (0 → 3.15)
@@ -105,8 +102,8 @@ cue(6.38, "success", 0.35)
 # ============================================================ 3. GARDE LE PIED (6.8 → 10.4)
 def s_keep(t):
     w, u = new_layers(background("table"))
-    leek(w, 540, TABLE, 1150, s=life(t, 6.85, dur=0.4))
-    bh = 1150 * BASE_H / FULL_H
+    leek(w, 540, TABLE, 1300, s=life(t, 6.85, dur=0.4))
+    bh = 1300 * BASE_H / FULL_H
     hl_ellipse(w, 540, TABLE - bh * 0.5, 210, bh * 0.55, life(t, 8.34))
     put(u, text_img("LE PIED", F_TITLE, 100, YEL, 11, DARK, 9, DARK), 830, TABLE - bh * 0.75, life(t, 8.6), -6)
     put(u, text_img("RACINES", F_TITLE, 74, CREAM, 9, DARK, 7, DARK), 290, TABLE - 40, life(t, 9.82), 5)
@@ -124,7 +121,7 @@ cue(9.82, "pop", 0.3)
 # ============================================================ 4. COUPE À 4-5 CM (10.4 → 15.3)
 def s_cut(t):
     w, u = new_layers(background("table"))
-    hgt = 1150
+    hgt = 1300
     bh = hgt * BASE_H / FULL_H
     cut_y = TABLE - bh
     # couteau : arrive par la droite puis tranche
@@ -159,6 +156,7 @@ cue(14.38, "fail", 0.3)
 # ============================================================ 5. VERRE D'EAU (15.3 → 19.7)
 GX, GH, GW = 540, 560, 440
 BH_G = 330  # hauteur du pied posé dans le verre
+KG = BH_G / BASE_H
 
 
 def glass_scene(w, t, water, base_y_off=0.0, base_s=1.0, base_vis=True, murky=0.0, rotten=0.0, gx=GX,
@@ -166,8 +164,7 @@ def glass_scene(w, t, water, base_y_off=0.0, base_s=1.0, base_vis=True, murky=0.
     glass_back(w, gx, TABLE, GW, GH, s)
     bh = BH_G
     if base_vis:
-        shoots_real(w, gx, TABLE - 26 - bh * sy + base_y_off, shoot, shoot_h)
-        base_piece(w, gx, TABLE - 24 + base_y_off, bh, base_s, rotten=rotten, shadow=False, name=base_name, sy=sy)
+        pied(w, gx, TABLE - 24 + base_y_off, KG, shoot, rotten=rotten, shadow=False)
     glass_front(w, gx, TABLE, water, t, GW, GH, s, murky)
     return bh
 
@@ -278,9 +275,9 @@ for _k in range(4):
 # ============================================================ 9. LA POUSSE (33.0 → 37.8)
 def s_shoot(t):
     w, u = new_layers(background("table"))
-    g = ease_out((t - 35.9) / 1.6) * 0.45
-    glass_scene(w, t, 0.3, shoot=g, shoot_h=420)
-    top_y = TABLE - 26 - BH_G
+    g = ease_out((t - 35.9) / 1.6) * 0.2
+    glass_scene(w, t, 0.3, shoot=g)
+    top_y = TABLE - 24 - BH_G
     hl_ellipse(w, GX, top_y + 10, 110, 70, life(t, 34.4, 35.85))
     sparkles(w, t, 36.0, GX, top_y - 120, 160, 6, 9)
     pills(u, ["J3", "J4", "J5"], 1 if t > 33.8 else -1, t, 33.2, 35.0, y=560, pw=150)
@@ -299,23 +296,18 @@ cue(36.0, "sparkle", 0.35)
 # ============================================================ 10. UNE SEMAINE PLUS TARD (37.8 → 40.5)
 def s_week(t):
     w, u = new_layers(background("table"))
-    g = lerp(0.45, 1.0, ease_out((t - 38.3) / 1.6))
-    k = ease_io((t - 39.6) / 0.4)
-    gx = lerp(540, 330, k)
-    glass_back(w, gx, TABLE, GW, GH)
-    shoots_real(w, gx, TABLE - 26 - BH_G, g, 560)
-    base_piece(w, gx, TABLE - 24, BH_G, shadow=False)
-    glass_front(w, gx, TABLE, 0.3, t, GW, GH)
-    spr(w, P + "jar_regrowth", 800, TABLE, 720, life(t, 39.7))
-    put(u, text_img("EN VRAI", F_TITLE, 64, CREAM, 8, DARK, 6, DARK), 800, TABLE - 760, life(t, 39.85), 4)
-    title(u, "1 SEMAINE", t, 38.3, None, y=300)
+    g = lerp(0.2, 0.45, ease_out((t - 38.3) / 1.6))
+    glass_scene(w, t, 0.3, shoot=g)
+    sparkles(w, t, 39.7, GX, 600, 260, 8, 12)
+    pills(u, ["J1", "J4", "J7"], 2 if t > 38.5 else -1, t, 38.35, None, y=1380, pw=150)
+    title(u, "1 SEMAINE", t, 38.3, None, y=260)
     return w, u
 
 
 cue(38.3, "pop", 0.35)
 cue(38.4, "rise", 0.3)
-cue(39.7, "pop_lo", 0.4)
-cue(39.85, "sparkle", 0.3)
+cue(38.5, "tick", 0.3)
+cue(39.7, "sparkle", 0.35)
 
 
 # ============================================================ 11. PLUS LOIN : RACINES + POT (40.5 → 46.5)
@@ -324,25 +316,23 @@ def s_further(t):
     to_pot = ease_io((t - 44.4) / 0.5)
     if to_pot < 1:
         gx = lerp(540, -400, to_pot)
-        grow = ease_out((t - 42.3) / 1.4)
+        lift = ease_io((t - 41.9) / 0.45)          # on sort le pied du verre pour voir les racines
+        ground = TABLE - 24 - 260 * lift
         glass_back(w, gx, TABLE, GW, GH)
-        shoots_real(w, gx, TABLE - 26 - BH_G, 1.0, 560)
-        name = "leek_base_long" if t > 42.6 else "leek_base"
-        base_piece(w, gx, TABLE - 24, BH_G * (1.15 + 0.15 * grow) if t > 42.6 else BH_G, shadow=False, name=name)
+        pied(w, gx, ground, KG, 0.45, long=t > 42.55, shadow=False, s=1 + 0.06 * life(t, 42.55, 42.9))
         glass_front(w, gx, TABLE, 0.3, t, GW, GH)
-        hl_ellipse(w, gx, TABLE - 110, 200, 100, life(t, 42.9, 44.3))
+        hl_ellipse(w, gx, ground - 85, 190, 110, life(t, 42.9, 44.3))
     if t > 44.4:
         bx = lerp(1400, 540, to_pot)
-        y = drop(t, 44.8, TABLE - 470, 700, 0.4)
+        y = drop(t, 44.8, TABLE - 200, 700, 0.4)
         if y is not None:
-            shoots_real(w, bx, y - 300, 1.0, 560)
-            base_piece(w, bx, y, 300, shadow=False, name="leek_base_long")
+            pied(w, bx, y, KG, 0.4, long=True, shadow=False)
         spr(w, P + "barrel", bx, TABLE + 10, 560)
         # terre visible en haut du bac
         put(u, text_img("EN POT", F_TITLE, 80, YEL, 9, DARK, 7, DARK), 220, 960, life(t, 45.26), -4)
         put(u, text_img("OU AU POTAGER", F_TITLE, 66, YEL, 8, DARK, 7, DARK), 790, 960, life(t, 45.7), 4)
-    title(u, "PLUS LOIN ?", t, 40.6, 42.2, y=360)
-    title(u, "BLANCHES & LONGUES", t, 42.9, 44.3, y=360, size=110)
+    title(u, "PLUS LOIN ?", t, 40.6, 42.2, y=330)
+    title(u, "BLANCHES & LONGUES", t, 42.9, 44.3, y=330, size=100)
     title(u, "REPLANTE !", t, 44.46, None, y=360, color=YEL)
     return w, u
 
@@ -361,12 +351,9 @@ def s_soil(t):
     soil_y = lerp(H, 1180, ease_out((t - 46.55) / 0.45))
     w, u = new_layers(background("none", soil_y))
     grow = ease_io((t - 48.5) / 1.3)
-    roots(w, 540, soil_y + 280, clamp((t - 47.0) / 0.8), 51, length=170, n=12)
-    if grow < 0.98:
-        shoots_real(w, 540, soil_y - 40, 1.0, lerp(560, 800, grow))
-        base_piece(w, 540, soil_y + 300, lerp(300, 340, grow), shadow=False, name="leek_base_long")
-    if grow > 0.02:
-        leek(w, 540, soil_y + 320, lerp(1000, 1300, grow), s=1.0, shadow=False, top_alpha=grow)
+    roots(w, 540, soil_y + 420, clamp((t - 47.0) / 0.8), 51, length=170, n=12)
+    k = KG * lerp(1.0, 1.35, grow)                 # il grossit
+    pied(w, 540, soil_y - 20 + LONG_H * k, k, lerp(0.45, 0.55, grow), long=True, shadow=False)
     # nutriments qui remontent vers les racines
     if 47.9 < t < 49.6:
         r = np.random.default_rng(3)

@@ -230,6 +230,8 @@ def shadow_blob():
 
 # l'échalote fournie est fine et haute : on l'agrandit pour garder une masse visuelle proche de l'ail
 ASSET_SCALE = {"shallot_red": 1.3}
+# photos avec marge transparente (pied de poireau recentré) : ombre réduite à la tige
+SHADOW_SCALE = {"poireau/leek_base": 0.4, "poireau/leek_base_long": 0.4}
 
 
 def spr(c, name, x, base_y, h, s=1.0, rot=0.0, alpha=1.0, rotten=0.0, shadow=True,
@@ -264,7 +266,8 @@ def spr(c, name, x, base_y, h, s=1.0, rot=0.0, alpha=1.0, rotten=0.0, shadow=Tru
     else:
         cx, cy = x, base_y
     if shadow and anchor == "bottom":
-        sb = shadow_blob().resize((max(2, int(tw * 1.25)), max(2, int(tw * 0.3))))
+        sw = tw * SHADOW_SCALE.get(name, 1.0)
+        sb = shadow_blob().resize((max(2, int(sw * 1.25)), max(2, int(sw * 0.3))))
         if alpha < 1:
             sb.putalpha(sb.getchannel("A").point(lambda v: int(v * alpha)))
         c.alpha_composite(sb, (int(x - sb.width / 2), int(base_y - sb.height * 0.55)), )
