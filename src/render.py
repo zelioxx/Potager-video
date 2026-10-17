@@ -50,6 +50,13 @@ trop souvent gorgée étouffent l'excès d'humidité pourrir pourrie boit pieds 
 jaunes molles terre humide odeur marécage temps stop arrête d'arroser sécher sèche 2 3 centimètres test doigt
 imparable tard rempote sors coupe noires saines fermes claires mélange respire tiers perlite fibres chips coco
 terreau drainant respirer pot percé stagne soucoupe abonne-toi astuces commentaire plantes sauvetage"""),
+    "bouture": dict(
+        scenes="scenes_bouture", dur=39.9, voice=os.path.join(AUD, "bouture", "voix.mp3"),
+        words=os.path.join(AUD, "bouture", "voix_mots.json"), out="bouture_petits_fruitiers_1080x1920.mp4",
+        highlight="""tailles groseilliers jettes branches non plants gratuits cassissiers figuiers feuilles tombent
+bouturent super facilement étape 1 2 3 4 branche l'année crayon coupe 20 cm bas biais bourgeon haut droit
+au-dessus jamais l'envers enfonce-la 2/3 terre légère l'abri vent l'oublies l'hiver printemps racines nouveaux
+abonne-toi astuces potager"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

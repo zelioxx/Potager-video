@@ -5,6 +5,7 @@ Vidéos motion design verticales (TikTok / YouTube Shorts), même direction arti
 1. **Ail & échalote : automne ou printemps ?** — `output/ail_echalote_printemps_1080x1920.mp4`
 2. **Refaire pousser un poireau à partir du pied** — `output/poireau_repousse_1080x1920.mp4` (60,7 s ; voix `assets/audio/poireau/`, photos `assets/images/poireau/`)
 3. **N'arrose pas trop tes plantes d'intérieur** — `output/arrosage_plantes_1080x1920.mp4` (76,8 s ; voix `assets/audio/arrosage/`, photos `assets/images/arrosage/`)
+4. **Bouturer les petits fruitiers** — `output/bouture_petits_fruitiers_1080x1920.mp4` (39,9 s ; voix `assets/audio/bouture/`, photos `assets/images/bouture/`)
 
 ## Vidéo ail & échalote
 
@@ -20,6 +21,7 @@ pip install pillow numpy scipy soundfile
 python3 src/render.py ail                      # vidéo ail & échalote -> output/
 python3 src/render.py poireau                  # vidéo poireau -> output/
 python3 src/render.py arrosage                 # vidéo arrosage -> output/
+python3 src/render.py bouture                  # vidéo bouturage -> output/
 python3 src/render.py poireau --preview 3,20   # images de contrôle
 ```
 
