@@ -57,6 +57,13 @@ terreau drainant respirer pot percé stagne soucoupe abonne-toi astuces commenta
 bouturent super facilement étape 1 2 3 4 branche l'année crayon coupe 20 cm bas biais bourgeon haut droit
 au-dessus jamais l'envers enfonce-la 2/3 terre légère l'abri vent l'oublies l'hiver printemps racines nouveaux
 abonne-toi astuces potager"""),
+    "aromatiques": dict(
+        scenes="scenes_aromatiques", dur=41.4, voice=os.path.join(AUD, "aromatiques", "voix.mp3"),
+        words=os.path.join(AUD, "aromatiques", "voix_mots.json"), out="bouture_aromatiques_1080x1920.mp4",
+        highlight="""romarin gratuits seule plante 10 thym lavande sauge sarriette maintenant bouturent menthe simple
+verre d'eau racines étape 1 2 3 4 coupe tige cm fleurs retire feuilles bas plante-la terreau drainant secret
+arrose peine détestent pieds mouillés l'abri froid patientes printemps nouveaux plants abonne-toi astuces
+potager potagers louis"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
@@ -109,8 +116,10 @@ def word_img(i, size):
 
 
 def captions(c, t):
+    if t < getattr(scenes, "NO_CAPTION_UNTIL", 0.0):
+        return
     for start, end, ch in CHUNKS:
-        if not (start <= t < end):
+        if not (start <= t < end) or start < getattr(scenes, "NO_CAPTION_UNTIL", 0.0):
             continue
         size = CAP_SIZE
         imgs = [word_img(i, size) for i in ch]
@@ -141,7 +150,7 @@ def render_scene(fn, a, b, t):
     w, u = fn(t)
     # léger zoom avant continu sur le calque « monde »
     z = 1 + 0.035 * ease_io((t - a) / max(0.1, min(b, DUR) - a))
-    if z > 1.001:
+    if z > 1.001 and not getattr(fn, "raw", False):
         cw, ch = W / z, H / z
         x0, y0 = (W - cw) / 2, (H - ch) * 0.45
         w = w.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BILINEAR)
