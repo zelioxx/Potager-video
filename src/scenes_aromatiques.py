@@ -17,6 +17,7 @@ from gfx import (ROOT, W, H, YEL, RED, GREEN, CREAM, DARK, WHITE, background, sp
                  measure, roots, particles, text_img, asset, aa, glass_back, glass_front, window_img, F_TITLE,
                  F_BLACK)
 from scenes import TABLE, new_layers, drop, sparkles, falling
+from scenes_arrosage import can_center_for_spout
 
 CUES = []
 NO_CAPTION_UNTIL = 2.2   # pas de sous-titres pendant la vidéo d'intro
@@ -115,8 +116,8 @@ def stripped_leaves_fall(c, cx, bottom, h, t, t0):
         r = part.rotate(sg * -50 * k, expand=True, resample=Image.BICUBIC)
         if k > 0.6:
             r.putalpha(r.getchannel("A").point(lambda v, f=max(0.0, 1 - (k - 0.6) / 0.6): int(v * f)))
-        px = left0 + ox + part.width / 2 + sg * 240 * k
-        py = top0 + img.height / 2 + 1000 * k * k
+        px = left0 + ox + part.width / 2 + sg * 420 * k
+        py = top0 + img.height / 2 - 120 * k + 1300 * k * k
         paste(c, r, px - r.width / 2, py - r.height / 2)
 
 
@@ -228,13 +229,13 @@ SP_X, SP_B, SP_H = 540, TABLE + 20, 1000
 
 def s_step1(t):
     w, u = new_layers(background("table"))
-    put(u, num_badge("1", 160), 830, 560, life(t, 16.5, 17.6))
+    put(u, num_badge("1", 160), 200, 560, life(t, 16.5, 17.6))
     title(u, "ÉTAPE 1", t, 16.5, 17.4, y=300)
     if t < 19.15:
         sprig(w, SP_X, SP_B, SP_H, life(t, 16.55), shadow=True)
         if 17.4 < t < 18.3:
             snip = abs(math.sin((t - 17.4) * 9)) * 14
-            spr(w, "bouture/secateur", SP_X + 117 * 1.0, SP_B - 30 + 74, 230, rot=-snip, shadow=False,
+            spr(w, "bouture/secateur", SP_X + 117, SP_B - 150 + 74, 230, rot=-snip, shadow=False,
                 anchor="center")
         measure(u, 820, SP_B - SP_H + 20, SP_B - 10, "10 cm", life(t, 18.38))
         title(u, "UNE TIGE DE 10 CM", t, 17.46, None, y=350, size=115)
@@ -259,7 +260,7 @@ cue(19.35, "fail", 0.3)
 # ============================================================ E. ÉTAPE 2 : RETIRE LES FEUILLES DU BAS (20.05 → 22.2)
 def s_step2(t):
     w, u = new_layers(background("table"))
-    put(u, num_badge("2", 160), 830, 560, life(t, 20.14, 21.0))
+    put(u, num_badge("2", 160), 200, 560, life(t, 20.14, 21.0))
     title(u, "ÉTAPE 2", t, 20.14, 20.9, y=300)
     stripped = 1.0 if t > 21.0 else 0.0
     sprig(w, SP_X, SP_B, SP_H, 1.0, stripped, shadow=True)
@@ -304,17 +305,25 @@ def soil_scene(t, mix=1.0, warm=0.0):
 
 def planted(c, cx, h=900, k=1.0, s=1.0, root_g=0.0, seed=2):
     """Tige effeuillée plantée : la partie nue est sous terre."""
-    bury = h * (ROM_H - STRIP) / ROM_H * 0.85
+    bury = h * (ROM_H - STRIP) / ROM_H * 0.6
     bottom = lerp(SOIL - 40, SOIL + bury, k)
     if root_g > 0.01:
-        roots(c, cx, bottom - 6, root_g, seed, spread=60, length=210 * s, n=11)
+        roots(c, cx, bottom - 4, root_g, seed, spread=50, length=200 * s, n=11)
     sprig(c, cx, bottom, h, s, 1.0)
+    # partie enterrée de la tige rendue visible dans la coupe (sinon brun sur brun)
+    if s > 0.5 and bottom > SOIL + 6:
+        sw = max(6, 26 * h / ROM_H * s)
+        d = ImageDraw.Draw(c)
+        x = cx + 4 * h / ROM_H
+        d.line([(x, SOIL + 6), (x, bottom - 2)], fill=(70, 46, 28), width=int(sw + 5))
+        d.line([(x, SOIL + 6), (x, bottom - 2)], fill=(206, 168, 118), width=int(sw))
+        d.line([(x - sw * 0.2, SOIL + 6), (x - sw * 0.2, bottom - 4)], fill=(232, 204, 160), width=max(1, int(sw * 0.25)))
     return bottom
 
 
 def s_step3(t):
     w, u = soil_scene(t, mix=ease_out((t - 24.18) / 0.5))
-    put(u, num_badge("3", 160), 830, 560, life(t, 22.34, 23.2))
+    put(u, num_badge("3", 160), 200, 560, life(t, 22.34, 23.2))
     title(u, "ÉTAPE 3", t, 22.34, 23.2, y=300)
     k = ease_io((t - 23.3) / 0.6)
     planted(w, 540, 900, k, life(t, 22.4))
@@ -344,27 +353,31 @@ CAN = "poireau/watering_can"
 
 def s_secret(t):
     w, u = soil_scene(t, mix=1.0)
-    planted(w, 540, 900, 1.0)
+    foot = planted(w, 540, 900, 1.0)
     if t < 28.3:
         put(u, icon("lightbulb", 160), 540, 520, life(t, 25.42, 26.3), math.sin(t * 4) * 5)
         title(u, "PETIT SECRET", t, 25.42, 26.4, y=350)
         if t > 26.3:
             k = ease_out((t - 26.3) / 0.35)
-            spr(w, CAN, lerp(1200, 840, k), 560, 300, rot=-25, shadow=False, anchor="center")
+            spout = (lerp(-200, 400, k), SOIL - 260)
+            cx_, cy_ = can_center_for_spout(spout[0], spout[1], 300, 38)
+            spr(w, CAN, cx_, cy_, 300, rot=-38, shadow=False, anchor="center")
             for i in range(3):
                 tt = t - 26.7 - i * 0.35
-                if 0 < tt < 0.6:
-                    put(w, icon("drop", 50), 700 - i * 20, 650 + tt * 600, 1, 0, 1)
+                if 0 < tt < 0.55:
+                    y = spout[1] + 20 + (SOIL - spout[1] - 10) * (tt / 0.55) ** 2
+                    put(w, icon("drop", 46), spout[0] + 10 + 120 * (tt / 0.55), y, 1, 0, 1)
         title(u, "ARROSE À PEINE", t, 26.46, None, y=350, color=YEL, size=125)
     else:
         # pieds mouillés : flaque autour de la base
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         d = ImageDraw.Draw(ov)
         a = int(170 * fade(t, 28.4, None, 0.4))
-        d.ellipse([340, SOIL + 260, 740, SOIL + 420], fill=(80, 150, 210, a))
-        d.ellipse([360, SOIL + 270, 720, SOIL + 400], outline=(210, 236, 250, a), width=4)
+        d.ellipse([400, foot - 70, 690, foot + 60], fill=(80, 150, 210, a))
+        d.ellipse([414, foot - 60, 676, foot + 50], outline=(210, 236, 250, a), width=4)
         w.alpha_composite(ov)
-        put(u, icon("nosign", 300), 540, SOIL + 340, life(t, 28.6))
+        planted(w, 540, 900, 1.0)
+        put(u, icon("nosign", 260), 545, foot, life(t, 28.6))
         title(u, "PIEDS MOUILLÉS", t, 28.42, None, y=350, color=RED, size=125)
     return w, u
 
@@ -474,8 +487,8 @@ def s_cta(t):
     if t > 37.3:
         k = ease_out((t - 37.3) / 0.3)
         put(u, icon("cursor", 110), lerp(900, 640, k), lerp(580, 340, k), 1)
-    put(u, logo_img(), 540, 780, life(t, 39.38, dur=0.45), math.sin((t - 39.4) * 2) * 1.5)
-    sparkles(u, t, 39.5, 540, 780, 330, 10, 12)
+    put(u, logo_img(480), 540, 650, life(t, 39.38, dur=0.45), math.sin((t - 39.4) * 2) * 1.5)
+    sparkles(u, t, 39.5, 540, 650, 300, 10, 12)
     return w, u
 
 
