@@ -70,6 +70,14 @@ potager potagers louis"""),
         highlight="""l'état composteur bien 3 erreurs erreur 1 2 épluchures humide pourrit mauvais ajoute sec feuilles
 mortes carton brun branches viande poisson produits laitiers odeurs rats jamais remuer compost étouffe fourche
 temps reparti tout abonne-toi astuces potager potagers louis"""),
+    "ananas": dict(
+        scenes="scenes_ananas", dur=68.4, voice=os.path.join(AUD, "ananas", "voix.mp3"),
+        words=os.path.join(AUD, "ananas", "voix_mots.json"), out="ananas_bouture_1080x1920.mp4",
+        highlight="""jettes tête ananas erreur pousser nouvel montre choisis feuilles vertes taches brunes fruit mûr
+trop étape 1 2 3 4 tourne touffe détacher retire petites bas 2 3 cm tige secret sécher jours pourrit plonge base
+verre d'eau chaud lumière change régulièrement semaines racines apparaissent plante-la pot terre drainante
+chaleur arrosage léger attention pourrissent fleurit ans pomme mûre sac transparent gaz floraison patient
+premier fierté croquer abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
