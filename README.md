@@ -7,6 +7,7 @@ Vidéos motion design verticales (TikTok / YouTube Shorts), même direction arti
 3. **N'arrose pas trop tes plantes d'intérieur** — `output/arrosage_plantes_1080x1920.mp4` (76,8 s ; voix `assets/audio/arrosage/`, photos `assets/images/arrosage/`)
 4. **Bouturer les petits fruitiers** — `output/bouture_petits_fruitiers_1080x1920.mp4` (39,9 s ; voix `assets/audio/bouture/`, photos `assets/images/bouture/`)
 5. **Bouturer les aromatiques** — `output/bouture_aromatiques_1080x1920.mp4` (41,4 s ; intro = vidéo fournie `assets/video/intro_thym.mp4`, voix `assets/audio/aromatiques/`)
+6. **Compost : les 3 erreurs** — `output/compost_3_erreurs_1080x1920.mp4` (37,8 s ; intro = vidéo fournie `assets/video/intro_compost.mp4`, voix `assets/audio/compost/`)
 
 ## Vidéo ail & échalote
 
@@ -24,6 +25,7 @@ python3 src/render.py poireau                  # vidéo poireau -> output/
 python3 src/render.py arrosage                 # vidéo arrosage -> output/
 python3 src/render.py bouture                  # vidéo bouturage -> output/
 python3 src/render.py aromatiques              # vidéo aromatiques -> output/
+python3 src/render.py compost                  # vidéo compost -> output/
 python3 src/render.py poireau --preview 3,20   # images de contrôle
 ```
 

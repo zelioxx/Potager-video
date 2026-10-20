@@ -64,6 +64,12 @@ abonne-toi astuces potager"""),
 verre d'eau racines étape 1 2 3 4 coupe tige cm fleurs retire feuilles bas plante-la terreau drainant secret
 arrose peine détestent pieds mouillés l'abri froid patientes printemps nouveaux plants abonne-toi astuces
 potager potagers louis"""),
+    "compost": dict(
+        scenes="scenes_compost", dur=37.8, voice=os.path.join(AUD, "compost", "voix.mp3"),
+        words=os.path.join(AUD, "compost", "voix_mots.json"), out="compost_3_erreurs_1080x1920.mp4",
+        highlight="""l'état composteur bien 3 erreurs erreur 1 2 épluchures humide pourrit mauvais ajoute sec feuilles
+mortes carton brun branches viande poisson produits laitiers odeurs rats jamais remuer compost étouffe fourche
+temps reparti tout abonne-toi astuces potager potagers louis"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
