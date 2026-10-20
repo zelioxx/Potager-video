@@ -252,6 +252,44 @@ def splash():
     return norm(out, 0.85)
 
 
+def alert(f0=330.0):
+    """Petit jingle d'erreur (deux notes descendantes, timbre doux) — hauteur variable."""
+    out = np.zeros(int(0.62 * SR), np.float32)
+    for k, (mul, st, d) in enumerate([(1.5, 0.0, 0.16), (1.0, 0.17, 0.36)]):
+        t = _t(d)
+        f = f0 * mul
+        x = (np.sin(2 * np.pi * f * t) + 0.35 * np.sin(2 * np.pi * 2 * f * t) + 0.12 * np.sin(2 * np.pi * 3 * f * t))
+        x *= np.exp(-t * (7 if k else 12)) * np.minimum(1, t / 0.006)
+        o = int(st * SR)
+        out[o: o + len(x)] += x
+    return norm(out, 0.75)
+
+
+def squeak():
+    """Couinement de rat : deux petits cris aigus."""
+    out = np.zeros(int(0.45 * SR), np.float32)
+    for st, d in ((0.0, 0.11), (0.17, 0.15)):
+        t = _t(d)
+        f = 3200 + 900 * np.sin(np.pi * t / d) + 250 * np.sin(2 * np.pi * 38 * t)
+        x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * t / d) ** 1.2
+        o = int(st * SR)
+        out[o: o + len(x)] += x
+    return norm(out, 0.55)
+
+
+def stir(d=0.55):
+    """Fourche qui brasse le compost : bruit grave et granuleux."""
+    n = int(d * SR)
+    t = np.arange(n) / SR
+    x = _bp(rng.standard_normal(n), 120, 1600) * (0.6 + 0.4 * np.sin(2 * np.pi * 7 * t))
+    for _ in range(14):
+        o = rng.integers(0, n - 3000)
+        tt = _t(0.03)
+        x[o: o + len(tt)] += _bp(rng.standard_normal(len(tt)), 600, 4000) * np.exp(-tt * 120) * 0.8
+    env = np.sin(np.pi * t / d) ** 0.8
+    return norm(x * env, 0.75)
+
+
 BANK = {
     "whoosh": lambda: whoosh(0.42),
     "whoosh_up": lambda: whoosh(0.38, up=True),
@@ -277,6 +315,11 @@ BANK = {
     "chop": chop,
     "pour": pour,
     "splash": splash,
+    "alert1": lambda: alert(392.0),
+    "alert2": lambda: alert(349.2),
+    "alert3": lambda: alert(311.1),
+    "squeak": squeak,
+    "stir": stir,
 }
 
 

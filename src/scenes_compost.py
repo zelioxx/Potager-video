@@ -136,13 +136,6 @@ def s_intro(t):
     return w, u
 
 
-cue(2.15, "whoosh_up", 0.35)
-cue(2.2, "thud", 0.45)
-cue(2.38, "pop", 0.3)
-cue(3.9, "success", 0.35)
-cue(4.7, "rise", 0.3)
-for _i in range(3):
-    cue(5.38 + _i * 0.1, "pop_hi", 0.3)
 
 
 # ============================================================ B. ERREUR 1 : QUE DES ÉPLUCHURES (6.3 → 13.1)
@@ -171,14 +164,6 @@ def s_err1(t):
     return w, u
 
 
-cue(6.3, "whoosh_up", 0.3)
-cue(6.42, "fail", 0.3)
-for _i in range(3):
-    cue(7.9 + _i * 0.3, "whoosh", 0.2)
-    cue(8.45 + _i * 0.3, "squish", 0.25)
-cue(10.42, "rain", 0.3)
-cue(11.54, "squish", 0.35)
-cue(12.34, "buzz", 0.2)
 
 
 # ============================================================ C. AJOUTE DU SEC (13.1 → 17.05)
@@ -201,13 +186,6 @@ def s_dry(t):
     return w, u
 
 
-cue(13.1, "whoosh_up", 0.3)
-cue(13.26, "pop", 0.3)
-cue(13.9, "success", 0.35)
-for _n, _t0, _l, _h in DRY:
-    cue(_t0, "pop", 0.4)
-    cue(_t0 + 0.1, "crunch", 0.25)
-cue(16.55, "whoosh", 0.3)
 
 
 # ============================================================ D. ERREUR 2 : VIANDE, POISSON, LAITIERS (17.05 → 24.15)
@@ -228,21 +206,13 @@ def s_err2(t):
     mx, my, half = bin_open(w, 680, TABLE + 40, 860)
     stink(w, mx, my - 100, t, fade(t, 22.6, None, 0.4), 120)
     flies(w, t, 22.8, None, mx, my - 220, 220)
-    put(w, card_img("rat.jpg", 330), 230, 1000, life(t, 23.65), -6)
+    k = ease_out((t - 23.55) / 0.45)
+    spr(w, C + "rat", lerp(-300, 300, k), TABLE + 60, 300)
     title(u, "BONJOUR LES ODEURS…", t, 22.54, 23.6, y=330, color=RED, size=115)
     title(u, "ET LES RATS !", t, 23.74, None, y=330, color=RED, size=150)
     return w, u
 
 
-cue(17.05, "whoosh_up", 0.3)
-cue(17.18, "fail", 0.3)
-for _n, _t0, _h, _x, _y in BAD:
-    cue(_t0, "pop", 0.4)
-    cue(_t0 + 0.15, "pop_lo", 0.25)
-cue(21.5, "whoosh", 0.25)
-cue(22.6, "buzz", 0.2)
-cue(23.65, "squish", 0.3)
-cue(23.74, "fail", 0.3)
 
 
 # ============================================================ E. ERREUR 3 : NE JAMAIS LE REMUER (24.15 → 31.9)
@@ -256,7 +226,7 @@ def s_err3(t):
     pile(w, mx, my, half, [(C + "feuille1", -0.4, 80, 20), (C + "carton", 0.2, 80, -10),
                             (C + "epluchure_orange", 0.5, 70, 30)], 24.2, t, rotten=0.6 if t < 29.1 else 0.0)
     if t < 28.9:
-        spr(w, FORK, 840, 760, 640, life(t, 25.58), rot=200, shadow=False, anchor="center")
+        spr(w, FORK, 850, 760, 640, life(t, 25.58), rot=-12, shadow=False, anchor="center")
         put(u, icon("nosign", 300), 840, 760, life(t, 25.86))
         stink(w, mx, my - 80, t, fade(t, 27.42, None, 0.3))
         title(u, "ERREUR N°3", t, 24.22, 25.5, y=330, color=RED)
@@ -268,7 +238,7 @@ def s_err3(t):
         stir = math.sin((t - 29.3) * 9) * 14 if t > 29.3 else 0
         fx = lerp(1100, mx + 40, k) + stir * 2
         fy = lerp(300, my - 230, k) + abs(stir)
-        spr(w, FORK, fx, fy, 640, rot=195 + stir, shadow=False, anchor="center")
+        spr(w, FORK, fx, fy, 640, rot=12 + stir, shadow=False, anchor="center")
         if t > 29.3:
             particles(w, t, 29.3 + ((t - 29.3) // 0.5) * 0.5, mx, my, 10, int(t * 2), col=(90, 64, 40), size=9,
                       up=420, dur=0.5)
@@ -279,15 +249,6 @@ def s_err3(t):
     return w, u
 
 
-cue(24.15, "whoosh_up", 0.3)
-cue(24.22, "fail", 0.3)
-cue(25.6, "pop", 0.35)
-cue(25.86, "pop_lo", 0.4)
-cue(27.42, "squish", 0.35)
-cue(28.95, "whoosh", 0.3)
-for _k in range(4):
-    cue(29.35 + _k * 0.35, "crunch", 0.35)
-cue(30.6, "success", 0.4)
 
 
 # ============================================================ F. CTA + LOGO (31.9 → fin)
@@ -320,13 +281,27 @@ def s_cta(t):
     return w, u
 
 
-cue(31.95, "pop_lo", 0.35)
-cue(32.98, "success", 0.35)
-cue(34.3, "pop_hi", 0.35)
-cue(34.83, "click", 0.6)
-cue(34.9, "bell", 0.4)
-cue(36.02, "rise", 0.3)
-cue(36.1, "success", 0.4)
+
+# ------------------------------------------------------------- plan sonore (sobre, sans répétitions)
+for _c in [
+    (2.2, "thud", 0.4), (2.38, "pop", 0.25), (3.9, "ding", 0.3), (4.7, "rise", 0.25),
+    (5.38, "pop_hi", 0.2), (5.48, "pop_hi", 0.2), (5.58, "pop_hi", 0.2),
+    # erreur 1
+    (6.42, "alert1", 0.45), (7.95, "whoosh", 0.2), (8.55, "plop", 0.3), (9.15, "plop", 0.22),
+    (10.42, "rain", 0.25), (11.54, "squish", 0.3), (12.34, "buzz", 0.16),
+    # ajoute du sec
+    (13.3, "ding", 0.3), (14.34, "pop", 0.3), (15.18, "pop", 0.28), (15.98, "pop", 0.26), (16.6, "whoosh", 0.22),
+    # erreur 2
+    (17.18, "alert2", 0.45), (18.94, "pop", 0.3), (19.66, "pop", 0.28), (20.38, "pop", 0.26), (20.6, "pop_hi", 0.2),
+    (22.6, "buzz", 0.16), (23.7, "squeak", 0.4),
+    # erreur 3
+    (24.22, "alert3", 0.45), (25.6, "pop", 0.28), (25.86, "tick", 0.3), (27.42, "squish", 0.28),
+    (28.95, "whoosh", 0.25), (29.35, "stir", 0.45), (30.0, "stir", 0.38), (30.6, "success", 0.35),
+    # fin
+    (31.95, "pop_lo", 0.3), (32.98, "sparkle", 0.3), (34.3, "pop_hi", 0.3), (34.83, "click", 0.55),
+    (34.9, "bell", 0.35), (36.1, "success", 0.35),
+]:
+    cue(*_c)
 
 SCENES = [
     (0.0, VID_END, s_video),
