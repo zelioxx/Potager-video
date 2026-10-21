@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw
 
 from gfx import (W, H, YEL, RED, GREEN, CREAM, DARK, WHITE, background, spr, put, paste, title, life, fade,
                  ease_out, ease_in, ease_io, clamp, lerp, icon, num_badge, pills, tag, button_img, hl_ellipse,
-                 measure, particles, text_img, asset, aa, glass_back, glass_front, water, F_TITLE, F_BLACK)
+                 measure, particles, text_img, asset, aa, glass_back, glass_front, water, shadow_blob, F_TITLE, F_BLACK)
 from scenes import TABLE, new_layers, flies, sparkles, falling
 from scenes_aromatiques import pot
 from scenes_arrosage import can_center_for_spout
@@ -64,24 +64,109 @@ def progress_bar(c, x0, x1, y, p, labels, t, t0):
 
 
 # ============================================================ A. ERREUR (0 → 3.0)
+BIN = A + "poubelle"
+BIN_RIM = 218            # bas du couvercle dans poubelle.png
+BIN_HINGE = (432, 212)   # charnière du couvercle (côté droit)
+BIN_X, BIN_H = 730, 540
+IN_K = 0.62              # échelle de la couronne lancée
+
+
+@lru_cache(64)
+def _bin_parts(h):
+    im = asset(BIN)
+    k = h / im.height
+    sz = lambda c: c.resize((max(1, int(c.width * k)), max(1, int(c.height * k))), Image.BICUBIC)
+    return k, sz(im.crop((0, 0, im.width, BIN_RIM + 2))), sz(im.crop((0, BIN_RIM - 4, im.width, im.height)))
+
+
+def trash_bin(c, cx, base, h, lid=0.0, s=1.0, inside=None):
+    """Poubelle photo dont le couvercle bascule (lid en degrés) ; inside(c) est dessiné DANS la poubelle."""
+    if s <= 0.01:
+        return
+    k, lid_im, body = _bin_parts(int(h * s))
+    im_w = asset(BIN).width
+    x0, y0 = cx - im_w * k / 2, base - asset(BIN).height * k
+    P = lambda px, py: (x0 + px * k, y0 + py * k)
+    sb = shadow_blob().resize((int(im_w * k * 1.2), max(2, int(im_w * k * 0.28))))
+    c.alpha_composite(sb, (int(cx - sb.width / 2), int(base - sb.height * 0.55)))
+    if lid > 2:
+        d = ImageDraw.Draw(c)
+        d.polygon([P(28, 192), P(420, 192), P(416, 226), P(32, 226)], fill=(26, 24, 22))
+        d.polygon([P(40, 196), P(408, 196), P(404, 206), P(44, 206)], fill=(52, 49, 46))
+    if inside:
+        inside(c)
+    paste(c, body, *P(0, BIN_RIM - 4))
+    hx, hy = BIN_HINGE[0] * k, BIN_HINGE[1] * k
+    D = int(2 * max(lid_im.width, lid_im.height)) + 4
+    can = Image.new("RGBA", (D, D), (0, 0, 0, 0))
+    can.alpha_composite(lid_im, (int(D / 2 - hx), int(D / 2 - hy)))
+    if lid > 0.5:
+        can = can.rotate(-lid, center=(D / 2, D / 2), resample=Image.BICUBIC)
+    X, Y = P(*BIN_HINGE)
+    paste(c, can, X - D / 2, Y - D / 2)
+
+
+def bin_rim_y():
+    return TABLE + 10 - (asset(BIN).height - BIN_RIM) * BIN_H / asset(BIN).height
+
+
+def crown_path(t):
+    """Position (x, y du centre), rotation et visibilité de la couronne lancée."""
+    ch = (CROWN_BOX[3] - CROWN_BOX[1]) * IN_K
+    sx, sy = 270, TABLE + 40 - (986 - 468) * 0.8 - ch / 2          # posée sur le fruit
+    ex, ey = BIN_X, bin_rim_y() + ch * 0.5 - 135                     # au fond de la poubelle
+    if t < 0.62:
+        return sx, sy, 0.0
+    if t < 1.12:                                                    # vol en cloche + 1 tour
+        p = ease_io((t - 0.62) / 0.5)
+        return lerp(sx, ex, p), lerp(sy, ey - 40, p) - math.sin(math.pi * p) * 330, -360 * p
+    if t < 2.5:                                                     # tombe dedans
+        p = ease_out((t - 1.12) / 0.18)
+        return ex, lerp(ey - 40, ey, p), 0.0
+    # « non ! » : elle ressort de la poubelle et revient à gauche
+    p = ease_io((t - 2.5) / 0.45)
+    return lerp(ex, 190, p), lerp(ey, TABLE + 20 - ch / 2, p) - math.sin(math.pi * p) * 300, 360 * p
+
+
 def s_intro(t):
     w, u = new_layers(background("table"))
-    place(w, A + "ananas", AN_BOX, 1.0, 510, 986, 540, TABLE + 40, life(t, 0.0, dur=0.4))
-    cx, cy = 540, TABLE + 40 - (986 - 250)
-    hl_ellipse(w, cx, cy, 270, 230, life(t, 0.74, 2.2))
-    put(u, icon("arrow_down", 130), cx + 290, cy - 120, life(t, 0.74, 2.2), 30)
-    title(u, "LA TÊTE ?", t, 0.74, 2.2, y=330, size=160)
-    if t > 2.2:
-        shake = math.sin(t * 50) * 6 * fade(t, 2.26, 2.7)
-        spr(w, "poireau/trash", 840 + shake, TABLE + 10, 380, life(t, 2.2))
-    stamp(u, "ERREUR !", 540, 420, t, 2.26)
+    lid = 68 * ease_out((t - 0.5) / 0.22)
+    shake = math.sin(t * 55) * 9 * fade(t, 1.14, 1.5) if t > 1.14 else 0.0
+    cx, cy, rot = crown_path(t)
+    ch = (CROWN_BOX[3] - CROWN_BOX[1]) * IN_K
+    crown = lambda c: spr(c, A + "couronne", cx, cy, ch, life(t, 0.0, dur=0.35), rot=rot, shadow=False,
+                          anchor="center")
+    inside = 1.12 <= t < 2.5
+    place(w, A + "fruit", FRUIT_BOX, 0.8, 510, 986, 270, TABLE + 40, life(t, 0.0, dur=0.35))
+    trash_bin(w, BIN_X + shake, TABLE + 10, BIN_H, lid, life(t, 0.12, dur=0.35), crown if inside else None)
+    if not inside:
+        crown(w)
+    if 0.62 < t < 2.5:                                             # traînée pointillée
+        d = ImageDraw.Draw(u)
+        for i in range(14):
+            q = i / 13
+            if q > clamp((t - 0.62) / 0.5):
+                break
+            px = lerp(270, BIN_X, ease_io(q))
+            py = lerp(crown_path(0)[1], bin_rim_y() - 60, ease_io(q)) - math.sin(math.pi * ease_io(q)) * 330
+            a = int(235 * (1 - clamp((t - 1.95) / 0.3)))
+            if a > 0:
+                d.ellipse([px - 9, py - 9, px + 9, py + 9], fill=YEL + (a,))
+    if t > 1.14:
+        particles(w, t, 1.14, BIN_X, bin_rim_y() - 10, 10, 9, col=(120, 100, 70), size=9, up=260)
+    title(u, "TU LA JETTES ?", t, 0.46, 2.0, y=330, size=140)
+    if 2.26 <= t < 2.55:
+        put(u, icon("cross", 260), BIN_X, TABLE - 260, life(t, 2.26))
+    stamp(u, "ERREUR !", 540, 360, t, 2.26)
     return w, u
 
 
 cue(0.05, "pop_lo", 0.35)
-cue(0.74, "pop_hi", 0.3)
-cue(2.26, "thud", 0.5)
-cue(2.3, "alert1", 0.4)
+cue(0.5, "click", 0.4)
+cue(0.62, "whoosh", 0.35)
+cue(1.12, "thud", 0.5)
+cue(2.26, "alert1", 0.45)
+cue(2.5, "whoosh_up", 0.35)
 
 
 def s_error(t):

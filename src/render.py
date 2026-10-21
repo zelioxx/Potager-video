@@ -141,7 +141,8 @@ def captions(c, t):
     if t < getattr(scenes, "NO_CAPTION_UNTIL", 0.0):
         return
     for start, end, ch in CHUNKS:
-        if not (start <= t < end) or start < getattr(scenes, "NO_CAPTION_UNTIL", 0.0):
+        nc = getattr(scenes, "NO_CAPTION_UNTIL", 0.0)
+        if not (start <= t < end) or (nc > 0 and start < nc):
             continue
         size = CAP_SIZE
         imgs = [word_img(i, size) for i in ch]
