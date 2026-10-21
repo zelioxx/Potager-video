@@ -286,7 +286,8 @@ cue(22.5, "sparkle", 0.3)
 cue(24.4, "tick", 0.3)
 cue(24.6, "tick", 0.3)
 cue(24.8, "tick", 0.3)
-cue(25.5, "squish", 0.3)
+cue(25.5, "squish", 0.25)
+cue(25.74, "fail", 0.32)
 
 
 # ============================================================ G. ÉTAPE 3 : VERRE D'EAU (26.4 → 32.2)
@@ -350,22 +351,32 @@ cue(34.42, "success", 0.35)
 POT_TOP = TABLE - 330
 
 
+def mound(c, x=540, y=POT_TOP + 10, w=190):
+    """Petite butte de terre au pied de la tête : on la voit plantée dans le terreau."""
+    d = ImageDraw.Draw(c)
+    d.ellipse([x - w / 2, y - 16, x + w / 2, y + 20], fill=(46, 32, 22))
+    d.ellipse([x - w / 2 + 14, y - 12, x + w / 2 - 14, y + 8], fill=(66, 46, 31))
+
+
 def potted(c, s=1.0, k=0.8, sink=0.0):
-    head(c, 540, POT_TOP + 40 + sink, k, s)
+    """Pot d'abord, puis la tête plantée dans le terreau (base au centre de la surface), puis la butte de terre."""
     pot(c, 540, POT_TOP, 420, 330)
+    head(c, 540, POT_TOP + 14 + sink, k, s)
+    mound(c)
 
 
 def s_step4(t):
     w, u = new_layers(background("table"))
     dropin = ease_out((t - 36.06) / 0.5)
-    if t < 36.06:
-        pot(w, 540, POT_TOP, 420, 330)
-    else:
-        head(w, 540, lerp(POT_TOP - 400, POT_TOP + 40, dropin), 0.8)
-        pot(w, 540, POT_TOP, 420, 330)
+    pot(w, 540, POT_TOP, 420, 330)
+    if t >= 36.06:
+        head(w, 540, lerp(POT_TOP - 400, POT_TOP + 14, dropin), 0.8)
+        if dropin > 0.98:
+            mound(w)
+            particles(w, t, 36.56, 540, POT_TOP + 10, 10, 6, col=(70, 48, 32), size=8, up=300, dur=0.6)
     put(u, num_badge("4", 160), 190, 560, life(t, 35.2, 36.0))
-    put(u, icon("sun", 150), 200, 620, life(t, 40.62), t * 25)
-    put(u, icon("thermo", 150), 880, 620, life(t, 41.54))
+    put(u, icon("sun", 150), 830, 560, life(t, 40.62), t * 25)
+    put(u, icon("thermo", 140), 960, 740, life(t, 41.54))
     if t > 42.3:
         spout = (380, POT_TOP - 200)
         cx_, cy_ = can_center_for_spout(spout[0], spout[1], 280, 38)
@@ -408,7 +419,8 @@ def s_too_wet(t):
 
 cue(43.66, "alert2", 0.4)
 cue(44.66, "pour", 0.3)
-cue(45.5, "squish", 0.3)
+cue(45.5, "squish", 0.25)
+cue(45.98, "fail", 0.32)
 
 
 # ============================================================ K. PAS DE FLEUR AU BOUT DE 2 ANS ? (46.7 → 53.8)
