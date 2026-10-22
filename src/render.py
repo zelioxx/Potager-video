@@ -86,6 +86,12 @@ trop étape 1 2 3 4 tourne touffe détacher retire petites bas 2 3 cm tige secre
 verre d'eau chaud lumière change régulièrement semaines racines apparaissent plante-la pot terre drainante
 chaleur arrosage léger attention pourrissent fleurit ans pomme mûre sac transparent gaz floraison patient
 premier fierté croquer abonne-toi astuces"""),
+    "hortensia": dict(
+        scenes="scenes_hortensia", dur=26.4, voice=os.path.join(AUD, "hortensia", "voix.mp3"),
+        words=os.path.join(AUD, "hortensia", "voix_mots.json"), out="hortensia_bouture_1080x1920.mp4",
+        highlight="""hortensia gratuit seule tige oui simple coupe l'année sans fleurs deux paires bourgeons retire
+feuilles bas haut plante-la mélange terreau sable l'abri froid secret humide jamais détrempée printemps racines
+nouvel abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
