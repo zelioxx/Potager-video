@@ -92,6 +92,11 @@ premier fierté croquer abonne-toi astuces"""),
         highlight="""hortensia gratuit seule tige oui simple coupe l'année sans fleurs deux paires bourgeons retire
 feuilles bas haut plante-la mélange terreau sable l'abri froid secret humide jamais détrempée printemps racines
 nouvel abonne-toi astuces"""),
+    "avocat": dict(
+        scenes="scenes_avocat", dur=23.7, voice=os.path.join(AUD, "avocat", "voix.mp3"),
+        words=os.path.join(AUD, "avocat", "voix_mots.json"), out="avocat_noyau_1080x1920.mp4",
+        highlight="""jettes noyau d'avocat dommage arbre dort lave-le trois cure-dents verre d'eau plat bas moitié
+immergé chaud lumière change l'eau semaine patience semaines fend racine tige abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
