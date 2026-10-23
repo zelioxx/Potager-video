@@ -103,6 +103,12 @@ immergé chaud lumière change l'eau semaine patience semaines fend racine tige 
         highlight="""jettes noyau mangue attention graine cachée étape 1 2 3 4 gratte chair sécher journée ouvre-le
 délicatement ciseau côté grosse haricot géant enroule-la essuie-tout humide boîte fermée chaud patience
 semaines racine sort planter pot abonne-toi astuces"""),
+    "feuilles": dict(
+        scenes="scenes_feuilles", dur=29.8, voice=os.path.join(AUD, "feuilles", "voix.mp3"),
+        words=os.path.join(AUD, "feuilles", "voix_mots.json"), out="feuilles_mortes_paillage_1080x1920.mp4",
+        highlight="""tempête austine vidé arbres bonne nouvelle paillage gratuit étalées potager feuilles mortes
+protègent froid pluie dessous vers régalent printemps l'engrais souple conseil tondeuse broyées croûte
+décomposent vite week-end râteau brouette abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
