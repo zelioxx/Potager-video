@@ -69,7 +69,6 @@ MULCH_BASE = (630, 1060)      # bas du tas broyé
 MOWER_BASE = (640, 1190)      # sous les roues de la tondeuse
 MOWER_FRONT = 1220            # avant de la tondeuse (roue avant droite)
 BARROW_BASE = (560, 1150)     # sous la roue / les pieds de la brouette
-TRAY = (200, 600, 880, 680)   # bord du bac de la brouette
 RAKE_BASE = (1070, 1150)
 LEAVES = ["feuilles/feuille_a", "feuilles/feuille_b", "feuilles/feuille_c"]   # platane (vidéo compost) teinté
 
@@ -297,8 +296,7 @@ def s_mower(t):
 
 
 cue(18.1, "sparkle", 0.25)
-cue(19.2, "buzz", 0.3)
-cue(19.9, "crunch", 0.35)
+cue(19.1, "mower", 0.4)
 
 
 # ============================================================ F. BROYÉES : PAS DE CROÛTE, PLUS VITE (20.65 → 24.3)
@@ -343,14 +341,19 @@ def s_weekend(t):
     if t > 25.7:
         item(w, "rateau", RAKE_BASE, 880, TABLE + 40, 0.72, 1.0, lerp(-40, 0, rk), shadow=0)
     if t > 26.18:
-        roll = 1 - ease_out((t - 26.2) / 0.5)
+        roll = 1 - ease_out((t - 26.2) / 0.35)
         bx = 380 - 700 * roll
         k = 0.66
-        # tas de feuilles dans le bac (dessiné avant la brouette : on ne voit que ce qui dépasse)
-        tx = bx + ((TRAY[0] + TRAY[2]) / 2 - BARROW_BASE[0]) * k
-        ty = TABLE + 40 + (TRAY[3] + 40 - BARROW_BASE[1]) * k
-        item(w, "tas_feuilles", PILE_BASE, tx, ty, 0.33)
         item(w, "brouette", BARROW_BASE, bx, TABLE + 40, k, shadow=700)
+        # tas de feuilles DANS le bac : posé sur la brouette, on efface ce qui passe sous le bord avant du bac
+        P = lambda x, y: (bx + (x - BARROW_BASE[0]) * k, TABLE + 40 + (y - BARROW_BASE[1]) * k)
+        pile = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        cx, cy = P(545, 690)
+        item(pile, "tas_feuilles", PILE_BASE, cx, cy, 0.5 * k)
+        m = Image.new("L", (W, H), 255)
+        ImageDraw.Draw(m).polygon([P(195, 652), P(885, 668), P(885, 1300), P(195, 1300)], fill=0)
+        pile.putalpha(Image.composite(pile.getchannel("A"), Image.new("L", (W, H), 0), m))
+        w.alpha_composite(pile)
     act = 0 if t < 25.1 else 1
     from gfx import pills
     pills(u, ["SAMEDI", "DIMANCHE"], act, t, 24.55, None, y=560, pw=280)

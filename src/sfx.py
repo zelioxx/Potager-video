@@ -136,6 +136,25 @@ def buzz(d=1.6):
     return norm(x * env, 0.6)
 
 
+def mower(d=1.5):
+    """Tondeuse thermique qui traverse l'écran : moteur mono-cylindre (explosions ~27 Hz), lame qui broie."""
+    n = int(d * SR)
+    t = np.arange(n) / SR
+    f = 27 + 2.5 * np.sin(2 * np.pi * 0.7 * t)
+    frac = np.cumsum(f) / SR % 1
+    pulse = np.exp(-frac * 7)
+    noise = rng.standard_normal(n)
+    engine = pulse * (np.sin(2 * np.pi * 82 * t) + 0.5 * np.sin(2 * np.pi * 164 * t + 1.0))
+    engine += pulse * _bp(noise, 120, 700) * 1.2
+    rattle = _bp(noise, 1400, 3800) * 0.18 * (0.4 + 0.6 * pulse)
+    grind = _bp(rng.standard_normal(n), 1800, 6000) * 0.35
+    grind *= np.clip((t - 0.35) / 0.15, 0, 1) * np.clip((d - 0.3 - t) / 0.2, 0, 1)
+    grind *= 0.6 + 0.4 * (rng.random(n) > 0.6)
+    x = engine * 0.9 + rattle + grind
+    env = np.minimum(1, t / 0.25) * np.minimum(1, (d - t) / 0.4) * (0.55 + 0.45 * np.sin(np.pi * t / d))
+    return norm(x * env, 0.75)
+
+
 def rain(d=2.2):
     n = int(d * SR)
     x = _bp(rng.standard_normal(n), 500, 6000) * 0.25
@@ -304,6 +323,7 @@ BANK = {
     "bird": chirp_bird,
     "peck": peck,
     "buzz": buzz,
+    "mower": mower,
     "rain": rain,
     "crunch": crunch,
     "sparkle": sparkle,
