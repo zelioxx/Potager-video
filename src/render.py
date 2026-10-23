@@ -259,7 +259,7 @@ def build_audio(path):
     mix[: min(n, len(voice))] += voice[:n]
     cues = list(scenes.CUES)
     for a, b, fn in scenes.SCENES[1:]:
-        cues.append((a - 0.2, "whoosh", 0.32))
+        cues.append((a - 0.2, "whoosh", getattr(scenes, "TRANS_GAIN", 0.32)))
     fx = sfx.render_track(cues, DUR)
     mix += fx * 0.55
     st = np.stack([mix, mix], 1)

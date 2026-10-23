@@ -176,12 +176,10 @@ def s_intro(t):
     return w, u
 
 
-cue(0.05, "pop_lo", 0.35)
-cue(0.3, "click", 0.4)
-cue(0.5, "whoosh", 0.35)
-cue(0.98, "thud", 0.5)
-cue(2.06, "alert3", 0.45)
-cue(2.2, "whoosh_up", 0.35)
+cue(0.05, "pop_lo", 0.3)
+cue(0.5, "whoosh", 0.3)
+cue(0.98, "thud", 0.45)
+cue(2.06, "alert3", 0.4)
 
 
 # ============================================================ B. UN ARBRE QUI DORT (2.0 → 4.55)
@@ -215,9 +213,7 @@ def s_sleep(t):
     return w, u
 
 
-cue(2.85, "pop", 0.25)
-cue(3.0, "pop_hi", 0.3)
-cue(3.2, "sparkle", 0.3)
+cue(3.05, "sparkle", 0.25)
 
 
 # ============================================================ C. ÉTAPE 1 : LAVE-LE, 3 CURE-DENTS (4.55 → 7.1)
@@ -269,12 +265,9 @@ def s_step1(t):
     return w, u
 
 
-cue(4.6, "rise", 0.3)
-cue(4.66, "splash", 0.35)
-cue(5.1, "sparkle", 0.3)
+cue(4.7, "splash", 0.3)
 for _i in range(3):
-    cue(5.94 + _i * 0.18, "click", 0.4)
-cue(6.5, "pop_hi", 0.25)
+    cue(5.94 + _i * 0.18, "click", 0.3)
 
 
 # ============================================================ D. ÉTAPE 2 : SUR UN VERRE, PLAT EN BAS, À MOITIÉ (7.1 → 11.1)
@@ -303,13 +296,9 @@ def s_step2(t):
     return w, u
 
 
-cue(7.15, "rise", 0.3)
-cue(7.3, "whoosh", 0.25)
-cue(7.72, "plop", 0.45)
-cue(8.62, "pop", 0.25)
-cue(8.9, "pop", 0.25)
-cue(9.95, "pour", 0.35)
-cue(10.35, "ding", 0.3)
+cue(7.72, "plop", 0.4)
+cue(8.75, "pop", 0.22)
+cue(9.95, "pour", 0.3)
 
 
 # ============================================================ E. AU CHAUD, LUMIÈRE, CHANGE L'EAU (11.1 → 14.0)
@@ -334,13 +323,9 @@ def s_care(t):
     return w, u
 
 
-cue(11.15, "whoosh_up", 0.25)
-cue(11.46, "pop", 0.3)
-cue(12.06, "sparkle", 0.3)
-cue(12.95, "pour", 0.3)
-cue(13.22, "splash", 0.3)
-for _k in range(4):
-    cue(13.42 + _k * 0.14, "tick", 0.28)
+cue(11.46, "pop", 0.22)
+cue(12.06, "sparkle", 0.22)
+cue(12.95, "pour", 0.28)
 
 
 # ============================================================ F. ET MAINTENANT, PATIENCE (14.0 → 16.6)
@@ -360,9 +345,7 @@ def s_wait(t):
     return w, u
 
 
-cue(14.07, "whoosh", 0.25)
-cue(14.2, "pop", 0.25)
-cue(15.45, "bell", 0.3)
+cue(15.45, "bell", 0.25)
 
 
 # ============================================================ G. IL SE FEND, UNE RACINE, PUIS UNE TIGE (16.6 → 20.95)
@@ -391,12 +374,9 @@ def s_sprout(t):
     return w, u
 
 
-cue(16.78, "whoosh_up", 0.25)
-cue(18.78, "crunch", 0.5)
-cue(18.82, "pop_lo", 0.3)
-cue(19.3, "pop_hi", 0.3)
-cue(19.98, "rise", 0.3)
-cue(20.05, "success", 0.4)
+cue(18.78, "crunch", 0.45)
+cue(19.3, "pop_hi", 0.22)
+cue(20.05, "success", 0.35)
 
 
 # ============================================================ H. CTA (20.95 → fin)
@@ -416,11 +396,8 @@ def s_cta(t):
     return w, u
 
 
-cue(21.0, "pop_lo", 0.3)
-cue(21.05, "pop_hi", 0.3)
-cue(21.63, "click", 0.55)
-cue(21.7, "bell", 0.35)
-cue(22.6, "sparkle", 0.3)
+cue(21.63, "click", 0.45)
+cue(22.6, "sparkle", 0.25)
 
 if HAS_VIDEO:
     _intro = [(0.0, VID_END, s_video), (VID_END, 2.75, s_intro)]
@@ -436,6 +413,9 @@ SCENES = _intro + [
     (16.6, 20.95, s_sprout),
     (20.95, 99.0, s_cta),
 ]
+
+# bruitages allégés : un son par action, rien dans les 0,4 s autour des transitions
+TRANS_GAIN = 0.26
 
 TRAPS = [(1, 4.6, 7.1), (2, 7.15, 11.1), (3, 11.15, 16.6)]
 
