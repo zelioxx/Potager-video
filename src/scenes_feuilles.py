@@ -172,8 +172,7 @@ def s_free(t):
     return w, u
 
 
-cue(3.34, "pop_hi", 0.25)
-cue(4.4, "rise", 0.22)
+cue(2.85, "rustle", 0.32)
 cue(5.6, "thud", 0.4)
 cue(5.66, "success", 0.3)
 
@@ -348,8 +347,8 @@ def s_weekend(t):
         # tas de feuilles DANS le bac : posé sur la brouette, on efface ce qui passe sous le bord avant du bac
         P = lambda x, y: (bx + (x - BARROW_BASE[0]) * k, TABLE + 40 + (y - BARROW_BASE[1]) * k)
         pile = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        cx, cy = P(545, 690)
-        item(pile, "tas_feuilles", PILE_BASE, cx, cy, 0.5 * k)
+        cx, cy = P(545, 770)
+        item(pile, "tas_feuilles", PILE_BASE, cx, cy, 0.43 * k)
         m = Image.new("L", (W, H), 255)
         ImageDraw.Draw(m).polygon([P(195, 652), P(885, 668), P(885, 1300), P(195, 1300)], fill=0)
         pile.putalpha(Image.composite(pile.getchannel("A"), Image.new("L", (W, H), 0), m))

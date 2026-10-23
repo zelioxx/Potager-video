@@ -155,6 +155,20 @@ def mower(d=1.5):
     return norm(x * env, 0.75)
 
 
+def rustle(d=1.6):
+    """Bruissement de feuilles mortes : petits craquements secs et doux, qui arrivent puis s'éloignent."""
+    n = int(d * SR)
+    out = np.zeros(n, np.float32)
+    for _ in range(int(d * 45)):
+        o = int(rng.uniform(0, d - 0.05) * SR)
+        g = _t(rng.uniform(0.015, 0.04))
+        out[o: o + len(g)] += _bp(rng.standard_normal(len(g)), 1800, 7000) * np.exp(-g * 90) * rng.uniform(0.2, 1)
+    t = np.arange(n) / SR
+    out += _bp(rng.standard_normal(n), 900, 4000) * 0.08
+    env = np.minimum(1, t / 0.35) * np.minimum(1, (d - t) / 0.6)
+    return norm(out * env, 0.6)
+
+
 def rain(d=2.2):
     n = int(d * SR)
     x = _bp(rng.standard_normal(n), 500, 6000) * 0.25
@@ -324,6 +338,7 @@ BANK = {
     "peck": peck,
     "buzz": buzz,
     "mower": mower,
+    "rustle": rustle,
     "rain": rain,
     "crunch": crunch,
     "sparkle": sparkle,
