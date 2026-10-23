@@ -145,11 +145,14 @@ def worm(c, x, y, k, t, rot=0.0, phase=0.0):
     """Ver de terre qui ondule (légère déformation verticale)."""
     im = raw("ver").crop(raw("ver").getbbox())
     w_, h_ = int(im.width * k), int(im.height * k)
-    im = im.resize((max(1, w_), max(1, h_)), Image.BICUBIC)
+    if w_ < 8 or h_ < 8:
+        return
+    im = im.resize((w_, h_), Image.BICUBIC)
     a = np.asarray(im)
     out = np.zeros_like(a)
     for xx in range(0, w_, 4):
         dy = int(math.sin(xx / max(1, w_) * 6.28 * 1.5 + t * 6 + phase) * 10 * k / 0.3)
+        dy = max(-(h_ - 1), min(h_ - 1, dy))
         sl = a[:, xx:xx + 4]
         if dy >= 0:
             out[dy:, xx:xx + 4] = sl[:h_ - dy]
