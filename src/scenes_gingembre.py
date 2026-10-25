@@ -160,17 +160,51 @@ def gin_in_pot(c, t, name="gingembre_yeux", drop=1.0, alpha=1.0):
 
 
 # ============================================================ A. AU FOND DE TON PANIER ? (0 → 2.3)
+BAG_K, BAG_X = 0.75, 540
+BAG_FRONT = [(360, 166), (600, 171), (895, 157)]     # bord supérieur du pan avant du sac
+PEEK_K = 0.33
+
+
+@lru_cache(None)
+def bag_front():
+    """Pan avant du sac seul (sous son bord supérieur) : redessiné devant le gingembre."""
+    im = Image.open(os.path.join(ROOT, "assets", "images", A + "sac.png")).convert("RGBA")
+    m = Image.new("L", im.size, 0)
+    ImageDraw.Draw(m).polygon(BAG_FRONT + [(895, 1254), (360, 1254)], fill=255)
+    im.putalpha(Image.composite(im.getchannel("A"), Image.new("L", im.size, 0), m))
+    return im
+
+
+def bag_scene(c, t, gin_pose=None, s=1.0, dx=0.0, alpha=1.0):
+    """Sac posé ; gin_pose = (x, y, rot) : gingembre DANS le sac (devant le fond, derrière le pan avant)."""
+    if s <= 0.01:
+        return
+    place(c, A + "sac", FULL, BAG_K, *BAG_BASE, BAG_X + dx, TABLE + 40, s, 0.0, 0.0, alpha)
+    if gin_pose:
+        x, y, rot = gin_pose
+        gin(c, x, y, PEEK_K, "gingembre", rot=rot, shadow=False)
+        front = bag_front()
+        sz = int(1254 * BAG_K * s)
+        f = front.resize((sz, sz), Image.LANCZOS)
+        put(c, f, BAG_X + dx + (627 - BAG_BASE[0]) * BAG_K * s, TABLE + 40 + (627 - BAG_BASE[1]) * BAG_K * s, 1.0)
+
+
+def bag_rim_y():
+    return TABLE + 40 + (166 - BAG_BASE[1]) * BAG_K
+
+
+def peek_pose(t):
+    """Le gingembre, presque debout dans le sac, pointe hors de l'ouverture."""
+    p = ease_out((t - 0.85) / 0.45)
+    wob = math.sin(t * 6) * 4 * p
+    # gingembre tourné de 70° : son bas (repère GIN_BASE) est caché dans le sac
+    return BAG_X + 10, bag_rim_y() + lerp(420, 170, p), -70 + wob
+
+
 def s_intro(t):
     w, u = new_layers(background("table"))
-    k = 0.62
-    peek = ease_out((t - 0.85) / 0.4)
-    bag_s = life(t, 0.0, dur=0.4)
-    # le gingembre est DANS le sac : dessiné avant, il dépasse du bord quand il pointe le bout du nez
-    gx, gy = 540, TABLE + 40 + (BAG_TOP - BAG_BASE[1]) * k + lerp(260, 40, peek)
-    if peek > 0:
-        gin(w, gx, gy, 0.42, rot=-8 + 6 * math.sin(t * 5), shadow=False)
-    place(w, A + "sac", FULL, k, *BAG_BASE, 540, TABLE + 40, bag_s)
-    put(u, icon("question", 130), 820, 640, life(t, 1.4), math.sin(t * 5) * 6)
+    bag_scene(w, t, peek_pose(t) if t > 0.8 else None, life(t, 0.0, dur=0.4))
+    put(u, icon("question", 130), 860, 600, life(t, 1.4), math.sin(t * 5) * 6)
     title(u, "AU FOND DU PANIER ?", t, 0.38, None, y=330, size=125)
     return w, u
 
@@ -185,19 +219,35 @@ def s_dont(t):
     w, u = new_layers(background("table"))
     if t > 3.3:
         plant(w, 540, TABLE + 30, 0.62, life(t, 3.4, dur=0.5), alpha=0.35 + 0.15 * math.sin(t * 4))
-    jump = ease_out((t - 2.35) / 0.45)
-    gin(w, lerp(540, 330, jump), TABLE + 30 - math.sin(math.pi * clamp((t - 2.35) / 0.45)) * 200, 0.42)
-    if t < 3.38:
-        trash_bin(w, 820, TABLE + 10, BIN_H * 0.8, 0, life(t, 2.6, 3.35))
-        put(u, icon("nosign", 330), 820, TABLE - 230, life(t, 2.95, 3.35))
+    # il saute hors du sac et atterrit à gauche ; le sac s'en va ensuite
+    p = clamp((t - 2.4) / 0.55)
+    x0, y0, r0 = peek_pose(2.4)
+    # 1) il sort tout droit par l'ouverture (toujours derrière le pan avant), 2) il bascule et saute à gauche
+    up = ease_out(clamp(p / 0.35))
+    q = ease_io(clamp((p - 0.3) / 0.7))
+    x = lerp(x0, 290, q)
+    y = lerp(y0 - 70 * up, TABLE + 30, q) - math.sin(math.pi * q) * 80
+    rot = lerp(r0, 0, q)
+    k = lerp(PEEK_K, 0.4, q)
+    bag_a = 1 - ease_io((t - 2.62) / 0.22)
+    if q <= 0:
+        bag_scene(w, t, (x, y, rot))
     else:
+        bag_scene(w, t, None, 1.0, alpha=bag_a)
+        gin(w, x, y, k, "gingembre", rot=rot, shadow=q >= 1)
+    if 2.75 < t < 3.38:
+        trash_bin(w, 820, TABLE + 10, BIN_H * 0.8, 0, life(t, 2.78, 3.35))
+        put(u, icon("nosign", 330), 820, TABLE - 230, life(t, 2.95, 3.35))
+    elif t >= 3.38:
         sparkles(u, t, 3.45, 540, 760, 360, 9, 4)
     title(u, "NE LE JETTE PAS !", t, 2.42, 3.32, y=330, color=RED, size=140)
     title(u, "IL PEUT REPOUSSER", t, 3.38, None, y=330, color=YEL, size=130)
     return w, u
 
 
-cue(2.95, "alert2", 0.35)
+cue(2.45, "whoosh_up", 0.22)
+cue(2.9, "thud", 0.3)
+cue(3.0, "alert2", 0.32)
 cue(3.45, "sparkle", 0.3)
 
 
