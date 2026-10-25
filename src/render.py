@@ -109,6 +109,11 @@ semaines racine sort planter pot abonne-toi astuces"""),
         highlight="""tempête austine vidé arbres bonne nouvelle paillage gratuit étalées potager feuilles mortes
 protègent froid pluie dessous vers régalent printemps l'engrais souple conseil tondeuse broyées croûte
 décomposent vite week-end râteau brouette abonne-toi astuces"""),
+    "gingembre": dict(
+        scenes="scenes_gingembre", dur=29.3, voice=os.path.join(AUD, "gingembre", "voix.mp3"),
+        words=os.path.join(AUD, "gingembre", "voix_mots.json"), out="gingembre_repousse_1080x1920.mp4",
+        highlight="""gingembre panier jette repousser étape 1 2 3 dodu yeux bourgeons tremper nuit l'eau tiède
+couche-le pot haut surface secret chaleur peine humide semaines pousse verte terre abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
