@@ -13,3 +13,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `calathea_morte.png` | Même calathea, entièrement desséchée (feuilles brunes) |
 | `robinet_mitigeur.png` | Robinet mitigeur de cuisine chromé |
 | `robinet_mural.png` | Robinet mural (sortie de jardin) chromé, embout de tuyau |
+| `arrosoir_zinc.png` | Arrosoir en zinc galvanisé (pomme à gauche) |

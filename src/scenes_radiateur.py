@@ -195,18 +195,27 @@ cue(5.42, "thud", 0.4)
 cue(5.48, "alert1", 0.35)
 
 
-# ============================================================ C-D-E. UNE SEULE SCÈNE CONTINUE (6.6 → 16.15)
-# même décor du début à la fin (plante au centre, radiateur à droite) : pas de coupure entre les trois phrases.
-PX, PK = 600, 0.5                 # plante
+# ============================================================ C-D-E. UNE SEULE SCÈNE, LA CAMÉRA GLISSE (6.6 → 16.15)
+# décor unique plus large que l'écran : robinet mural à gauche (hors champ), plante et radiateur au centre.
+# la caméra glisse vers le robinet puis revient sur la plante en emportant l'arrosoir : aucune coupure.
+PX, PK = 540, 0.5                    # plante
 RX, RY, RK = 870, TABLE - 50, 0.38   # radiateur
 TAP = "banque/robinet_mural"
-TAP_K = 0.32
+TAP_K = 0.42
 TAP_INLET, TAP_NOZZLE = (150, 630), (950, 1190)     # filetage (dans le mur) / bout du tuyau (robinet_mural.png)
-CAN = "poireau/watering_can"
-CAN_H = 300
-CAN_OPEN = (290, 210)             # ouverture de l'arrosoir (watering_can.png, 887×703)
-NOZ = (12 + (TAP_NOZZLE[0] - TAP_INLET[0]) * TAP_K, TABLE - 180 - 250)
-CAN_X = NOZ[0] + (443 - CAN_OPEN[0]) * CAN_H / 703   # l'ouverture est pile sous le robinet
+CAN = "banque/arrosoir_zinc"
+CAN_K = 0.4
+CAN_BASE, CAN_OPEN, CAN_ROSE = (815, 1150), (1000, 450), (110, 430)   # arrosoir_zinc.png
+CAM_TAP = -1000                      # décalage caméra quand on regarde le robinet
+NOZ_W = (CAM_TAP + 640, 880)         # bout du robinet (coordonnées du décor)
+CAN_W = (NOZ_W[0] - (CAN_OPEN[0] - CAN_BASE[0]) * CAN_K, TABLE + 30)   # arrosoir posé, ouverture sous le robinet
+TIP_I = 4                            # pointe de feuille montrée à la loupe (TIPS[4], tournée vers la droite)
+
+
+def cam_x(t):
+    go = ease_io((t - 9.45) / 0.5)
+    back = ease_io((t - 10.95) / 0.55)
+    return CAM_TAP * go * (1 - back)
 
 
 def heat_haze(c, t, a):
@@ -224,14 +233,16 @@ def heat_haze(c, t, a):
     c.alpha_composite(ov.filter(ImageFilter.GaussianBlur(7)).resize((W, H), Image.BICUBIC))
 
 
-def wall_tap(c, s=1.0):
-    """Robinet mural : son filetage rentre dans le mur (bord gauche de l'image)."""
-    if s <= 0.01:
+def wall_tap(c, cx):
+    """Robinet mural en grand ; son filetage rentre dans une rosace fixée au mur."""
+    nx = NOZ_W[0] - cx
+    if nx < -700 or nx > W + 700:
         return
-    place(c, TAP, FULL, TAP_K, *TAP_NOZZLE, NOZ[0], NOZ[1], s)
+    ix = nx + (TAP_INLET[0] - TAP_NOZZLE[0]) * TAP_K
+    iy = NOZ_W[1] + (TAP_INLET[1] - TAP_NOZZLE[1]) * TAP_K
     d = ImageDraw.Draw(c)
-    iy = NOZ[1] + (TAP_INLET[1] - TAP_NOZZLE[1]) * TAP_K
-    d.ellipse([-30, iy - 60 * s, 30, iy + 60 * s], fill=(200, 200, 196), outline=(150, 150, 146), width=4)
+    d.ellipse([ix - 40, iy - 95, ix + 40, iy + 95], fill=(196, 196, 192), outline=(140, 140, 136), width=5)
+    place(c, TAP, FULL, TAP_K, *TAP_NOZZLE, nx, NOZ_W[1])
 
 
 def stream(c, x, y0, y1, t, a=1.0):
@@ -242,8 +253,8 @@ def stream(c, x, y0, y1, t, a=1.0):
     d = ImageDraw.Draw(ov)
     pts = [(x + 3 * math.sin(yy * 0.05 + t * 20), yy) for yy in range(int(y0), int(y1), 8)]
     if len(pts) > 1:
-        d.line(pts, fill=(110, 175, 230, int(220 * a)), width=16, joint="curve")
-        d.line([(px - 3, py) for px, py in pts], fill=(225, 242, 252, int(230 * a)), width=4)
+        d.line(pts, fill=(110, 175, 230, int(220 * a)), width=22, joint="curve")
+        d.line([(px - 5, py) for px, py in pts], fill=(225, 242, 252, int(230 * a)), width=5)
     c.alpha_composite(ov)
 
 
@@ -262,62 +273,125 @@ def tip_specks(c, X, Y, k, acc, state="seche"):
                           outline=(200, 200, 196))
 
 
+def can_at(c, base_x, base_y, rot=0.0, s=1.0, alpha=1.0):
+    place(c, CAN, FULL, CAN_K, *CAN_BASE, base_x, base_y, s, rot, 0.0, alpha)
+
+
+def can_rose(base_x, base_y, rot):
+    """Position écran de la pomme de l'arrosoir posé en (base_x, base_y) et tourné de rot° (sens PIL)."""
+    cx = base_x + (627 - CAN_BASE[0]) * CAN_K
+    cy = base_y + (627 - CAN_BASE[1]) * CAN_K
+    vx, vy = (CAN_ROSE[0] - 627) * CAN_K, (CAN_ROSE[1] - 627) * CAN_K
+    a = math.radians(rot)
+    return cx + vx * math.cos(a) + vy * math.sin(a), cy - vx * math.sin(a) + vy * math.cos(a)
+
+
+@lru_cache(8)
+def tip_zoom(burn_q):
+    """Gros plan rond sur une pointe de feuille (photo très sèche), qui brunit avec burn."""
+    name, base = PLANTS["seche"]
+    src = Image.open(os.path.join(IMG, B + name + ".png")).convert("RGBA")
+    tx, ty = TIPS[TIP_I]
+    r = 120
+    crop = src.crop((tx - 40 - r, ty + 5 - r, tx - 40 + r, ty + 5 + r)).resize((340, 340), Image.LANCZOS)
+    S = 380
+    im = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.ellipse([0, 0, S - 1, S - 1], fill=DARK)
+    d.ellipse([10, 10, S - 11, S - 11], fill=CREAM)
+    m = Image.new("L", (340, 340), 0)
+    ImageDraw.Draw(m).ellipse([0, 0, 339, 339], fill=255)
+    inner = Image.new("RGBA", (340, 340), CREAM + (255,))
+    inner.alpha_composite(crop)
+    if burn_q:
+        # la pointe (côté gauche du gros plan) devient brun foncé
+        b = Image.new("L", (340, 340), 0)
+        ImageDraw.Draw(b).ellipse([150, 80, 360, 260], fill=int(235 * burn_q / 10))
+        b = b.filter(ImageFilter.GaussianBlur(28))
+        brown = Image.new("RGBA", (340, 340), (92, 52, 22, 255))
+        a = np.minimum(np.asarray(b), np.asarray(crop.getchannel("A")))
+        brown.putalpha(Image.fromarray(a.astype("uint8")))
+        inner.alpha_composite(brown)
+    im.paste(inner, (20, 20), m)
+    return im
+
+
 def s_middle(t):
     w, u = new_layers(background("table"))
-    radiator(w, RX, RY, RK)
-    # --- air chaud et sec (6.6 → 9.45)
-    heat_haze(w, t, fade(t, 6.9, 9.4, 0.5, 0.4))
-    # --- état de la plante : bords secs → très sèche → morte (calcaire qui brûle)
+    cx = cam_x(t)
+    # --- décor : radiateur + plante (dans le repère du décor, décalé par la caméra)
+    radiator(w, RX - cx, RY, RK)
+    heat_haze(w, t, fade(t, 6.9, 9.3, 0.5, 0.4))
     if t < 13.3:
-        state_a, state_b, p = "secs", "seche", ease_io((t - 8.0) / 1.2)
+        sa, sb, p = "secs", "seche", ease_io((t - 8.0) / 1.2)
     else:
-        state_a, state_b, p = "seche", "morte", ease_io((t - 13.3) / 0.6)
-    move = ease_io((t - 14.86) / 0.7)
-    X = lerp(PX, 230, move)
-    # --- robinet + arrosoir (9.45 → 14.3)
-    tap_s = life(t, 9.55, 11.05, dur=0.35)
-    wall_tap(w, tap_s)
-    lift = ease_io((t - 11.0) / 0.45)
-    can_a = 1 - fade(t, 13.9, None, 0.3)
-    if 9.55 < t < 14.2 and lift <= 0:
-        spr(w, CAN, CAN_X, TABLE + 30, CAN_H, life(t, 9.65), alpha=can_a)
-    if 9.55 < t < 14.2:
-        if 9.95 < t < 10.95:
-            stream(w, NOZ[0], NOZ[1] + 4, TABLE - 180, t, fade(t, 9.95, 10.95, 0.08, 0.15))
-            particles(w, t, 10.0, NOZ[0], TABLE - 180, 6, 3, col=(200, 230, 250), size=8, up=120, dur=0.9)
-    plant_mix(w, state_a, state_b, p, X, TABLE + 30, PK)
-    if 11.0 < t < 14.2 and lift > 0 and can_a > 0.01:
-        # l'arrosoir se soulève et arrose le pot (dessiné devant la plante pour voir l'eau)
-        soil = (X - 20, TABLE + 30 - 330 * PK)
-        spout = (lerp(CAN_X + 200, soil[0] - 90, lift), lerp(TABLE - 200, soil[1] - 330, lift))
-        from scenes_arrosage import watering
-        layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        watering(layer, t, 11.3, spout, soil, CAN_H, 38 * lift, pour=t < 12.6)
-        if can_a < 1:
-            layer.putalpha(layer.getchannel("A").point(lambda v: int(v * can_a)))
-        w.alpha_composite(layer)
-    tip_specks(w, X, TABLE + 30, PK, ease_out((t - 11.6) / 1.3) * (1 - p if t >= 13.3 else 1))
-    if 7.74 < t < 9.45:   # la plante transpire : l'eau s'évapore des feuilles
+        sa, sb, p = "seche", "morte", ease_io((t - 13.3) / 0.6)
+    X = lerp(PX, 230, ease_io((t - 14.86) / 0.7)) - cx
+    # --- robinet mural (hors champ à gauche au début)
+    wall_tap(w, cx)
+    # --- arrosoir : posé sous le robinet, rempli, puis emporté au-dessus du pot
+    carry = ease_io((t - 10.95) / 0.6)
+    tilt = ease_out((t - 11.45) / 0.35) * (1 - ease_io((t - 12.75) / 0.3))
+    pose = (X + 330, TABLE - 230)                          # au-dessus, à droite du pot
+    bx = lerp(CAN_W[0] - cx, pose[0], carry)
+    by = lerp(CAN_W[1], pose[1], carry) - math.sin(math.pi * carry) * 120
+    can_a = 1 - fade(t, 13.0, None, 0.35)
+    plant_mix(w, sa, sb, p, X, TABLE + 30, PK)
+    if t > 9.3 and can_a > 0.01:
+        rot = 32 * tilt
+        if 10.0 < t < 10.95:
+            nx = NOZ_W[0] - cx
+            stream(w, nx, NOZ_W[1] + 4, CAN_W[1] - (CAN_BASE[1] - CAN_OPEN[1]) * CAN_K + 10, t,
+                   fade(t, 10.0, 10.9, 0.08, 0.15))
+            particles(w, t, 10.05, nx, CAN_W[1] - (CAN_BASE[1] - CAN_OPEN[1]) * CAN_K, 6, 3, col=(200, 230, 250),
+                      size=8, up=120, dur=0.85)
+        can_at(w, bx, by, rot, life(t, 9.4, dur=0.35), can_a)
+        if tilt > 0.3:
+            rx_, ry_ = can_rose(bx, by, rot)
+            soil = (X, TABLE + 30 - 300 * PK)
+            r = np.random.default_rng(4)
+            d = ImageDraw.Draw(w)
+            for i in range(18):
+                ph = ((t - 11.5) * 1.6 + i / 18) % 1
+                x = lerp(rx_, soil[0] + r.uniform(-60, 60), ph)
+                y = lerp(ry_, soil[1], ph ** 1.3)
+                rad = r.uniform(5, 8)
+                d.ellipse([x - rad, y - rad * 1.3, x + rad, y + rad * 1.3], fill=(90, 165, 225, 230),
+                          outline=(225, 242, 252, 255), width=2)
+    # --- calcaire : petits dépôts blancs au bout des feuilles + loupe sur une pointe
+    if 11.7 < t < 14.3:
+        acc = ease_out((t - 11.75) / 1.3)
+        tip_specks(w, X, TABLE + 30, PK, acc * (1 - p if t >= 13.3 else 1))
+        burn = ease_io((t - 13.3) / 0.6)
+        zx, zy = 830, 600
+        zs = life(t, 11.8, 14.25)
+        if zs > 0.01:
+            z = tip_zoom(int(round(burn * 10))).copy()
+            dz = ImageDraw.Draw(z)
+            rr = np.random.default_rng(9)
+            for j in range(int(40 * acc * (1 - burn))):
+                ox, oy, rad = rr.normal(222, 26), rr.normal(176, 18), rr.uniform(5, 10)
+                dz.ellipse([ox - rad, oy - rad, ox + rad, oy + rad], fill=(252, 252, 248), outline=(205, 205, 200))
+            tx, ty = tip_pos(TIP_I, sa, X, TABLE + 30, PK)
+            dl = ImageDraw.Draw(u)
+            dl.line([(tx, ty), (zx - 60 * zs, zy + 175 * zs)], fill=DARK + (200,), width=5)
+            put(u, z, zx, zy, zs)
+            tag(u, "CALCAIRE" if t < 13.26 else "BRÛLURE", 470, 560, t, 12.0, 14.2, rot=-4, size=50)
+    # --- icônes
+    put(u, icon("thermo", 130), RX - 80 - cx, 640, life(t, 6.95, 9.4))
+    if t > 7.38:
+        put(u, icon("drop", 100), RX + 90 - cx, 640, life(t, 7.4, 9.4))
+        put(u, icon("nosign", 150), RX + 90 - cx, 640, life(t, 7.45, 9.4))
+    if 7.74 < t < 9.45:   # la plante transpire
         for i in range(6):
             tt = (t - 7.8 - i * 0.2) % 1.1
             put(w, icon("drop", 36), X - 160 + i * 64, TABLE - 420 - tt * 260, 1, 0, (1 - tt / 1.1) * 0.9)
-    # --- icônes et étiquettes
-    put(u, icon("thermo", 130), RX - 80, 640, life(t, 6.95, 9.4))
-    if t > 7.38:
-        put(u, icon("drop", 100), RX + 90, 640, life(t, 7.4, 9.4))
-        put(u, icon("nosign", 150), RX + 90, 640, life(t, 7.45, 9.4))
-    if 11.6 < t < 13.25:
-        tx0, ty0 = tip_pos(3, "seche", X, TABLE + 30, PK)
-        tag(u, "CALCAIRE", 860, ty0 - 160, t, 11.65, 13.2, rot=-5, size=56, string_to=(tx0, ty0 - 10))
-    if t > 13.3:
-        put(u, icon("cross", 150), 860, 620, life(t, 13.6, 14.3))
     if t > 14.9:
         d = ImageDraw.Draw(u)
         a = int(255 * fade(t, 15.3, None, 0.2))
-        y = TABLE - 120
         for i in range(0, 12, 2):
             x0 = 420 + i * 30
-            d.line([(x0, y), (x0 + 30, y)], fill=(255, 255, 255, a), width=8)
+            d.line([(x0, TABLE - 120), (x0 + 30, TABLE - 120)], fill=(255, 255, 255, a), width=8)
         tag(u, "LOIN DU RADIATEUR", 540, 640, t, 15.35, None, rot=-4, size=50)
     title(u, "AIR CHAUD ET SEC", t, 6.86, 7.7, y=330, size=140)
     title(u, "ELLE BOIT PLUS VITE", t, 7.74, 9.4, y=330, color=YEL, size=125)
@@ -330,13 +404,14 @@ def s_middle(t):
 
 cue(7.0, "rise", 0.18)
 cue(7.45, "pop", 0.2)
-cue(9.6, "pop_lo", 0.25)
-cue(9.85, "squeak", 0.22)
-cue(9.98, "pour", 0.3)
-cue(11.35, "pour", 0.22)
-cue(11.7, "sparkle", 0.2)
-cue(13.4, "fail", 0.38)
-cue(14.9, "whoosh", 0.22)
+cue(9.5, "whoosh", 0.18)
+cue(9.88, "squeak", 0.22)
+cue(10.02, "pour", 0.3)
+cue(11.0, "whoosh", 0.16)
+cue(11.5, "pour", 0.22)
+cue(11.85, "pop_hi", 0.2)
+cue(13.35, "fail", 0.38)
+cue(14.9, "whoosh", 0.2)
 
 
 # ============================================================ F. PLATEAU DE BILLES D'ARGILE + FOND D'EAU (16.15 → 20.85)
@@ -380,14 +455,14 @@ cue(19.7, "sparkle", 0.3)
 
 
 # ============================================================ G. ARROSE À L'EAU DE PLUIE (20.85 → 22.55)
-CAN = "poireau/watering_can"
+CAN_RAIN = "banque/arrosoir_zinc"
 
 
 def s_rain(t):
     w, u = new_layers(background("table"))
     falling(w, t, 20.9, None, "drop", 22, 7, 1300, 46, bottom=TABLE)
     plant(w, "saine", 330, TABLE + 30, 0.5)
-    spr(w, CAN, 800, TABLE + 30, 330, life(t, 21.1))
+    spr(w, CAN_RAIN, 800, TABLE + 30, 380, life(t, 21.1))
     put(u, icon("check", 140), 800, 620, life(t, 21.7))
     title(u, "ARROSE À L'EAU DE PLUIE", t, 20.9, None, y=330, size=105)
     return w, u
