@@ -11,3 +11,5 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `calathea_bords_secs.png` | Même calathea, débuts de bords bruns et secs |
 | `calathea_tres_seche.png` | Même calathea, bords très bruns, feuilles qui s'enroulent |
 | `calathea_morte.png` | Même calathea, entièrement desséchée (feuilles brunes) |
+| `robinet_mitigeur.png` | Robinet mitigeur de cuisine chromé |
+| `robinet_mural.png` | Robinet mural (sortie de jardin) chromé, embout de tuyau |
