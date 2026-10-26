@@ -724,6 +724,8 @@ def particles(c, t, t0, x, y, n=14, seed=3, col=(96, 64, 40), spread=360, up=520
         px = x + vx * k
         py = y + vy * k + 1400 * k * k
         s = size * r.uniform(0.6, 1.3) * (1 - k / dur)
+        if s < 0.5:
+            continue
         d.ellipse([px - s, py - s, px + s, py + s], fill=col + (255,))
 
 
