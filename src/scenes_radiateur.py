@@ -82,10 +82,17 @@ def plant(c, state, X, Y, k, s=1.0, alpha=1.0, shadow=True):
 
 
 def plant_mix(c, a, b, p, X, Y, k, s=1.0):
-    """Fondu d'un état de la plante à l'autre (p = 0 → a, 1 → b)."""
-    plant(c, a, X, Y, k, s)
-    if p > 0.01:
-        plant(c, b, X, Y, k, s, alpha=clamp(p), shadow=False)
+    """Passage d'un état de la plante à l'autre (p = 0 → a, 1 → b), sans jamais superposer les deux photos :
+    la plante se tasse, change d'un coup au plus petit, puis reprend sa taille (petit rebond)."""
+    p = clamp(p)
+    if p <= 0.0 or p >= 1.0:
+        plant(c, b if p >= 1.0 else a, X, Y, k, s)
+        return
+    if p < 0.5:
+        plant(c, a, X, Y, k, s * (1 - 0.1 * ease_io(p * 2)))
+    else:
+        q = (p - 0.5) * 2
+        plant(c, b, X, Y, k, s * (0.9 + 0.1 * q + 0.03 * math.sin(math.pi * q)))
 
 
 def tip_pos(i, state, X, Y, k):
