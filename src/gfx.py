@@ -625,6 +625,8 @@ def hl_ellipse(c, cx, cy, rx, ry, s=1.0, width=9):
     if s <= 0.01:
         return
     rx, ry = rx * s, ry * s
+    if rx < 4 or ry < 4:   # trop petite (début du pop) : rien à dessiner
+        return
     w, h = int(rx * 2 + 40), int(ry * 2 + 40)
 
     def f(d, k, _):
