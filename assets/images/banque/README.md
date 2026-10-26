@@ -10,3 +10,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `calathea_saine.png` | Calathea en pot noir, feuilles saines |
 | `calathea_bords_secs.png` | Même calathea, débuts de bords bruns et secs |
 | `calathea_tres_seche.png` | Même calathea, bords très bruns, feuilles qui s'enroulent |
+| `calathea_morte.png` | Même calathea, entièrement desséchée (feuilles brunes) |

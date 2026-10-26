@@ -114,6 +114,12 @@ décomposent vite week-end râteau brouette abonne-toi astuces"""),
         words=os.path.join(AUD, "gingembre", "voix_mots.json"), out="gingembre_repousse_1080x1920.mp4",
         highlight="""gingembre panier jette repousser étape 1 2 3 dodu yeux bourgeons tremper nuit l'eau tiède
 couche-le pot haut surface secret chaleur peine humide semaines pousse verte terre abonne-toi astuces"""),
+    "radiateur": dict(
+        scenes="scenes_radiateur", dur=25.5, voice=os.path.join(AUD, "radiateur", "voix.mp3"),
+        words=os.path.join(AUD, "radiateur", "voix_mots.json"), out="radiateur_pointes_brunes_1080x1920.mp4",
+        highlight="""pointes brunissent chauffage coupable radiateur chaud sec boire vite robinet calcaire
+s'accumule feuilles brûle éloigne-la plateau billes d'argile fond d'eau humidifie l'air arrose pluie
+abonne-toi astuces plantes"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
