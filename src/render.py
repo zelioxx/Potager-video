@@ -120,6 +120,12 @@ couche-le pot haut surface secret chaleur peine humide semaines pousse verte ter
         highlight="""pointes brunissent chauffage coupable radiateur chaud sec boire vite robinet calcaire
 s'accumule feuilles brûle éloigne-la plateau billes d'argile fond d'eau humidifie l'air arrose pluie
 abonne-toi astuces plantes"""),
+    "tulipes": dict(
+        scenes="scenes_tulipes", dur=32.5, voice=os.path.join(AUD, "tulipes", "voix.mp3"),
+        words=os.path.join(AUD, "tulipes", "voix_mots.json"), out="tulipes_bulbes_1080x1920.mp4",
+        highlight="""printemps tulipes partout mêmes trop tard bonne nouvelle maintenant planter tulipe jonquille
+crocus enterre bulbe 2 3 fois hauteur pointe haut l'envers drainante pourrit automne froid l'hiver fleurir
+beaux parterres abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
