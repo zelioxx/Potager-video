@@ -126,6 +126,12 @@ abonne-toi astuces plantes"""),
         highlight="""printemps tulipes partout mêmes trop tard bonne nouvelle maintenant planter tulipe jonquille
 crocus enterre bulbe 2 3 fois hauteur pointe haut l'envers drainante pourrit automne froid l'hiver fleurir
 beaux parterres abonne-toi astuces"""),
+    "citron": dict(
+        scenes="scenes_citron", dur=29.6, voice=os.path.join(AUD, "citron", "voix.mp3"),
+        words=os.path.join(AUD, "citron", "voix_mots.json"), out="citron_pepin_1080x1920.mp4",
+        highlight="""jettes pépins citron arrête arbres simple germer frais rince-les retire délicatement peau
+blanche secret deux fois vite sopalin humide boîte film transparent chaud lumière 2 3 semaines feuilles
+sentent abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
