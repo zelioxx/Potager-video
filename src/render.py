@@ -137,6 +137,11 @@ sentent abonne-toi astuces"""),
         words=os.path.join(AUD, "avocat2", "voix_mots.json"), out="avocat_noyau_v2_1080x1920.mp4",
         highlight="""jettes noyau d'avocat arbre savoir lave-le retire peau brune enroule-le essuie-tout humide
 boîte fermée chaud attend semaines fend racine sort abonne-toi"""),
+    "chrysantheme": dict(
+        scenes="scenes_chrysantheme", dur=17.6, voice=os.path.join(AUD, "chrysantheme", "voix.mp3"),
+        words=os.path.join(AUD, "chrysantheme", "voix_mots.json"), out="chrysanthemes_1080x1920.mp4",
+        highlight="""chrysanthèmes gratuits acheter explique semaine milliers poubelle récupère-les coupe tiges
+10 cm plante-les jardin l'automne prochain refleurissent gratuitement malin"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
