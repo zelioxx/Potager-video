@@ -316,7 +316,7 @@ def build_audio(path):
 
 # volume « TikTok » : voix compressée puis normalisée à ≈ -10 LUFS, limiteur pour ne jamais saturer
 LOUD = ("acompressor=threshold=-20dB:ratio=3:attack=5:release=90:makeup=3,"
-        "loudnorm=I=-9.5:TP=-1.0:LRA=7,alimiter=limit=0.89:level=false")
+        "loudnorm=I=-9.5:TP=-1.5:LRA=7,alimiter=limit=0.78:level=false")
 
 
 def main():
