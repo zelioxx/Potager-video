@@ -15,6 +15,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 from gfx import (ROOT, IMG, W, H, YEL, RED, GREEN, CREAM, DARK, WHITE, put, title, life, fade, ease_out, ease_io,
+                 ease_in as ease_in_q,
                  clamp, lerp, icon, pills, tag, button_img, hl_ellipse, particles, light_rays)
 from scenes import sparkles
 from scenes_ananas import place, logo_img
@@ -128,63 +129,82 @@ def wrapped(c, X, Y, w_, pit, pit_w, cover, wet, see=0.45, pit_rot=-10):
 
 # ============================================================ A-B-C. LA CUISINE, UN SEUL PLAN (0 → 12.4)
 BOARD = (520, 1170)
-BIN_X, BIN_BASE, BIN_W = 880, 1470, 250
-BIN_RIM = BIN_BASE - (920 - 330) / (727 - 297) * BIN_W     # bord avant de la poubelle (écran)
+START = (440, 1150)                                         # le noyau au début, sur la planche
+# poubelle au PREMIER PLAN, posée par terre devant le plan de travail (coupée par le bas de l'image)
+BIN_X, BIN_BASE, BIN_W = 850, 2160, 620
+BIN_RIM = BIN_BASE - (920 - 330) / (727 - 297) * BIN_W     # bord avant de l'ouverture (écran)
+BIN_IN = (BIN_X - 10, BIN_RIM - 40)                         # où le noyau entre dans la poubelle
 
 
 def cam(t):
+    k0 = ease_out(t / 0.5)               # « coup de zoom » d'ouverture sur le noyau
     k1 = ease_io((t - 5.3) / 0.6)        # zoom sur le noyau (lavage, peau)
     k2 = ease_io((t - 8.1) / 0.6)        # plus large pour le sopalin et la boîte
-    z = lerp(lerp(1.0, 1.8, k1), 1.25, k2)
-    fx = lerp(lerp(540, BOARD[0], k1), BOARD[0], k2)
-    fy = lerp(lerp(1100, 1080, k1), 1130, k2)
+    z = lerp(lerp(lerp(1.45, 1.0, k0), 1.8, k1), 1.25, k2)
+    fx = lerp(lerp(lerp(START[0], 540, k0), BOARD[0], k1), BOARD[0], k2)
+    fy = lerp(lerp(lerp(START[1], 1100, k0), 1080, k1), 1130, k2)
     return z, fx, fy
 
 
-def pit_path(t):
-    """Le noyau : sur la planche → lancé dans la poubelle → il en ressort et revient sur la planche."""
-    start = (BOARD[0] - 60, BOARD[1] - 20)
-    inbin = (BIN_X, BIN_RIM + 60)
-    if t < 0.55:
-        return start[0], start[1], 0.0, True
-    if t < 1.1:
-        p = ease_io((t - 0.55) / 0.55)
-        return lerp(start[0], inbin[0], p), lerp(start[1], inbin[1] - 60, p) - math.sin(math.pi * p) * 380, -360 * p, True
-    if t < 2.35:
-        p = ease_out((t - 1.1) / 0.2)
-        return inbin[0], lerp(inbin[1] - 60, inbin[1], p), 0.0, True
-    p = ease_io((t - 2.35) / 0.6)
-    return lerp(inbin[0], BOARD[0], p), lerp(inbin[1], BOARD[1] - 20, p) - math.sin(math.pi * p) * 420, 360 * p, p < 0.25
+def throw(p):
+    """Trajectoire planche → poubelle (p = 0..1) : le noyau grossit en se rapprochant de la caméra."""
+    x = lerp(START[0], BIN_IN[0], p)
+    y = lerp(START[1], BIN_IN[1], p) - math.sin(math.pi * p) * 330
+    return x, y, lerp(190, 300, p)
 
 
 def s_kitchen(t):
     world = photo("citron_fond_cuisine.png").copy()
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     PW = 190   # largeur du noyau dans le décor
-    # --- 1. jeté à la poubelle, puis il revient (0 → 3.0)
-    bin_s = life(t, 0.0, 3.3, dur=0.35)
-    if t < 3.3:
-        x, y, rot, near_bin = pit_path(t)
-        if bin_s > 0.01:
-            shadow(world, BIN_X, BIN_BASE, BIN_W * 1.1 * bin_s)
-            ob(world, BIN, BIN_X, BIN_BASE, BIN_W, bin_s, anchor="bottom")
-        if near_bin and 1.0 < t < 2.6:
-            # dans la poubelle : on ne voit que ce qui dépasse du bord avant
+    # --- 1. jeté à la poubelle… RETOUR EN ARRIÈRE… c'est un arbre ! (0 → 4.6)
+    if t < 4.6:
+        bin_x = BIN_X + 700 * ease_io((t - 2.8) / 0.5)          # la poubelle sort par la droite
+        shake = math.sin(t * 60) * 10 * fade(t, 1.12, 1.45, 0.02, 0.2) if 1.12 < t < 1.45 else 0.0
+        inside = False
+        if t < 0.55:
+            x, y, pw, rot = START[0], START[1], PW, 0.0
+        elif t < 1.12:
+            p = ease_in_q(clamp((t - 0.55) / 0.57))
+            x, y, pw = throw(p)
+            rot = -300 * p
+        elif t < 1.95:
+            x, y, pw, rot = BIN_IN[0], BIN_IN[1] + 150 * ease_out((t - 1.12) / 0.2), 300, 0.0
+            inside = True
+        elif t < 2.7:   # rembobinage : le noyau refait le chemin à l'envers
+            p = 1 - ease_io((t - 1.95) / 0.75)
+            x, y, pw = throw(p)
+            rot = -300 * p
+            inside = p > 0.92
+        else:
+            x, y, pw, rot = START[0], START[1], PW, 0.0
+        on_board = t < 0.55 or t >= 2.7
+        if on_board:
+            shadow(world, x, BOARD[1] + 70, PW * 0.9)
+        if on_board and t > 2.9 and t < 4.6:
+            # « un arbre ! » : le noyau devient une jeune pousse, puis redevient noyau (« sans le savoir »)
+            w1, s1 = swap((t - 2.92) / 0.3)
+            w2, s2 = swap((t - 4.25) / 0.3)
+            if w1 == 1 and w2 == 0:
+                ob(world, PLANT, x + 20, BOARD[1] + 40, 330 * s1 * (s2 if t > 4.25 else 1), anchor="bottom")
+            else:
+                ob(world, PIT, x, y, PW * (s1 if w1 == 0 else s2))
+        elif not inside:
+            ob(world, PIT, x, y, pw, rot=rot)
+        if inside:
             lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-            ob(lay, PIT, x, y, PW * 0.8, rot=rot)
+            ob(lay, PIT, x, y, pw, rot=rot)
             m = Image.new("L", (W, H), 0)
             ImageDraw.Draw(m).rectangle([0, 0, W, int(BIN_RIM)], fill=255)
             lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), m))
             world.alpha_composite(lay)
-        else:
-            if t < 0.6 or t > 2.9:
-                shadow(world, x, BOARD[1] + 70, PW * 0.9)
-            ob(world, PIT, x, y, PW * (0.8 if 0.55 < t < 2.9 else 1.0), rot=rot)
-        if 1.1 < t < 1.5:
-            particles(world, t, 1.12, BIN_X, BIN_RIM - 10, 8, 3, col=(150, 150, 150), size=7, up=220)
+        if bin_x < W + 400:
+            ob(world, BIN, bin_x + shake, BIN_BASE, BIN_W, anchor="bottom")
+        if 1.12 < t < 1.5:
+            particles(world, t, 1.13, BIN_IN[0], BIN_RIM - 30, 10, 3, col=(170, 170, 170), size=9, up=260)
     # --- 2. lavage et peau brune (5.3 → 8.1)
-    if t >= 3.3:
-        X, Y = BOARD[0], BOARD[1] - 20
+    if t >= 4.6:
+        X, Y = START[0] + (BOARD[0] - START[0]) * ease_io((t - 4.6) / 0.5), BOARD[1] - 20
         if t < 8.6:
             shadow(world, X, BOARD[1] + 70, PW * 0.9)
             wipe(world, PIT, PELE, X, Y, PW, PW * 0.92, ease_io((t - 6.85) / 0.9))
@@ -224,19 +244,26 @@ def s_kitchen(t):
     world = zoomed(world, z, fx, fy)
     world.alpha_composite(shade())
     # --- UI
-    if 2.4 < t < 5.3:
-        s_ = life(t, 2.5, 5.2)
-        if s_ > 0.01:
-            d = ImageDraw.Draw(u)
-            r = 165 * s_
-            d.ellipse([860 - r - 8, 780 - r - 8, 860 + r + 8, 780 + r + 8], fill=DARK)
-            d.ellipse([860 - r, 780 - r, 860 + r, 780 + r], fill=CREAM)
-            ob(u, TREE, 860, 790, 190, s_)
-        sparkles(u, t, 4.15, 860, 780, 230, 8, 4)
+    if 1.95 < t < 2.75:   # effet « retour en arrière » : lignes de balayage + ◀◀
+        a = fade(t, 1.95, 2.72, 0.08, 0.12)
+        ov = Image.new("RGBA", (W, H), (40, 60, 90, int(50 * a)))
+        d = ImageDraw.Draw(ov)
+        for yy in range(0, H, 9):
+            d.line([(0, yy), (W, yy)], fill=(255, 255, 255, int(22 * a)), width=2)
+        off = (t * 900) % H
+        d.rectangle([0, off, W, off + 26], fill=(255, 255, 255, int(70 * a)))
+        u.alpha_composite(ov)
+        d = ImageDraw.Draw(u)
+        for i in range(2):
+            x0 = 120 + i * 70
+            d.polygon([(x0 + 70, 560), (x0 + 70, 660), (x0, 610)], fill=WHITE + (int(240 * a),), outline=DARK)
+    if 2.95 < t < 4.6:
+        sparkles(u, t, 3.0, 560, 900, 300, 9, 4)
     if 6.85 < t < 8.05:
         tag(u, "PEAU BRUNE", 790, 640, t, 6.9, 8.0, rot=-5, size=52)
     title(u, "TU LE JETTES ?", t, 0.3, 1.75, y=330, size=150)
-    stamp(u, "UN ARBRE !", 540, 360, t, 2.9, 4.0, GREEN, 130, -8)
+    title(u, "STOP !", t, 1.85, 2.85, y=330, color=RED, size=180)
+    stamp(u, "UN ARBRE !", 540, 360, t, 2.92, 3.8, GREEN, 130, -8)
     title(u, "SANS LE SAVOIR…", t, 4.05, 5.25, y=330, size=140)
     title(u, "LAVE-LE", t, 5.9, 6.75, y=330, color=YEL, size=170)
     title(u, "RETIRE SA PEAU", t, 6.8, 8.0, y=330, size=145)
@@ -246,13 +273,13 @@ def s_kitchen(t):
     return world, u
 
 
-cue(0.05, "pop_lo", 0.3)
+cue(0.0, "whoosh_up", 0.25)
 cue(0.6, "whoosh", 0.3)
 cue(1.12, "thud", 0.45)
-cue(1.85, "alert3", 0.35)
-cue(2.4, "whoosh_up", 0.3)
-cue(2.95, "thud", 0.35)
-cue(3.0, "success", 0.25)
+cue(1.88, "alert3", 0.35)
+cue(1.98, "rise", 0.3)
+cue(2.95, "success", 0.3)
+cue(4.28, "pop_lo", 0.22)
 cue(5.4, "whoosh", 0.15)
 cue(5.98, "splash", 0.3)
 cue(6.9, "squish", 0.25)
