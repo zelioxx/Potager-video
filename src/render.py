@@ -132,6 +132,11 @@ beaux parterres abonne-toi astuces"""),
         highlight="""jettes pépins citron arrête arbres simple germer frais rince-les retire délicatement peau
 blanche secret deux fois vite sopalin humide boîte film transparent chaud lumière 2 3 semaines feuilles
 sentent abonne-toi astuces"""),
+    "avocat2": dict(
+        scenes="scenes_avocat2", dur=20.9, voice=os.path.join(AUD, "avocat2", "voix.mp3"),
+        words=os.path.join(AUD, "avocat2", "voix_mots.json"), out="avocat_noyau_v2_1080x1920.mp4",
+        highlight="""jettes noyau d'avocat arbre savoir lave-le retire peau brune enroule-le essuie-tout humide
+boîte fermée chaud attend semaines fend racine sort abonne-toi"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
