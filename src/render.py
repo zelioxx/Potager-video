@@ -309,6 +309,11 @@ def build_audio(path):
     sf.write(path, st, sfx.SR)
 
 
+# volume « TikTok » : voix compressée puis normalisée à ≈ -10 LUFS, limiteur pour ne jamais saturer
+LOUD = ("acompressor=threshold=-20dB:ratio=3:attack=5:release=90:makeup=3,"
+        "loudnorm=I=-9.5:TP=-1.0:LRA=7,alimiter=limit=0.89:level=false")
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     if "--preview" in sys.argv:
@@ -330,7 +335,7 @@ def main():
         f.writelines(f"file '{p}'\n" for p in parts)
     final = os.path.join(OUT, CFG["out"])
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-i", wav,
-                    "-c:v", "copy", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k",
+                    "-c:v", "copy", "-af", LOUD, "-c:a", "aac", "-b:a", "192k",
                     "-ar", "48000", "-shortest", "-movflags", "+faststart", final], check=True)
     print(final)
 
