@@ -17,7 +17,8 @@ from scenes_ananas import logo_img
 from scenes_hortensia import stamp
 from scenes_mangue import warm_glow
 from scenes_citron import photo, shade, zoomed, shadow, swap, sopalin
-from scenes_avocat2 import ob, wipe, wrapped, PIT, PELE, FENDU, PLANT, TREE, BIN, BOX_O, BOX_F, TOP
+from scenes_avocat2 import ob, wipe, wrapped, PIT, PELE, FENDU, PLANT, TREE, BOX_O, BOX_F, TOP
+from scenes_ananas import place
 
 CUES = []
 NO_CAPTION_UNTIL = 0.0
@@ -82,31 +83,81 @@ for _i in range(1, len(CHAIN)):
 
 
 # ============================================================ B. LA POUBELLE : UN ARBRE CACHÉ DEDANS (1.82 → 4.55)
-BIN_X, BIN_W = 770, 340
-BIN_K = BIN_W / (727 - 297)
+# poubelle en zinc (photos fournies, cadre 1024) : fermée, ouverte, et le couvercle seul (cadre 1254)
+ZB_OPEN, ZB_SHUT, ZB_LID = "banque/poubelle_zinc_ouverte", "banque/poubelle_zinc_fermee", "banque/poubelle_zinc_couvercle"
+BIN_X, BIN_W = 590, 380                       # largeur écran (poignées comprises)
+BIN_K = BIN_W / (845 - 179)
 BIN_BOT = TABLE + 40
-BIN_RIM = BIN_BOT - (920 - 330) * BIN_K             # bord avant de l'ouverture
-PIT0 = (300, TABLE - 40)
+SRC_BOT = 919                                 # bas de la poubelle dans la photo
+LIP = (512, 218, 275, 74)                     # ouverture : centre x, centre y, demi-axes (photo ouverte)
+LID_K = BIN_K * 564 / 902                     # couvercle seul ramené à l'échelle de la poubelle
+LID_ON = (626, 784)                           # bas-centre du couvercle seul ↔ (512, 305) sur la photo fermée
+LID_REST = (895, TABLE + 62)                  # couvercle posé sur la table, à droite
+PIT0 = (200, TABLE - 40)
+
+
+def bsrc(x, y):
+    """Point (x, y) de la photo de la poubelle → écran."""
+    return BIN_X + (x - 512) * BIN_K, BIN_BOT + (y - SRC_BOT) * BIN_K
+
+
+def lip_y(x):
+    """Bord avant de l'ouverture (écran) à l'abscisse x."""
+    cx, cy, rx, ry = LIP
+    sx = 512 + (x - BIN_X) / BIN_K
+    f = clamp(1 - ((sx - cx) / rx) ** 2, 0, 1)
+    return bsrc(0, cy + ry * math.sqrt(f))[1]
+
+
+def bin_img(c, name, dx=0.0):
+    place(c, name, (0, 0, 1024, 1024), BIN_K, 512, SRC_BOT, BIN_X + dx, BIN_BOT)
+
+
+def lid(c, X, Y, rot=0.0):
+    """Couvercle seul, son bas-centre en (X, Y)."""
+    place(c, ZB_LID, (0, 0, 1254, 1254), LID_K, *LID_ON, X, Y, 1.0, rot)
 
 
 def s_bin(t):
     w, u = new_layers(background("table"))
-    shake = math.sin(t * 60) * 8 * fade(t, 2.38, 2.7, 0.02, 0.2) if 2.38 < t < 2.7 else 0.0
-    shadow(w, BIN_X, BIN_BOT, BIN_W * 1.05)
-    ob(w, BIN, BIN_X + shake, BIN_BOT, BIN_W, anchor="bottom")
-    p = ease_in((t - 1.9) / 0.48)
-    if t < 2.38:
+    shake = math.sin(t * 60) * 7 * fade(t, 2.86, 3.15, 0.02, 0.2) if 2.86 < t < 3.15 else 0.0
+    shadow(w, BIN_X, BIN_BOT, BIN_W * 0.95)
+    # --- 1. le couvercle se soulève, glisse sur le côté et se pose sur la table
+    up = ease_out((t - 1.92) / 0.22)
+    slide = ease_io((t - 2.14) / 0.42)
+    lid_on_x, lid_on_y = bsrc(512, 305)
+    lx = lerp(lid_on_x, LID_REST[0], slide)
+    ly = lerp(lid_on_y - 130 * up, LID_REST[1], slide) - math.sin(math.pi * slide) * 90
+    lrot = -10 * up * (1 - slide) + 0 * slide
+    if t < 1.92:
+        bin_img(w, ZB_SHUT)
+    else:
+        bin_img(w, ZB_OPEN, shake)
+    if slide > 0.6:
+        shadow(w, LID_REST[0], LID_REST[1], 300 * clamp((slide - 0.6) / 0.4))
+    # --- 2. le noyau est lancé dedans (on ne voit que ce qui dépasse du bord avant)
+    p = ease_in((t - 2.4) / 0.46)
+    if t < 2.86:
         x = lerp(PIT0[0], BIN_X, p)
-        y = lerp(PIT0[1], BIN_RIM - 30, p) - math.sin(math.pi * p) * 360
+        y = lerp(PIT0[1], bsrc(0, 250)[1], p) - math.sin(math.pi * p) * 380
         if p <= 0:
             shadow(w, PIT0[0], TABLE + 40, 130)
-        ob(w, PIT, x, y, lerp(150, 120, p), rot=-280 * p)
-    if 2.38 < t < 2.8:
-        particles(w, t, 2.4, BIN_X, BIN_RIM - 10, 10, 3, col=(170, 170, 170), size=8, up=240)
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ob(lay, PIT, x, y, lerp(150, 110, p), rot=-280 * p)
+        if p > 0.75:
+            m = Image.new("L", (W, H), 0)
+            ImageDraw.Draw(m).polygon([(0, 0), (W, 0)] + [(xx, lip_y(xx)) for xx in range(W, -1, -20)], fill=255)
+            lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), m))
+        w.alpha_composite(lay)
+    if t >= 1.92:
+        lid(w, lx, ly, lrot)
+    if 2.86 < t < 3.3:
+        particles(w, t, 2.88, BIN_X, bsrc(0, 220)[1], 10, 3, col=(170, 170, 170), size=8, up=240)
+    BIN_RIM = bsrc(0, 300)[1]
     # loupe « rayons X » : un arbre caché dans la poubelle
-    g = life(t, 2.95, dur=0.4)
+    g = life(t, 3.05, dur=0.4)
     if g > 0.01:
-        cx, cy, r = BIN_X, BIN_RIM + 150, 185 * g
+        cx, cy, r = BIN_X, BIN_RIM + 170, 175 * g
         lens = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         dl = ImageDraw.Draw(lens)
         dl.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(20, 40, 50, 235))
@@ -122,16 +173,18 @@ def s_bin(t):
         d.line([(hx, hy), (hx - 140 * g, hy + 140 * g)], fill=DARK, width=int(42 * g))
         d.line([(hx - 8, hy + 8), (hx - 132 * g, hy + 132 * g)], fill=(150, 90, 50), width=int(26 * g))
         sparkles(u, t, 3.2, cx, cy, 240, 8, 5)
-    title(u, "À LA POUBELLE ?", t, 1.86, 3.05, y=330, color=RED, size=150)
-    stamp(u, "UN ARBRE !", 540, 360, t, 3.1, 3.7, GREEN, 135, -8)
+    title(u, "À LA POUBELLE ?", t, 1.86, 3.1, y=330, color=RED, size=150)
+    stamp(u, "UN ARBRE !", 540, 360, t, 3.14, 3.7, GREEN, 135, -8)
     title(u, "SANS LE SAVOIR…", t, 3.74, None, y=330, size=140)
     return w, u
 
 
-cue(1.92, "whoosh", 0.3)
-cue(2.4, "thud", 0.45)
-cue(2.98, "pop_lo", 0.25)
-cue(3.12, "success", 0.3)
+cue(1.93, "click", 0.35)
+cue(2.56, "chop", 0.3)
+cue(2.42, "whoosh", 0.25)
+cue(2.87, "thud", 0.45)
+cue(3.08, "pop_lo", 0.22)
+cue(3.15, "success", 0.3)
 
 
 # ============================================================ C. LES ÉTAPES SUR FOND BEIGE (4.55 → 12.4)

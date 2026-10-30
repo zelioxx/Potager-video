@@ -14,3 +14,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `robinet_mitigeur.png` | Robinet mitigeur de cuisine chromé |
 | `robinet_mural.png` | Robinet mural (sortie de jardin) chromé, embout de tuyau |
 | `arrosoir_zinc.png` | Arrosoir en zinc galvanisé (pomme à gauche) |
+| `poubelle_zinc_ouverte.png` / `_fermee` / `_couvercle` | Poubelle en zinc ouverte, fermée, et son couvercle seul |
