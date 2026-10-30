@@ -36,17 +36,17 @@ def cue(t, name, gain=0.5):
 # sur la planche : noyau → épluché → fendu → jeune plant → avocatier (le pot fait la moitié de l'écran).
 ZB_OPEN, ZB_SHUT, ZB_LID = "banque/poubelle_zinc_ouverte", "banque/poubelle_zinc_fermee", "banque/poubelle_zinc_couvercle"
 AVO = "banque/avocat_coupe"
-BIN_X, BIN_W, BIN_BOT = 875, 330, 1445        # poubelle posée sur le plan de travail, à droite de la planche
+BIN_X, BIN_W, BIN_BOT = 845, 480, 1525        # poubelle (~28 cm) sur le plan de travail, devant le coin droit de la planche
 BIN_K = BIN_W / (845 - 179)
 SRC_BOT = 919                                 # bas de la poubelle dans la photo
 LIP = (512, 218, 275, 74)                     # ouverture : centre x, centre y, demi-axes (photo ouverte)
 LID_K = BIN_K * 564 / 902                     # couvercle seul ramené à l'échelle de la poubelle
 LID_ON = (626, 784)                           # bas-centre du couvercle seul ↔ (512, 305) sur la photo fermée
-LID_REST = (940, 1530)                        # couvercle posé à plat devant, à droite de la poubelle
-AVO_C, AVO_W = (430, 1175), 540               # avocat coupé sur la planche (centre, largeur)
+LID_REST = (400, 1500)                        # couvercle posé à plat sur le plan de travail, devant la planche
+AVO_C, AVO_W = (400, 1170), 390               # avocat coupé sur la planche (centre, largeur) : ~13 cm de long
 AVO_K = AVO_W / (943 - 81)
 CAVITY = (AVO_C[0] + (300 - 512) * AVO_K, AVO_C[1] + (500 - 496) * AVO_K)   # cavité de la moitié gauche
-PW = 128                                      # largeur du noyau
+PW = 92                                       # largeur du noyau (à l'échelle de l'avocat)
 GROW_C = (560, 1300)                          # avance rapide : posé au centre de la planche (bas)
 
 
@@ -124,14 +124,14 @@ def s_open(t):
     shake = math.sin(t * 60) * 5 * fade(t, 1.05, 1.35, 0.02, 0.2) if 1.05 < t < 1.35 else 0.0
     # --- l'avocat coupé sur la planche
     if adx > -700:
-        shadow(w, AVO_C[0] + adx, AVO_C[1] + 150, AVO_W * 0.9, 50)
+        shadow(w, AVO_C[0] + adx, AVO_C[1] + 0.28 * AVO_W, AVO_W * 0.9, 50)
         place(w, AVO, (0, 0, 1024, 1024), AVO_K, 512, 496, AVO_C[0] + adx, AVO_C[1])
     # --- la poubelle : fermée → ouverte (le couvercle se soulève 0,15 puis se pose devant 0,35 → 0,7)
     up = ease_out((t - 0.15) / 0.2)
     slide = ease_io((t - 0.35) / 0.35)
     lox, loy = bsrc(512, 305)
     lx = lerp(lox, LID_REST[0], slide) + bdx
-    ly = lerp(loy - 90 * up, LID_REST[1], slide) - math.sin(math.pi * slide) * 70
+    ly = lerp(loy - 120 * up, LID_REST[1], slide) - math.sin(math.pi * slide) * 110
     behind = False
     if bdx < 600:
         shadow(w, BIN_X + bdx, BIN_BOT, BIN_W * 0.95)
@@ -156,10 +156,10 @@ def s_open(t):
         x, y, rot = target[0], lerp(target[1] + 40, hover[1], p), -300 * (1 - p)
         inside, depth = p < 0.55, 0.55 * (1 - p)
     if t < 1.85:
-        if t >= 0.15 and bdx < 600:
+        if t >= 0.15:
             if slide > 0.55:
-                shadow(w, LID_REST[0] + bdx, LID_REST[1], 270 * clamp((slide - 0.55) / 0.45), 60)
-            lid(w, lx, ly, -8 * up * (1 - slide))
+                shadow(w, LID_REST[0], LID_REST[1], 360 * clamp((slide - 0.55) / 0.45), 60)
+            lid(w, lx - bdx, ly, -8 * up * (1 - slide))
         lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         if t >= 1.78:
             x, y, rot = hover[0], hover[1], 0.0
@@ -168,20 +168,21 @@ def s_open(t):
             in_bin(lay, depth)
         w.alpha_composite(lay)
     else:
-        if bdx < 600:
-            shadow(w, LID_REST[0] + bdx, LID_REST[1], 270, 60)
-            lid(w, lx, ly, 0.0)
+        if adx > -700:                                  # le couvercle part à gauche avec l'avocat
+            shadow(w, LID_REST[0] + adx, LID_REST[1], 360, 60)
+            lid(w, LID_REST[0] + adx, LID_REST[1], 0.0)
         p = ease_io((t - 1.85) / 0.2)
         gx = lerp(hover[0], GROW_C[0], p)
         gb = lerp(hover[1] + PW * 0.45, GROW_C[1], p)
+        wd = lerp(PW, wd, p) if name == PIT else wd       # le noyau grossit en douceur vers le gros plan
         shadow(w, gx, gb, wd * 0.8 * sc, 70)
         ob(w, name, gx, gb, wd * sc, anchor="bottom")
     if 1.06 < t < 1.45:
         particles(w, t, 1.07, BIN_X, bsrc(0, 220)[1], 9, 3, col=(170, 170, 170), size=6, up=200)
     # --- caméra : plan large de la cuisine, puis on se rapproche de la planche pour l'avance rapide
     zk = ease_io((t - 1.9) / 0.45)
-    z = lerp(lerp(1.22, 1.12, ease_out(t / 0.6)), 1.45, zk)
-    fx, fy = lerp(660, GROW_C[0], zk), lerp(1250, 1000, zk)
+    z = lerp(lerp(1.2, 1.12, ease_out(t / 0.6)), 1.45, zk)
+    fx, fy = lerp(620, GROW_C[0], zk), lerp(1200, 1000, zk)
     w = zoomed(w, z, fx, fy)
     w.alpha_composite(shade())
     if t > GROW_T0 + 4 * GROW_DT - 0.1:
