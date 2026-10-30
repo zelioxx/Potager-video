@@ -142,6 +142,11 @@ boîte fermée chaud attend semaines fend racine sort abonne-toi"""),
         words=os.path.join(AUD, "chrysantheme", "voix_mots.json"), out="chrysanthemes_1080x1920.mp4",
         highlight="""chrysanthèmes gratuits acheter explique semaine milliers poubelle récupère-les coupe tiges
 10 cm plante-les jardin l'automne prochain refleurissent gratuitement malin"""),
+    "avocat3": dict(
+        scenes="scenes_avocat3", dur=20.9, voice=os.path.join(AUD, "avocat2", "voix.mp3"),
+        words=os.path.join(AUD, "avocat2", "voix_mots.json"), out="avocat_variante_1080x1920.mp4",
+        highlight="""jettes noyau d'avocat arbre savoir lave-le retire peau brune enroule-le essuie-tout humide
+boîte fermée chaud attend semaines fend racine sort abonne-toi"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
