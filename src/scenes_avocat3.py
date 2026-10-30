@@ -22,89 +22,38 @@ from scenes_ananas import place
 
 CUES = []
 NO_CAPTION_UNTIL = 0.0
+CAP_STYLE = dict(max_words=4, max_chars=24, size=90)     # blocs de 3-4 mots, plus gros et plus lisibles
 
 
 def cue(t, name, gain=0.5):
     CUES.append((t, name, gain))
 
 
-def rewind_fx(u, t, t0, t1):
-    """Effet « retour en arrière » : voile bleuté, lignes de balayage, ◀◀."""
-    a = fade(t, t0, t1, 0.08, 0.12)
-    if a <= 0.01:
-        return
-    ov = Image.new("RGBA", (W, H), (40, 60, 90, int(45 * a)))
-    d = ImageDraw.Draw(ov)
-    for yy in range(0, H, 9):
-        d.line([(0, yy), (W, yy)], fill=(255, 255, 255, int(20 * a)), width=2)
-    off = (t * 1100) % H
-    d.rectangle([0, off, W, off + 26], fill=(255, 255, 255, int(70 * a)))
-    u.alpha_composite(ov)
-    d = ImageDraw.Draw(u)
-    for i in range(2):
-        x0 = 120 + i * 70
-        d.polygon([(x0 + 70, 560), (x0 + 70, 660), (x0, 610)], fill=WHITE + (int(240 * a),), outline=DARK)
-
-
-# ============================================================ A. LE RÉSULTAT D'ABORD… QUI SE REMBOBINE (0 → 1.82)
-# (image, largeur, ancrage bas) : avocatier → jeune plant → noyau fendu → noyau épluché → noyau brun
-CHAIN = [(TREE, 300), (PLANT, 330), (FENDU, 150), (PELE, 140), (PIT, 140)]
-CHAIN_T0, CHAIN_DT = 0.95, 0.2
-
-
-def chain_state(t):
-    i = int(clamp((t - CHAIN_T0) / CHAIN_DT, 0, len(CHAIN) - 1.001))
-    if t < CHAIN_T0:
-        return CHAIN[0], 1.0
-    p = (t - CHAIN_T0 - i * CHAIN_DT) / CHAIN_DT
-    which, sc = swap(p)
-    j = min(len(CHAIN) - 1, i + which)
-    return CHAIN[j], sc
-
-
-def s_hook(t):
-    w = photo("citron_fond_buffet.png").copy()
-    u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    (name, wd), sc = chain_state(t)
-    shadow(w, TOP[0], TOP[1], 260 if name in (TREE, PLANT) else 150)
-    ob(w, name, TOP[0], TOP[1], wd * sc, anchor="bottom")
-    z = lerp(1.0, 1.35, ease_io(t / 1.8))
-    w = zoomed(w, z, TOP[0], TOP[1] - 150)
-    w.alpha_composite(shade())
-    rewind_fx(u, t, CHAIN_T0 - 0.05, 1.8)
-    title(u, "TU JETTES ÇA ?", t, 0.1, None, y=330, color=YEL, size=165)
-    return w, u
-
-
-cue(0.0, "sparkle", 0.25)
-cue(CHAIN_T0, "rise", 0.3)
-for _i in range(1, len(CHAIN)):
-    cue(CHAIN_T0 + (_i - 0.5) * CHAIN_DT, "pop_hi", 0.18)
-
-
-# ============================================================ B. LA POUBELLE : UN ARBRE CACHÉ DEDANS (1.82 → 4.55)
-# poubelle en zinc (photos fournies, cadre 1024) : fermée, ouverte, et le couvercle seul (cadre 1254)
+# ============================================================ A. UNE SEULE SCÈNE D'OUVERTURE, OBJETS EN GRAND (0 → 4.55)
+# 0,0 : le noyau, en grand, au-dessus de la poubelle en zinc — « Tu jettes ça ? »
+# le couvercle s'ouvre et se pose à côté, le noyau tombe dedans… STOP, il ressort (◀◀)
+# puis ▶▶ avance rapide : noyau → épluché → fendu → jeune plant → avocatier (le pot fait la moitié de l'écran)
 ZB_OPEN, ZB_SHUT, ZB_LID = "banque/poubelle_zinc_ouverte", "banque/poubelle_zinc_fermee", "banque/poubelle_zinc_couvercle"
-BIN_X, BIN_W = 590, 380                       # largeur écran (poignées comprises)
+BIN_X, BIN_W = 400, 560                       # largeur écran (poignées comprises)
 BIN_K = BIN_W / (845 - 179)
 BIN_BOT = TABLE + 40
 SRC_BOT = 919                                 # bas de la poubelle dans la photo
 LIP = (512, 218, 275, 74)                     # ouverture : centre x, centre y, demi-axes (photo ouverte)
 LID_K = BIN_K * 564 / 902                     # couvercle seul ramené à l'échelle de la poubelle
 LID_ON = (626, 784)                           # bas-centre du couvercle seul ↔ (512, 305) sur la photo fermée
-LID_REST = (895, TABLE + 62)                  # couvercle posé sur la table, à droite
-PIT0 = (200, TABLE - 40)
+LID_REST = (870, TABLE + 80)                  # couvercle posé sur la table, à droite (devant)
+HOVER = (BIN_X, 500)                          # le noyau tenu au-dessus de la poubelle
 
 
-def bsrc(x, y):
+def bsrc(x, y, dx=0.0):
     """Point (x, y) de la photo de la poubelle → écran."""
-    return BIN_X + (x - 512) * BIN_K, BIN_BOT + (y - SRC_BOT) * BIN_K
+    return BIN_X + dx + (x - 512) * BIN_K, BIN_BOT + (y - SRC_BOT) * BIN_K
 
 
-def lip_y(x):
+def lip_y(x, dx=0.0):
     """Bord avant de l'ouverture (écran) à l'abscisse x."""
     cx, cy, rx, ry = LIP
-    sx = 512 + (x - BIN_X) / BIN_K
+    sx = 512 + (x - BIN_X - dx) / BIN_K
     f = clamp(1 - ((sx - cx) / rx) ** 2, 0, 1)
     return bsrc(0, cy + ry * math.sqrt(f))[1]
 
@@ -118,73 +67,114 @@ def lid(c, X, Y, rot=0.0):
     place(c, ZB_LID, (0, 0, 1254, 1254), LID_K, *LID_ON, X, Y, 1.0, rot)
 
 
-def s_bin(t):
+def speed_fx(u, t, t0, t1, forward=True):
+    """Effet vidéo : voile, lignes de balayage, ◀◀ (retour) ou ▶▶ (avance rapide)."""
+    a = fade(t, t0, t1, 0.08, 0.12)
+    if a <= 0.01:
+        return
+    ov = Image.new("RGBA", (W, H), (40, 60, 90, int(40 * a)))
+    d = ImageDraw.Draw(ov)
+    for yy in range(0, H, 9):
+        d.line([(0, yy), (W, yy)], fill=(255, 255, 255, int(18 * a)), width=2)
+    off = (t * 1100) % H
+    d.rectangle([0, off, W, off + 26], fill=(255, 255, 255, int(60 * a)))
+    u.alpha_composite(ov)
+    d = ImageDraw.Draw(u)
+    for i in range(2):
+        x0 = 860 + i * 70 if forward else 120 + i * 70
+        pts = [(x0, 560), (x0, 660), (x0 + 70, 610)] if forward else [(x0 + 70, 560), (x0 + 70, 660), (x0, 610)]
+        d.polygon(pts, fill=WHITE + (int(240 * a),), outline=DARK)
+
+
+# avance rapide : (image, largeur à l'écran), posés sur la table au centre
+GROW = [(PIT, 300), (PELE, 290), (FENDU, 340), (PLANT, 560), (TREE, 500)]
+GROW_T0, GROW_DT = 2.05, 0.3
+
+
+def grow_state(t):
+    if t < GROW_T0:
+        return GROW[0], 1.0
+    i = int(clamp((t - GROW_T0) / GROW_DT, 0, len(GROW) - 1.001))
+    p = (t - GROW_T0 - i * GROW_DT) / GROW_DT
+    which, sc = swap(p)
+    return GROW[min(len(GROW) - 1, i + which)], sc
+
+
+def s_open(t):
     w, u = new_layers(background("table"))
-    shake = math.sin(t * 60) * 7 * fade(t, 2.86, 3.15, 0.02, 0.2) if 2.86 < t < 3.15 else 0.0
-    shadow(w, BIN_X, BIN_BOT, BIN_W * 0.95)
-    # --- 1. le couvercle se soulève, glisse sur le côté et se pose sur la table
-    up = ease_out((t - 1.92) / 0.22)
-    slide = ease_io((t - 2.14) / 0.42)
-    lid_on_x, lid_on_y = bsrc(512, 305)
-    lx = lerp(lid_on_x, LID_REST[0], slide)
-    ly = lerp(lid_on_y - 130 * up, LID_REST[1], slide) - math.sin(math.pi * slide) * 90
-    lrot = -10 * up * (1 - slide) + 0 * slide
-    if t < 1.92:
-        bin_img(w, ZB_SHUT)
+    bin_dx = -900 * ease_in((t - 1.85) / 0.4)          # la poubelle sort par la gauche (avance rapide)
+    lid_dx = 900 * ease_in((t - 1.85) / 0.4)           # et le couvercle par la droite
+    shake = math.sin(t * 60) * 7 * fade(t, 1.02, 1.3, 0.02, 0.2) if 1.02 < t < 1.3 else 0.0
+    # --- couvercle : se soulève (0,15) puis se pose à droite sur la table (0,35 → 0,7)
+    up = ease_out((t - 0.15) / 0.2)
+    slide = ease_io((t - 0.35) / 0.35)
+    lox, loy = bsrc(512, 305)
+    lx = lerp(lox, LID_REST[0], slide) + lid_dx
+    ly = lerp(loy - 120 * up, LID_REST[1], slide) - math.sin(math.pi * slide) * 80
+    if bin_dx > -800:
+        shadow(w, BIN_X + bin_dx, BIN_BOT, BIN_W * 0.95)
+        bin_img(w, ZB_SHUT if t < 0.15 else ZB_OPEN, bin_dx + shake)
+    if slide > 0.6 and lid_dx < 700:
+        shadow(w, LID_REST[0] + lid_dx, LID_REST[1], 380 * clamp((slide - 0.6) / 0.4))
+    if t >= 0.15 and lid_dx < 700:
+        lid(w, lx, ly, -10 * up * (1 - slide))
+    # --- le noyau : tenu au-dessus → tombe dedans (0,72 → 1,02) → STOP, ressort (1,4 → 1,75) → au centre (1,85 → 2,05)
+    (name, wd), sc = grow_state(t)
+    clip = False
+    if t < 0.72:
+        x, y, pw, rot = HOVER[0], HOVER[1] + 10 * math.sin(t * 5), 300, 0.0
+    elif t < 1.02:
+        p = ease_in((t - 0.72) / 0.3)
+        x, y, pw, rot = HOVER[0], lerp(HOVER[1], bsrc(0, 330)[1] + 60, p), 300, -60 * p
+        clip = p > 0.4
+    elif t < 1.4:
+        x, y, pw, rot, clip = HOVER[0], bsrc(0, 330)[1] + 60, 300, -60, True
+    elif t < 1.75:
+        p = ease_out((t - 1.4) / 0.35)
+        x, y, pw, rot = HOVER[0], lerp(bsrc(0, 330)[1] + 60, HOVER[1], p), 300, -60 * (1 - p)
+        clip = p < 0.6
     else:
-        bin_img(w, ZB_OPEN, shake)
-    if slide > 0.6:
-        shadow(w, LID_REST[0], LID_REST[1], 300 * clamp((slide - 0.6) / 0.4))
-    # --- 2. le noyau est lancé dedans (on ne voit que ce qui dépasse du bord avant)
-    p = ease_in((t - 2.4) / 0.46)
-    if t < 2.86:
-        x = lerp(PIT0[0], BIN_X, p)
-        y = lerp(PIT0[1], bsrc(0, 250)[1], p) - math.sin(math.pi * p) * 380
-        if p <= 0:
-            shadow(w, PIT0[0], TABLE + 40, 130)
+        p = ease_io((t - 1.85) / 0.2)
+        x = lerp(HOVER[0], 540, p)
+        bottom = lerp(HOVER[1] + 150, TABLE + 40, p)
+        y = None
+    if y is not None:
         lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        ob(lay, PIT, x, y, lerp(150, 110, p), rot=-280 * p)
-        if p > 0.75:
+        ob(lay, PIT, x, y, pw, rot=rot)
+        if clip:
             m = Image.new("L", (W, H), 0)
-            ImageDraw.Draw(m).polygon([(0, 0), (W, 0)] + [(xx, lip_y(xx)) for xx in range(W, -1, -20)], fill=255)
+            ImageDraw.Draw(m).polygon([(0, 0), (W, 0)] + [(xx, lip_y(xx, shake)) for xx in range(W, -1, -20)],
+                                      fill=255)
             lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), m))
         w.alpha_composite(lay)
-    if t >= 1.92:
-        lid(w, lx, ly, lrot)
-    if 2.86 < t < 3.3:
-        particles(w, t, 2.88, BIN_X, bsrc(0, 220)[1], 10, 3, col=(170, 170, 170), size=8, up=240)
-    BIN_RIM = bsrc(0, 300)[1]
-    # loupe « rayons X » : un arbre caché dans la poubelle
-    g = life(t, 3.05, dur=0.4)
-    if g > 0.01:
-        cx, cy, r = BIN_X, BIN_RIM + 170, 175 * g
-        lens = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        dl = ImageDraw.Draw(lens)
-        dl.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(20, 40, 50, 235))
-        ob(lens, PLANT, cx, cy + r * 0.85, 300 * g, anchor="bottom")
-        m = Image.new("L", (W, H), 0)
-        ImageDraw.Draw(m).ellipse([cx - r, cy - r, cx + r, cy + r], fill=255)
-        lens.putalpha(Image.composite(lens.getchannel("A"), Image.new("L", (W, H), 0), m))
-        w.alpha_composite(lens)
-        d = ImageDraw.Draw(u)
-        d.ellipse([cx - r - 12, cy - r - 12, cx + r + 12, cy + r + 12], outline=DARK, width=int(26 * g))
-        d.ellipse([cx - r - 5, cy - r - 5, cx + r + 5, cy + r + 5], outline=(190, 196, 200), width=int(10 * g))
-        hx, hy = cx - r * 0.72, cy + r * 0.72
-        d.line([(hx, hy), (hx - 140 * g, hy + 140 * g)], fill=DARK, width=int(42 * g))
-        d.line([(hx - 8, hy + 8), (hx - 132 * g, hy + 132 * g)], fill=(150, 90, 50), width=int(26 * g))
-        sparkles(u, t, 3.2, cx, cy, 240, 8, 5)
-    title(u, "À LA POUBELLE ?", t, 1.86, 3.1, y=330, color=RED, size=150)
-    stamp(u, "UN ARBRE !", 540, 360, t, 3.14, 3.7, GREEN, 135, -8)
+    else:
+        shadow(w, x, TABLE + 40, wd * 0.75 * sc)
+        ob(w, name, x, bottom, wd * sc, anchor="bottom")
+    if 1.03 < t < 1.4:
+        particles(w, t, 1.04, BIN_X, bsrc(0, 220)[1], 10, 3, col=(170, 170, 170), size=8, up=240)
+    if t > GROW_T0 + 4 * GROW_DT - 0.1:
+        sparkles(u, t, GROW_T0 + 4 * GROW_DT, 540, 800, 360, 10, 7)
+    speed_fx(u, t, 1.4, 1.78, forward=False)
+    speed_fx(u, t, 1.86, GROW_T0 + 4 * GROW_DT + 0.1, forward=True)
+    if t < 0.72:
+        put(u, icon("arrow_down", 110), HOVER[0] + 250, HOVER[1] + 40 + 12 * math.sin(t * 7), life(t, 0.1, 0.7), 0)
+    title(u, "TU JETTES ÇA ?", t, 0.05, 1.36, y=330, color=YEL, size=165)
+    title(u, "STOP !", t, 1.4, 1.84, y=330, color=RED, size=190)
+    stamp(u, "UN ARBRE !", 540, 340, t, 3.12, 3.7, GREEN, 135, -8)
     title(u, "SANS LE SAVOIR…", t, 3.74, None, y=330, size=140)
     return w, u
 
 
-cue(1.93, "click", 0.35)
-cue(2.56, "chop", 0.3)
-cue(2.42, "whoosh", 0.25)
-cue(2.87, "thud", 0.45)
-cue(3.08, "pop_lo", 0.22)
-cue(3.15, "success", 0.3)
+cue(0.0, "pop_lo", 0.3)
+cue(0.17, "click", 0.35)
+cue(0.62, "chop", 0.25)
+cue(0.74, "whoosh", 0.25)
+cue(1.03, "thud", 0.45)
+cue(1.42, "alert3", 0.32)
+cue(1.88, "rise", 0.3)
+for _i in range(1, len(GROW)):
+    cue(GROW_T0 + (_i - 0.5) * GROW_DT, "pop_hi", 0.18)
+cue(3.15, "success", 0.32)
 
 
 # ============================================================ C. LES ÉTAPES SUR FOND BEIGE (4.55 → 12.4)
@@ -227,6 +217,7 @@ def s_steps(t):
             shadow(w, bx, BOX_C[1] + 190, 560)
             which, sc = swap((t - 11.1) / 0.3)
             ob(w, BOX_O if which == 0 else BOX_F, bx, BOX_C[1] - (6 if which else 0), 620 * sc)
+    w = zoomed(w, 1.3, 540, 1130)          # objets plus gros à l'écran
     if t > 11.8:
         put(u, icon("thermo", 150), 170, 640, life(t, 11.85))
         put(u, icon("sun", 160), 910, 640, life(t, 11.95), t * 25)
@@ -325,7 +316,8 @@ def s_end(t):
     q = ease_out((t - 18.3) / 0.45)
     shadow(w, TOP[0], TOP[1], 300 * q)
     ob(w, TREE, TOP[0], TOP[1], 300, s=life(t, 18.3, dur=0.45), anchor="bottom")
-    sparkles(u, t, 18.5, TOP[0], TOP[1] - 300, 330, 10, 7)
+    w = zoomed(w, 1.65, TOP[0], TOP[1] - 230)
+    sparkles(u, t, 18.5, 540, 760, 330, 10, 7)
     w.alpha_composite(shade())
     if t > 19.1:
         clicked = t > 19.6
@@ -337,7 +329,9 @@ def s_end(t):
             put(u, icon("cursor", 110), lerp(900, 640, k), lerp(1520, 1280, k), 1)
         put(u, logo_img(260), 540, 330, life(t, 19.9, dur=0.45))
         sparkles(u, t, 20.0, 540, 330, 200, 10, 12)
-    title(u, "UN AVOCATIER GRATUIT !", t, 18.3, 19.05, y=1300, color=YEL, size=110)
+    title(u, "UNE PLANTE GRATUITE !", t, 18.3, 19.05, y=1300, color=YEL, size=120)
+    if t > 18.45:
+        tag(u, "PAS D'AVOCATS… MAIS QUELLE DÉCO !", 540, 1100, t, 18.5, 19.05, rot=-3, size=40)
     return w, u
 
 
@@ -346,8 +340,7 @@ cue(19.58, "click", 0.45)
 cue(20.0, "sparkle", 0.25)
 
 SCENES = [
-    (0.0, 1.82, s_hook),
-    (1.82, 4.55, s_bin),
+    (0.0, 4.55, s_open),
     (4.55, 12.4, s_steps),
     (12.4, 15.6, s_wait),
     (15.6, 18.25, s_macro),

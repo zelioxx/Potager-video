@@ -168,13 +168,19 @@ HL = {key(x) for x in HIGHLIGHT}
 
 
 # ------------------------------------------------------------- sous-titres
+# style de sous-titres propre au projet (scenes.CAP_STYLE) : blocs de 3-4 mots, plus gros, affichés d'un coup
+CAP_STYLE = getattr(scenes, "CAP_STYLE", None)
+MAX_WORDS = CAP_STYLE["max_words"] if CAP_STYLE else 3
+MAX_CHARS = CAP_STYLE["max_chars"] if CAP_STYLE else 20
+
+
 def build_chunks():
     chunks, cur = [], []
     for i, o in enumerate(WORDS):
         if cur:
             prev = WORDS[cur[-1]]
             txt = " ".join(WORDS[j]["w"] for j in cur + [i])
-            if (len(cur) >= 3 or len(txt) > 20 or re.search(r"[.,?!:]$", prev["w"])
+            if (len(cur) >= MAX_WORDS or len(txt) > MAX_CHARS or re.search(r"[.,?!:]$", prev["w"])
                     or o["s"] - prev["e"] > 0.35):
                 chunks.append(cur)
                 cur = []
@@ -198,8 +204,43 @@ def word_img(i, size):
     return text_img(wd, F_CAP, size, col, 7, DARK, 7, DARK)
 
 
+def captions_block(c, t):
+    """Bloc de 3-4 mots affiché d'un coup (sur 1 ou 2 lignes), le mot prononcé légèrement grossi."""
+    size, maxw = CAP_STYLE["size"], 990
+    for start, end, ch in CHUNKS:
+        if not (start <= t < end):
+            continue
+        imgs = [word_img(i, size) for i in ch]
+        ov = 30 - 0.2 * size                   # chevauchement des marges ; garde une espace visible entre les mots
+        lines, cur, cw = [], [], 0
+        for i, im in zip(ch, imgs):
+            add = im.width - (ov if cur else 0)
+            if cur and cw + add > maxw:
+                lines.append(cur)
+                cur, cw = [], 0
+                add = im.width
+            cur.append((i, im))
+            cw += add
+        lines.append(cur)
+        k = clamp((t - start) / 0.16)
+        pop = 0.82 + 0.18 * ease_out_back(k, 2.0)
+        lh = size * 1.12
+        y0 = CAP_Y - (len(lines) - 1) * lh / 2
+        for li, line in enumerate(lines):
+            total = sum(im.width for _, im in line) - ov * (len(line) - 1)
+            x = (W - total) / 2
+            for i, im in line:
+                ws, we = WORDS[i]["s"] - 0.04, WORDS[i]["e"]
+                on = 1.08 if ws <= t < we + 0.05 else 1.0
+                put(c, im, x + im.width / 2, y0 + li * lh + (1 - k) * 12, pop * on, 0, clamp(k * 3))
+                x += im.width - ov
+
+
 def captions(c, t):
     if t < getattr(scenes, "NO_CAPTION_UNTIL", 0.0):
+        return
+    if CAP_STYLE:
+        captions_block(c, t)
         return
     for start, end, ch in CHUNKS:
         nc = getattr(scenes, "NO_CAPTION_UNTIL", 0.0)
