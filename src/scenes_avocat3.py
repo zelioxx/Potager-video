@@ -8,7 +8,7 @@ buffet du salon.
 """
 import math
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 from gfx import (W, H, YEL, RED, GREEN, CREAM, DARK, WHITE, background, put, title, life, fade, ease_out, ease_io,
                  ease_in, clamp, lerp, icon, pills, tag, button_img, hl_ellipse, particles, num_badge, light_rays)
@@ -29,29 +29,34 @@ def cue(t, name, gain=0.5):
     CUES.append((t, name, gain))
 
 
-# ============================================================ A. UNE SEULE SCÈNE D'OUVERTURE, OBJETS EN GRAND (0 → 4.55)
-# 0,0 : le noyau, en grand, au-dessus de la poubelle en zinc — « Tu jettes ça ? »
-# le couvercle s'ouvre et se pose à côté, le noyau tombe dedans… STOP, il ressort (◀◀)
-# puis ▶▶ avance rapide : noyau → épluché → fendu → jeune plant → avocatier (le pot fait la moitié de l'écran)
+# ============================================================ A. OUVERTURE DANS LA CUISINE (0 → 4.55)
+# la cuisine (photo fournie, plan de travail + planche) : l'avocat coupé sur la planche, le noyau dans sa cavité,
+# la poubelle en zinc à droite sur le plan de travail. Le couvercle s'ouvre et se pose devant ; le noyau est lancé
+# dedans (il passe DEVANT le bord arrière et DERRIÈRE le bord avant) ; STOP, il ressort (◀◀) ; puis ▶▶ avance rapide
+# sur la planche : noyau → épluché → fendu → jeune plant → avocatier (le pot fait la moitié de l'écran).
 ZB_OPEN, ZB_SHUT, ZB_LID = "banque/poubelle_zinc_ouverte", "banque/poubelle_zinc_fermee", "banque/poubelle_zinc_couvercle"
-BIN_X, BIN_W = 400, 560                       # largeur écran (poignées comprises)
+AVO = "banque/avocat_coupe"
+BIN_X, BIN_W, BIN_BOT = 875, 330, 1445        # poubelle posée sur le plan de travail, à droite de la planche
 BIN_K = BIN_W / (845 - 179)
-BIN_BOT = TABLE + 40
 SRC_BOT = 919                                 # bas de la poubelle dans la photo
 LIP = (512, 218, 275, 74)                     # ouverture : centre x, centre y, demi-axes (photo ouverte)
 LID_K = BIN_K * 564 / 902                     # couvercle seul ramené à l'échelle de la poubelle
 LID_ON = (626, 784)                           # bas-centre du couvercle seul ↔ (512, 305) sur la photo fermée
-LID_REST = (870, TABLE + 80)                  # couvercle posé sur la table, à droite (devant)
-HOVER = (BIN_X, 500)                          # le noyau tenu au-dessus de la poubelle
+LID_REST = (940, 1530)                        # couvercle posé à plat devant, à droite de la poubelle
+AVO_C, AVO_W = (430, 1175), 540               # avocat coupé sur la planche (centre, largeur)
+AVO_K = AVO_W / (943 - 81)
+CAVITY = (AVO_C[0] + (300 - 512) * AVO_K, AVO_C[1] + (500 - 496) * AVO_K)   # cavité de la moitié gauche
+PW = 128                                      # largeur du noyau
+GROW_C = (560, 1300)                          # avance rapide : posé au centre de la planche (bas)
 
 
 def bsrc(x, y, dx=0.0):
-    """Point (x, y) de la photo de la poubelle → écran."""
+    """Point (x, y) de la photo de la poubelle → décor."""
     return BIN_X + dx + (x - 512) * BIN_K, BIN_BOT + (y - SRC_BOT) * BIN_K
 
 
 def lip_y(x, dx=0.0):
-    """Bord avant de l'ouverture (écran) à l'abscisse x."""
+    """Bord AVANT de l'ouverture (décor) à l'abscisse x."""
     cx, cy, rx, ry = LIP
     sx = 512 + (x - BIN_X - dx) / BIN_K
     f = clamp(1 - ((sx - cx) / rx) ** 2, 0, 1)
@@ -86,8 +91,7 @@ def speed_fx(u, t, t0, t1, forward=True):
         d.polygon(pts, fill=WHITE + (int(240 * a),), outline=DARK)
 
 
-# avance rapide : (image, largeur à l'écran), posés sur la table au centre
-GROW = [(PIT, 300), (PELE, 290), (FENDU, 340), (PLANT, 560), (TREE, 500)]
+GROW = [(PIT, 200), (PELE, 190), (FENDU, 230), (PLANT, 420), (TREE, 400)]
 GROW_T0, GROW_DT = 2.05, 0.3
 
 
@@ -100,64 +104,90 @@ def grow_state(t):
     return GROW[min(len(GROW) - 1, i + which)], sc
 
 
+def in_bin(lay, depth):
+    """Le noyau dans la poubelle : caché sous le bord avant, assombri en descendant."""
+    m = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(m).polygon([(0, 0), (W, 0)] + [(xx, lip_y(xx)) for xx in range(W, -1, -12)], fill=255)
+    m = m.filter(ImageFilter.GaussianBlur(1))
+    lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), m))
+    if depth > 0.01:
+        dark = Image.new("RGBA", (W, H), (20, 20, 22, int(150 * depth)))
+        dark.putalpha(Image.composite(dark.getchannel("A"), Image.new("L", (W, H), 0), lay.getchannel("A")))
+        lay.alpha_composite(dark)
+
+
 def s_open(t):
-    w, u = new_layers(background("table"))
-    bin_dx = -900 * ease_in((t - 1.85) / 0.4)          # la poubelle sort par la gauche (avance rapide)
-    lid_dx = 900 * ease_in((t - 1.85) / 0.4)           # et le couvercle par la droite
-    shake = math.sin(t * 60) * 7 * fade(t, 1.02, 1.3, 0.02, 0.2) if 1.02 < t < 1.3 else 0.0
-    # --- couvercle : se soulève (0,15) puis se pose à droite sur la table (0,35 → 0,7)
+    w = photo("citron_fond_cuisine.png").copy()
+    u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    out = ease_in((t - 1.85) / 0.4)                     # avance rapide : poubelle, couvercle et avocat s'en vont
+    bdx, adx = 700 * out, -800 * out
+    shake = math.sin(t * 60) * 5 * fade(t, 1.05, 1.35, 0.02, 0.2) if 1.05 < t < 1.35 else 0.0
+    # --- l'avocat coupé sur la planche
+    if adx > -700:
+        shadow(w, AVO_C[0] + adx, AVO_C[1] + 150, AVO_W * 0.9, 50)
+        place(w, AVO, (0, 0, 1024, 1024), AVO_K, 512, 496, AVO_C[0] + adx, AVO_C[1])
+    # --- la poubelle : fermée → ouverte (le couvercle se soulève 0,15 puis se pose devant 0,35 → 0,7)
     up = ease_out((t - 0.15) / 0.2)
     slide = ease_io((t - 0.35) / 0.35)
     lox, loy = bsrc(512, 305)
-    lx = lerp(lox, LID_REST[0], slide) + lid_dx
-    ly = lerp(loy - 120 * up, LID_REST[1], slide) - math.sin(math.pi * slide) * 80
-    if bin_dx > -800:
-        shadow(w, BIN_X + bin_dx, BIN_BOT, BIN_W * 0.95)
-        bin_img(w, ZB_SHUT if t < 0.15 else ZB_OPEN, bin_dx + shake)
-    if slide > 0.6 and lid_dx < 700:
-        shadow(w, LID_REST[0] + lid_dx, LID_REST[1], 380 * clamp((slide - 0.6) / 0.4))
-    if t >= 0.15 and lid_dx < 700:
-        lid(w, lx, ly, -10 * up * (1 - slide))
-    # --- le noyau : tenu au-dessus → tombe dedans (0,72 → 1,02) → STOP, ressort (1,4 → 1,75) → au centre (1,85 → 2,05)
+    lx = lerp(lox, LID_REST[0], slide) + bdx
+    ly = lerp(loy - 90 * up, LID_REST[1], slide) - math.sin(math.pi * slide) * 70
+    behind = False
+    if bdx < 600:
+        shadow(w, BIN_X + bdx, BIN_BOT, BIN_W * 0.95)
+        bin_img(w, ZB_SHUT if t < 0.15 else ZB_OPEN, bdx + shake)
+    # --- le noyau
     (name, wd), sc = grow_state(t)
-    clip = False
+    target = bsrc(512, 300)                             # fond de l'ouverture
+    hover = (BIN_X, bsrc(0, 60)[1])                     # juste au-dessus de la poubelle
+    inside, depth = False, 0.0
     if t < 0.72:
-        x, y, pw, rot = HOVER[0], HOVER[1] + 10 * math.sin(t * 5), 300, 0.0
-    elif t < 1.02:
-        p = ease_in((t - 0.72) / 0.3)
-        x, y, pw, rot = HOVER[0], lerp(HOVER[1], bsrc(0, 330)[1] + 60, p), 300, -60 * p
-        clip = p > 0.4
+        x, y, rot = CAVITY[0], CAVITY[1] - 10 * ease_out(t / 0.3), 0.0
+    elif t < 1.05:                                      # lancé en cloche dans la poubelle
+        p = ease_io((t - 0.72) / 0.33)
+        x = lerp(CAVITY[0], target[0], p)
+        y = lerp(CAVITY[1] - 10, target[1], p) - math.sin(math.pi * p) * 300
+        rot, inside = -300 * p, p > 0.7
+        depth = clamp((p - 0.85) / 0.15) * 0.4
     elif t < 1.4:
-        x, y, pw, rot, clip = HOVER[0], bsrc(0, 330)[1] + 60, 300, -60, True
-    elif t < 1.75:
-        p = ease_out((t - 1.4) / 0.35)
-        x, y, pw, rot = HOVER[0], lerp(bsrc(0, 330)[1] + 60, HOVER[1], p), 300, -60 * (1 - p)
-        clip = p < 0.6
-    else:
-        p = ease_io((t - 1.85) / 0.2)
-        x = lerp(HOVER[0], 540, p)
-        bottom = lerp(HOVER[1] + 150, TABLE + 40, p)
-        y = None
-    if y is not None:
+        x, y, rot, inside, depth = target[0], target[1] + 40, -300, True, 0.55
+    elif t < 1.78:                                      # ◀◀ il ressort
+        p = ease_out((t - 1.4) / 0.38)
+        x, y, rot = target[0], lerp(target[1] + 40, hover[1], p), -300 * (1 - p)
+        inside, depth = p < 0.55, 0.55 * (1 - p)
+    if t < 1.85:
+        if t >= 0.15 and bdx < 600:
+            if slide > 0.55:
+                shadow(w, LID_REST[0] + bdx, LID_REST[1], 270 * clamp((slide - 0.55) / 0.45), 60)
+            lid(w, lx, ly, -8 * up * (1 - slide))
         lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        ob(lay, PIT, x, y, pw, rot=rot)
-        if clip:
-            m = Image.new("L", (W, H), 0)
-            ImageDraw.Draw(m).polygon([(0, 0), (W, 0)] + [(xx, lip_y(xx, shake)) for xx in range(W, -1, -20)],
-                                      fill=255)
-            lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), m))
+        if t >= 1.78:
+            x, y, rot = hover[0], hover[1], 0.0
+        ob(lay, PIT, x, y, PW, rot=rot)
+        if inside:
+            in_bin(lay, depth)
         w.alpha_composite(lay)
     else:
-        shadow(w, x, TABLE + 40, wd * 0.75 * sc)
-        ob(w, name, x, bottom, wd * sc, anchor="bottom")
-    if 1.03 < t < 1.4:
-        particles(w, t, 1.04, BIN_X, bsrc(0, 220)[1], 10, 3, col=(170, 170, 170), size=8, up=240)
+        if bdx < 600:
+            shadow(w, LID_REST[0] + bdx, LID_REST[1], 270, 60)
+            lid(w, lx, ly, 0.0)
+        p = ease_io((t - 1.85) / 0.2)
+        gx = lerp(hover[0], GROW_C[0], p)
+        gb = lerp(hover[1] + PW * 0.45, GROW_C[1], p)
+        shadow(w, gx, gb, wd * 0.8 * sc, 70)
+        ob(w, name, gx, gb, wd * sc, anchor="bottom")
+    if 1.06 < t < 1.45:
+        particles(w, t, 1.07, BIN_X, bsrc(0, 220)[1], 9, 3, col=(170, 170, 170), size=6, up=200)
+    # --- caméra : plan large de la cuisine, puis on se rapproche de la planche pour l'avance rapide
+    zk = ease_io((t - 1.9) / 0.45)
+    z = lerp(lerp(1.22, 1.12, ease_out(t / 0.6)), 1.45, zk)
+    fx, fy = lerp(660, GROW_C[0], zk), lerp(1250, 1000, zk)
+    w = zoomed(w, z, fx, fy)
+    w.alpha_composite(shade())
     if t > GROW_T0 + 4 * GROW_DT - 0.1:
-        sparkles(u, t, GROW_T0 + 4 * GROW_DT, 540, 800, 360, 10, 7)
-    speed_fx(u, t, 1.4, 1.78, forward=False)
+        sparkles(u, t, GROW_T0 + 4 * GROW_DT, 540, 900, 360, 10, 7)
+    speed_fx(u, t, 1.4, 1.8, forward=False)
     speed_fx(u, t, 1.86, GROW_T0 + 4 * GROW_DT + 0.1, forward=True)
-    if t < 0.72:
-        put(u, icon("arrow_down", 110), HOVER[0] + 250, HOVER[1] + 40 + 12 * math.sin(t * 7), life(t, 0.1, 0.7), 0)
     title(u, "TU JETTES ÇA ?", t, 0.05, 1.36, y=330, color=YEL, size=165)
     title(u, "STOP !", t, 1.4, 1.84, y=330, color=RED, size=190)
     stamp(u, "UN ARBRE !", 540, 340, t, 3.12, 3.7, GREEN, 135, -8)
@@ -165,11 +195,11 @@ def s_open(t):
     return w, u
 
 
-cue(0.0, "pop_lo", 0.3)
+cue(0.0, "pop_lo", 0.25)
 cue(0.17, "click", 0.35)
-cue(0.62, "chop", 0.25)
+cue(0.62, "chop", 0.22)
 cue(0.74, "whoosh", 0.25)
-cue(1.03, "thud", 0.45)
+cue(1.05, "thud", 0.45)
 cue(1.42, "alert3", 0.32)
 cue(1.88, "rise", 0.3)
 for _i in range(1, len(GROW)):

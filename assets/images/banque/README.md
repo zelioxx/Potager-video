@@ -15,3 +15,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `robinet_mural.png` | Robinet mural (sortie de jardin) chromé, embout de tuyau |
 | `arrosoir_zinc.png` | Arrosoir en zinc galvanisé (pomme à gauche) |
 | `poubelle_zinc_ouverte.png` / `_fermee` / `_couvercle` | Poubelle en zinc ouverte, fermée, et son couvercle seul |
+| `avocat_coupe.png` | Avocat coupé en deux, sans noyau (deux moitiés) |
