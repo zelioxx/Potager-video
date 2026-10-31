@@ -17,3 +17,10 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `poubelle_zinc_ouverte.png` / `_fermee` / `_couvercle` | Poubelle en zinc ouverte, fermée, et son couvercle seul |
 | `avocat_coupe.png` | Avocat coupé en deux, sans noyau (deux moitiés) |
 | `mangue_coupee.png` | Mangue coupée en deux, sans noyau (deux moitiés, cadre 1254) |
+| `banane_entiere.png` | Banane entière, couchée (cadre 1024) |
+| `banane_epluchee.png` | Banane à moitié épluchée, peau ouverte en 4 (cadre 1024) |
+| `peau_banane.png` | Peau de banane vide, posée (cadre 1254) |
+| `verre_eau.png` | Verre d'eau transparent (transparence tirée de la photo : on voit à travers) |
+| `verre_vide.png` | Verre vide transparent (même procédé) |
+| `mouche.png` | Mouche vue de dessus (Open Images) |
+| `tomates_grappe.png` | Deux tomates sur leur grappe (Open Images, détourage manuel) |

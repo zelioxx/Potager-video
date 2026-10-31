@@ -153,6 +153,12 @@ boîte fermée chaud attend semaines fend racine sort abonne-toi"""),
         highlight="""jettes noyau mangue superbe plante d'intérieur nettoie graine l'eau ouvre coque ciseau côté
 grosse haricot géant enroule-la essuie-tout humide boîte fermée chaud semaines racine sort magnifique abonnez-vous
 astuces"""),
+    "banane": dict(
+        scenes="scenes_banane", dur=28.3, voice=os.path.join(AUD, "banane", "voix.mp3"),
+        words=os.path.join(AUD, "banane", "voix_mots.json"), out="banane_engrais_1080x1920.mp4",
+        highlight="""peau banane engrais vraiment surprendre oui potassium fleurs tomates adorent telle quelle
+mois décomposer mouches rongeurs l'eau presque rien coupe-la petits morceaux compost décomposant vrais nutriments
+abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
