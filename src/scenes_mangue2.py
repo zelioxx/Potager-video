@@ -212,15 +212,15 @@ def s_inside(t):
     sz = int(1024 * k)
     if gone < 1:
         shadow(w, PX, PY, 600)
-        b = bot.resize((sz, sz), Image.BICUBIC)
-        put(w, b, PX + (512 - PIT_C[0]) * k - 260 * gone, PY + (512 - PIT_BOT) * k, 1.0, 0, 1 - gone)
-    # la graine : d'abord dans la coque, puis elle grossit au centre
-    gw = lerp(430, 640, ease_out((t - 9.9) / 0.5))
-    gy = lerp(PY - 60, PY, gone)
+    # la graine : couchée DANS la moitié basse de la coque (seul son dessus dépasse), puis elle grossit au centre
+    gw = lerp(520, 640, ease_out((t - 9.9) / 0.5))
+    gy = lerp(PY - 40, PY, gone)
     if gone > 0.3:
         shadow(w, PX, PY, gw * 0.85)
-    ob(w, GRAINE, PX, gy, gw, s=life(t, 8.8, dur=0.2) if t < 9.9 else 1.0, anchor="bottom")
+    ob(w, GRAINE, PX, gy, gw, anchor="bottom")
     if gone < 1:
+        b = bot.resize((sz, sz), Image.BICUBIC)
+        put(w, b, PX + (512 - PIT_C[0]) * k - 260 * gone, PY + (512 - PIT_BOT) * k, 1.0, 0, 1 - gone)
         tp = top.resize((sz, sz), Image.BICUBIC)
         hx, hy = PX - (PIT_RX - 30) * k, PY - (PIT_BOT - PIT_C[1]) * k
         D = 2 * sz
