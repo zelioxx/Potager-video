@@ -147,6 +147,12 @@ boîte fermée chaud attend semaines fend racine sort abonne-toi"""),
         words=os.path.join(AUD, "avocat2", "voix_mots.json"), out="avocat_variante_1080x1920.mp4",
         highlight="""jettes noyau d'avocat arbre savoir lave-le retire peau brune enroule-le essuie-tout humide
 boîte fermée chaud attend semaines fend racine sort abonne-toi"""),
+    "mangue2": dict(
+        scenes="scenes_mangue2", dur=23.6, voice=os.path.join(AUD, "mangue2", "voix.mp3"),
+        words=os.path.join(AUD, "mangue2", "voix_mots.json"), out="mangue_noyau_v2_1080x1920.mp4",
+        highlight="""jettes noyau mangue superbe plante d'intérieur nettoie graine l'eau ouvre coque ciseau côté
+grosse haricot géant enroule-la essuie-tout humide boîte fermée chaud semaines racine sort magnifique abonnez-vous
+astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

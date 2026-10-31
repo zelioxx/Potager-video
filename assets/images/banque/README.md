@@ -16,3 +16,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `arrosoir_zinc.png` | Arrosoir en zinc galvanisé (pomme à gauche) |
 | `poubelle_zinc_ouverte.png` / `_fermee` / `_couvercle` | Poubelle en zinc ouverte, fermée, et son couvercle seul |
 | `avocat_coupe.png` | Avocat coupé en deux, sans noyau (deux moitiés) |
+| `mangue_coupee.png` | Mangue coupée en deux, sans noyau (deux moitiés, cadre 1254) |
