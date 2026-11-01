@@ -24,3 +24,7 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `verre_vide.png` | Verre vide transparent (même procédé) |
 | `mouche.png` | Mouche vue de dessus (Open Images) |
 | `tomates_grappe.png` | Deux tomates sur leur grappe (Open Images, détourage manuel) |
+| `larve_blanche.png` | Larve blanche à tête noire, de profil (larve de moucheron / sciaride) |
+| `bol_vinaigre_cidre.png` | Petit bol en grès avec du vinaigre de cidre (piège à moucherons) |
+| `moucheron_a.png` / `moucheron_b.png` | Moucherons du terreau (sciarides), de profil, tête à gauche |
+| `sable_texture.jpg` | Texture de sable (carré, recadré dans un bloc de sable) |

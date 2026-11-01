@@ -159,6 +159,12 @@ astuces"""),
         highlight="""peau banane engrais vraiment surprendre oui potassium fleurs tomates adorent telle quelle
 mois décomposer mouches rongeurs l'eau presque rien coupe-la petits morceaux compost décomposant vrais nutriments
 abonnez-vous astuces"""),
+    "moucherons": dict(
+        scenes="scenes_moucherons", dur=24.6, voice=os.path.join(AUD, "moucherons", "voix.mp3"),
+        words=os.path.join(AUD, "moucherons", "voix_mots.json"), out="moucherons_terreau_1080x1920.mp4",
+        highlight="""mouches partout plante l'arroses problème terre larves adorent terreau humide sécher surface
+arrosages recouvre centimètre sable pondre bonus verre vinaigre cidre goutte liquide vaisselle moucherons plongent
+abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
