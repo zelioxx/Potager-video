@@ -54,7 +54,7 @@ def swarm_pos(t, i, cx, cy, rx, ry):
 
 
 # ============================================================ A. LE COIN DU SALON (0 → 5.97)
-MON_X, MON_Y, MON_W = 810, 1000, 560            # monstera dans le coin droit, sur le parquet (derrière la table)
+MON_X, MON_Y, MON_W = 730, 1350, 640            # monstera sur le tapis, au milieu bas de l'image (hors titres)
 MON_K = MON_W / (931 - 109)
 SOIL_W = (MON_X + (512 - 520) * MON_K, MON_Y + (483 - 950) * MON_K)    # terre du pot (décor)
 CAN_C, CAN_W, CAN_ROT = (SOIL_W[0] - 224, SOIL_W[1] - 156), 420, -28  # arrosoir (retourné, pomme à droite)
@@ -72,9 +72,9 @@ def salon(t, gnats=True, burst=0.0):
         n = N_START + (N_BURST if burst > 0 else 0)
         for i in range(n):
             if i < N_START:
-                x, y, vx = swarm_pos(t, i, MON_X - 20, 620, 250, 200)
+                x, y, vx = swarm_pos(t, i, MON_X - 40, MON_Y - 380, 250, 200)
             else:                             # ils jaillissent de la terre et se dispersent
-                x, y, vx = swarm_pos(t, i, MON_X - 60, 600, 420, 380)
+                x, y, vx = swarm_pos(t, i, MON_X - 80, MON_Y - 400, 420, 360)
                 q = clamp(burst * 1.6 - (i - N_START) * 0.035)
                 if q <= 0:
                     continue
@@ -408,16 +408,16 @@ cue(20.9, "success", 0.28)
 def s_end(t):
     w = salon(t, gnats=False)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    w = zoomed(w, 1.25, 680, 900)
+    w = zoomed(w, 1.25, 660, 1100)
     w.alpha_composite(shade())
     sparkles(u, t, 21.4, 560, 760, 340, 10, 7)
     clicked = t > 22.7
     btn = button_img("ABONNÉ" if clicked else "S'ABONNER", (120, 120, 120) if clicked else RED, 70)
     press = 1 - 0.08 * math.sin(math.pi * clamp((t - 22.65) / 0.15))
-    put(u, btn, 540, 1240, life(t, 21.45) * press)
+    put(u, btn, 540, 1340, life(t, 21.45) * press)
     if t > 22.2:
         k = ease_out((t - 22.2) / 0.4)
-        put(u, icon("cursor", 110), lerp(900, 640, k), lerp(1520, 1280, k), 1)
+        put(u, icon("cursor", 110), lerp(900, 640, k), lerp(1600, 1380, k), 1)
     put(u, logo_img(260), 540, 330, life(t, 23.45, dur=0.45))
     sparkles(u, t, 23.55, 540, 330, 200, 10, 12)
     title(u, "ADIEU MOUCHERONS !", t, 21.35, 23.4, y=330, color=YEL, size=118)

@@ -161,7 +161,7 @@ mois décomposer mouches rongeurs l'eau presque rien coupe-la petits morceaux co
 abonnez-vous astuces"""),
     "moucherons": dict(
         scenes="scenes_moucherons", dur=24.6, voice=os.path.join(AUD, "moucherons", "voix.mp3"),
-        words=os.path.join(AUD, "moucherons", "voix_mots.json"), out="moucherons_terreau_v2.mp4",
+        words=os.path.join(AUD, "moucherons", "voix_mots.json"), out="moucherons_terreau_v3.mp4",
         highlight="""mouches partout plante l'arroses problème terre larves adorent terreau humide sécher surface
 arrosages recouvre centimètre sable pondre bonus verre vinaigre cidre goutte liquide vaisselle moucherons plongent
 abonne-toi astuces"""),
