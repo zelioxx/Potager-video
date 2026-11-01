@@ -161,7 +161,7 @@ mois décomposer mouches rongeurs l'eau presque rien coupe-la petits morceaux co
 abonnez-vous astuces"""),
     "moucherons": dict(
         scenes="scenes_moucherons", dur=24.6, voice=os.path.join(AUD, "moucherons", "voix.mp3"),
-        words=os.path.join(AUD, "moucherons", "voix_mots.json"), out="moucherons_terreau_1080x1920.mp4",
+        words=os.path.join(AUD, "moucherons", "voix_mots.json"), out="moucherons_terreau_v2.mp4",
         highlight="""mouches partout plante l'arroses problème terre larves adorent terreau humide sécher surface
 arrosages recouvre centimètre sable pondre bonus verre vinaigre cidre goutte liquide vaisselle moucherons plongent
 abonne-toi astuces"""),
@@ -370,7 +370,14 @@ def build_audio(path):
     for a, b, fn in scenes.SCENES[1:]:
         cues.append((a - 0.2, "whoosh", getattr(scenes, "TRANS_GAIN", 0.32)))
     fx = sfx.render_track(cues, DUR)
-    mix += fx * 0.55
+    # bruitages nettement sous la voix, et encore baissés (« ducking ») pendant qu'elle parle :
+    # sinon la compression du mastering les remonte dans les blancs et la voix paraît plus basse
+    win = int(0.05 * sfx.SR)
+    env = np.sqrt(np.convolve(mix ** 2, np.ones(win) / win, mode="same"))
+    active = np.clip(env / (np.percentile(env[env > 1e-4], 50) + 1e-6), 0, 1)
+    sm = int(0.25 * sfx.SR)
+    active = np.convolve(active, np.ones(sm) / sm, mode="same")
+    mix += fx * getattr(scenes, "SFX_GAIN", 0.34) * (1 - 0.45 * active)
     st = np.stack([mix, mix], 1)
     peak = np.abs(st).max()
     if peak > 0.98:

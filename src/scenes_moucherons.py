@@ -61,40 +61,101 @@ CAN_C, CAN_W, CAN_ROT = (SOIL_W[0] - 224, SOIL_W[1] - 156), 420, -28  # arrosoir
 SPOUT = (SOIL_W[0], SOIL_W[1] - 167)
 
 
-def salon(t, gnats=True, n=12, burst=0.0):
+N_START, N_BURST = 3, 26                         # 2-3 moucherons au début, puis une nuée à l'arrosage
+
+
+def salon(t, gnats=True, burst=0.0):
     w = photo("fond_salon_coin.webp").copy()
     shadow(w, MON_X, MON_Y, MON_W * 0.8, 70)
     ob(w, MONSTERA, MON_X, MON_Y, MON_W, anchor="bottom")
     if gnats:
+        n = N_START + (N_BURST if burst > 0 else 0)
         for i in range(n):
-            x, y, vx = swarm_pos(t, i, MON_X - 20, 640, 300, 230)
-            if burst > 0 and i >= n - 8:      # ceux qui jaillissent de la terre à l'arrosage
-                q = clamp(burst - (i - n + 8) * 0.06)
+            if i < N_START:
+                x, y, vx = swarm_pos(t, i, MON_X - 20, 620, 250, 200)
+            else:                             # ils jaillissent de la terre et se dispersent
+                x, y, vx = swarm_pos(t, i, MON_X - 60, 600, 420, 380)
+                q = clamp(burst * 1.6 - (i - N_START) * 0.035)
                 if q <= 0:
                     continue
-                x, y = lerp(SOIL_W[0] + (i % 4 - 1.5) * 50, x, ease_out(q)), lerp(SOIL_W[1], y, ease_out(q))
-            gnat(w, x, y, 70 + 12 * (i % 3), vx, i)
+                ox = SOIL_W[0] + ((i * 37) % 9 - 4) * 26
+                x, y = lerp(ox, x, ease_out(q)), lerp(SOIL_W[1] - 5, y, ease_out(q))
+            gnat(w, x, y, 62 + 12 * (i % 3), vx, i)
     return w
 
 
+ROSE = (SOIL_W[0] - 72, SOIL_W[1] - 222)       # centre de la pomme de l'arrosoir (incliné)
+
+
+def watering(c, t, a):
+    """Pomme d'arrosoir : fins jets d'eau en gerbe (paraboles), reflets qui filent, gouttes et éclaboussures."""
+    if a <= 0.01:
+        return
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    g, ground = 1900.0, SOIL_W[1] - 4
+    r = np.random.default_rng(11)
+    n = 26
+    for k in range(n):
+        q = k / (n - 1)
+        x0 = ROSE[0] + r.uniform(-10, 10) + q * 18
+        y0 = ROSE[1] + lerp(-26, 26, q) + r.uniform(-4, 4)
+        ang = math.radians(lerp(8, 62, q) + r.uniform(-5, 5))
+        v = r.uniform(250, 330)
+        vx, vy = v * math.cos(ang), v * math.sin(ang)
+        tau_end = (-vy + math.sqrt(vy * vy + 2 * g * (ground - y0))) / g
+        pts = []
+        for i in range(19):
+            tau = tau_end * i / 18
+            wob = math.sin(t * 40 + k * 1.7 + i * 0.9) * 1.2 * i / 18
+            pts.append((x0 + vx * tau + wob, y0 + vy * tau + 0.5 * g * tau * tau))
+        d.line(pts, fill=(196, 222, 244, int(105 * a)), width=2 if k % 3 else 3, joint="curve")
+        # reflets qui descendent le long du jet
+        for j in range(2):
+            ph = (t * 3.0 + k * 0.37 + j * 0.5) % 1.0
+            i0 = int(ph * 16)
+            d.line(pts[i0:i0 + 3], fill=(250, 253, 255, int(200 * a)), width=3)
+        # le bout du jet se casse en gouttes
+        ex, ey = pts[-1]
+        for j in range(3):
+            ph = (t * 4.0 + k * 0.29 + j * 0.33) % 1.0
+            gx, gy = lerp(pts[-4][0], ex, ph), lerp(pts[-4][1], ey, ph)
+            d.ellipse([gx - 2.4, gy - 3.2, gx + 2.4, gy + 3.2], fill=(232, 244, 254, int(200 * a)))
+    # éclaboussures sur la terre
+    for k in range(30):
+        p = (t * 3.4 + k * 0.161) % 1.0
+        ang = math.radians(200 + (k * 47) % 140)
+        sx = SOIL_W[0] - 40 + ((k * 29) % 15) * 9
+        x = sx + math.cos(ang) * 34 * p
+        y = ground - 4 + math.sin(ang) * 26 * p + 50 * p * p
+        rr = 2.4 * (1 - p) + 0.8
+        d.ellipse([x - rr, y - rr, x + rr, y + rr], fill=(228, 240, 252, int(180 * a * (1 - p))))
+    c.alpha_composite(lay.filter(ImageFilter.GaussianBlur(0.6)))
+
+
+def wet_soil(c, k):
+    """La terre du pot s'assombrit en buvant l'eau."""
+    if k <= 0.01:
+        return
+    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    rx, ry = 150 * MON_K, 62 * MON_K
+    ImageDraw.Draw(ov).ellipse([SOIL_W[0] - rx, SOIL_W[1] - ry, SOIL_W[0] + rx, SOIL_W[1] + ry],
+                               fill=(12, 8, 4, int(95 * k)))
+    c.alpha_composite(ov.filter(ImageFilter.GaussianBlur(10)))
+
+
 def s_salon(t):
-    burst = clamp((t - 2.75) / 0.6) if t > 2.75 else 0.0
-    n = 16 if t > 2.75 else 9
-    w = salon(t, True, n, burst)
+    burst = clamp((t - 2.8) / 0.9) if t > 2.8 else 0.0
+    w = salon(t, True, burst)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     # l'arrosoir arrive à « dès que tu l'arroses »
     cin = ease_out((t - 2.15) / 0.35)
     cout = ease_in((t - 3.25) / 0.3)
+    wet_soil(w, ease_out((t - 2.7) / 0.6))
     if 2.15 < t < 3.6:
         tilt = CAN_ROT * ease_io((t - 2.45) / 0.25) * (1 - cout)
         ob(w, ARROSOIR, lerp(-400, CAN_C[0], cin) - 700 * cout, CAN_C[1], CAN_W, rot=tilt, flip=True)
-        if 2.62 < t < 3.25:
-            d = ImageDraw.Draw(w)
-            a = fade(t, 2.62, 3.25, 0.06, 0.1)
-            for k in range(7):
-                d.line([(SPOUT[0] - 18 + k * 6, SPOUT[1] + 10), (SPOUT[0] - 60 + k * 20, SOIL_W[1] - 6)],
-                       fill=(160, 205, 238, int(190 * a)), width=5)
-            particles(w, t, 2.68, SOIL_W[0], SOIL_W[1], 10, 2, col=(160, 205, 238), size=7, up=160, dur=0.5)
+        watering(w, t, fade(t, 2.6, 3.27, 0.08, 0.1))
     # caméra : tout le coin, puis plongée sur la terre du pot
     zk = ease_io((t - 3.5) / 0.7)
     w = zoomed(w, lerp(1.12, 2.3, zk), lerp(600, SOIL_W[0], zk), lerp(980, SOIL_W[1] - 40, zk))
