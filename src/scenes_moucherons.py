@@ -84,7 +84,7 @@ def salon(t, gnats=True, burst=0.0):
     return w
 
 
-ROSE = (SOIL_W[0] - 72, SOIL_W[1] - 222)       # centre de la pomme de l'arrosoir (incliné)
+ROSE = (SOIL_W[0] - 36, SOIL_W[1] - 146)       # centre de la face de la pomme de l'arrosoir (incliné)
 
 
 def watering(c, t, a):
@@ -98,9 +98,9 @@ def watering(c, t, a):
     n = 26
     for k in range(n):
         q = k / (n - 1)
-        x0 = ROSE[0] + r.uniform(-10, 10) + q * 18
-        y0 = ROSE[1] + lerp(-26, 26, q) + r.uniform(-4, 4)
-        ang = math.radians(lerp(8, 62, q) + r.uniform(-5, 5))
+        x0 = ROSE[0] + lerp(14, -14, q) + r.uniform(-3, 3)      # le long du disque de la pomme
+        y0 = ROSE[1] + lerp(-22, 22, q) + r.uniform(-3, 3)
+        ang = math.radians(lerp(18, 72, q) + r.uniform(-5, 5))
         v = r.uniform(250, 330)
         vx, vy = v * math.cos(ang), v * math.sin(ang)
         tau_end = (-vy + math.sqrt(vy * vy + 2 * g * (ground - y0))) / g
@@ -155,7 +155,7 @@ def s_salon(t):
     if 2.15 < t < 3.6:
         tilt = CAN_ROT * ease_io((t - 2.45) / 0.25) * (1 - cout)
         ob(w, ARROSOIR, lerp(-400, CAN_C[0], cin) - 700 * cout, CAN_C[1], CAN_W, rot=tilt, flip=True)
-        watering(w, t, fade(t, 2.6, 3.27, 0.08, 0.1))
+        watering(w, t, fade(t, 2.66, 3.27, 0.06, 0.1))
     # caméra : tout le coin, puis plongée sur la terre du pot
     zk = ease_io((t - 3.5) / 0.7)
     w = zoomed(w, lerp(1.12, 2.3, zk), lerp(600, SOIL_W[0], zk), lerp(980, SOIL_W[1] - 40, zk))
