@@ -165,6 +165,11 @@ abonnez-vous astuces"""),
         highlight="""mouches partout plante l'arroses problème terre larves adorent terreau humide sécher surface
 arrosages recouvre centimètre sable pondre bonus verre vinaigre cidre goutte liquide vaisselle moucherons plongent
 abonne-toi astuces"""),
+    "oignon": dict(
+        scenes="scenes_oignon", dur=20.75, voice=os.path.join(AUD, "oignon", "voix.mp3"),
+        words=os.path.join(AUD, "oignon", "voix_mots.json"), out="oignon_germe_1080x1920.mp4",
+        highlight="""oignon germe placard jette surtout d'autres plante-le pot pointe verte au-dessus terre fenêtre
+arrosage léger semaines divise plusieurs nouveaux oignons tiges vertes mangent ciboulette abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

@@ -28,3 +28,6 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `bol_vinaigre_cidre.png` | Petit bol en grès avec du vinaigre de cidre (piège à moucherons) |
 | `moucheron_a.png` / `moucheron_b.png` | Moucherons du terreau (sciarides), de profil, tête à gauche |
 | `sable_texture.jpg` | Texture de sable (carré, recadré dans un bloc de sable) |
+| `oignon.png` | Oignon jaune entier (cadre 1024) |
+| `oignon_germe_court.png` | Oignon germé, pousses vertes courtes (cadre 1024) |
+| `oignon_germe_long.png` | Oignon germé, longues tiges vertes (cadre 1024) |
