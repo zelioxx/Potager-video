@@ -71,7 +71,7 @@ def soil_patch(size):
     return soil_tex().resize((w_, h_), Image.BICUBIC)
 
 
-def planted(c, name, X, Ybot, Wp, bw, depth=1.0, mound=1.0, hole=0.0, drop=0.0):
+def planted(c, name, X, Ybot, Wp, bw, depth=1.0, mound=1.0, hole=0.0, drop=0.0, lift=None, show=True):
     """Pot en terre avec l'oignon planté : depth 0 → 1 (il s'enfonce), mound 0 → 1 (la terre se referme autour)."""
     k, surf, rx, ry = pot_geom(X, Ybot, Wp)
     ob(c, POT, X, Ybot, Wp, anchor="bottom")
@@ -83,7 +83,10 @@ def planted(c, name, X, Ybot, Wp, bw, depth=1.0, mound=1.0, hole=0.0, drop=0.0):
         c.alpha_composite(ov.filter(ImageFilter.GaussianBlur(3)))
     # l'oignon : au-dessus du pot il est entier, puis le bas disparaît sous la surface
     hb = bulb_h(name, bw)
-    yb = lerp(surf[1] - 520 - hb * 0.2, surf[1] + hb * 0.92, depth) - drop
+    if not show:
+        return surf
+    lift = 520 + hb * 0.2 if lift is None else lift
+    yb = lerp(surf[1] - lift, surf[1] + hb * 0.92, depth) - drop
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     onion(lay, name, X, yb, bw)
     m = Image.new("L", (W, H), 255)
@@ -174,45 +177,82 @@ cue(3.06, "thud", 0.3)
 cue(3.85, "ding", 0.25)
 
 
-# ============================================================ 3. PLANTE-LE DANS UN POT (4.47 → 7.55)
-PX, PBOT, PWD = 540, TABLE + 80, 700
-PBW = 300
+# ============================================================ 3. PLANTE-LE : TOUJOURS DANS LA CUISINE (4.47 → 7.55)
+# la poubelle s'en va, un pot en terre arrive sur le plan de travail, l'oignon saute de la planche dans le trou,
+# la terre se referme, la pointe verte dépasse ; la caméra se rapproche du pot.
+KP_X, KP_BOT, KP_W = 740, 1480, 340             # pot sur le plan de travail, devant le coin de la planche
+Z0, Z1 = (1.2, 620, 1150), (1.9, 740, 1250)
+
+
+def cam_k(t):
+    q = ease_io((t - 5.45) / 0.55)
+    return tuple(lerp(a, b, q) for a, b in zip(Z0, Z1))
+
+
+def to_screen(x, y, z, fx, fy):
+    """Point du décor → écran, avec le même recadrage que zoomed()."""
+    cw, ch = W / z, H / z
+    x0 = min(max(fx - cw / 2, 0), W - cw)
+    y0 = min(max(fy - ch / 2, 0), H - ch)
+    return (x - x0) * z, (y - y0) * z
 
 
 def s_plant(t):
-    w, u = new_layers(background("table"))
-    s_ = life(t, 4.47, dur=0.35)
-    shadow(w, PX, PBOT, PWD * 0.75 * s_)
-    depth = ease_in((t - 4.75) / 0.55)
-    mound = ease_out((t - 5.3) / 0.55)
-    hole = (1 - mound) * life(t, 4.6, dur=0.3)
-    if s_ < 0.99:
-        ob(w, POT, PX, PBOT, PWD, s=s_, anchor="bottom")
-        surf = pot_geom(PX, PBOT, PWD)[1]
+    w = photo("citron_fond_cuisine.png").copy()
+    u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    bdx = 700 * ease_in((t - 4.47) / 0.35)          # la poubelle sort à droite
+    if bdx < 690:
+        shadow(w, BIN_X + bdx, BIN_BOT, BIN_W * 0.95)
+        bin_img(w, ZB_SHUT, bdx)
+    pin = ease_out((t - 4.6) / 0.4)                  # le pot arrive
+    px = lerp(1350, KP_X, pin)
+    shadow(w, px, KP_BOT, KP_W * 0.8, 75)
+    hop = ease_io((t - 4.95) / 0.4)                  # l'oignon saute de la planche au-dessus du trou
+    depth = ease_in((t - 5.35) / 0.25)
+    mound = ease_out((t - 5.55) / 0.5)
+    hole = (1 - mound) * ease_out((t - 4.85) / 0.25)
+    surf = pot_geom(KP_X, KP_BOT, KP_W)[1]
+    if t < 5.35:
+        planted(w, COURT, px, KP_BOT, KP_W, BW, hole=hole, show=False)
+        if hop <= 0:
+            shadow(w, BD[0], BD[1], BW * 1.1, 60)
+        x = lerp(BD[0], surf[0], hop)
+        y = lerp(BD[1], surf[1] - 40, hop) - math.sin(math.pi * hop) * 230
+        onion(w, COURT, x, y, BW, rot=-20 * math.sin(math.pi * hop))
     else:
-        surf = planted(w, COURT, PX, PBOT, PWD, PBW, depth, mound, hole)
-    if 5.3 < t < 5.95:   # la terre tombe autour
+        planted(w, COURT, KP_X, KP_BOT, KP_W, BW, depth, mound, hole, lift=40)
+    if 5.55 < t < 6.1:   # la terre retombe autour
         for i in range(3):
-            particles(w, t, 5.3 + i * 0.15, PX + (i - 1) * 120, surf[1] - 260, 14, i + 3, col=(62, 42, 28),
-                      size=12, up=30, spread=90, dur=0.5)
+            particles(w, t, 5.55 + i * 0.12, surf[0] + (i - 1) * 60, surf[1] - 120, 12, i + 3, col=(62, 42, 28),
+                      size=7, up=30, spread=60, dur=0.45)
+    z, fx, fy = cam_k(t)
+    w = zoomed(w, z, fx, fy)
+    w.alpha_composite(shade())
     if t > 5.75:   # la pointe verte, juste au-dessus de la terre
-        tip_y = surf[1] - 230
-        hl_ellipse(u, PX + 10, tip_y, 120, 170, life(t, 5.78))
-        tag(u, "POINTE VERTE", 850, 560, t, 5.8, None, rot=-6, size=52, string_to=(PX + 90, tip_y - 60))
+        tx, ty = to_screen(surf[0] + 4, surf[1] - 0.42 * bulb_h(COURT, BW), z, fx, fy)
+        hl_ellipse(u, tx, ty, 120, 160, life(t, 5.78))
+        tag(u, "POINTE VERTE", 850, 560, t, 5.8, None, rot=-6, size=52, string_to=(tx + 70, ty - 70))
     if t > 6.47:
         d = ImageDraw.Draw(u)
         a = life(t, 6.5)
-        for xx in range(int(PX - 330), int(PX + 330), 34):
-            d.line([(xx, surf[1] + 2), (xx + 18, surf[1] + 2)], fill=WHITE + (int(240 * a),), width=6)
+        lx0, ly = to_screen(surf[0] - 150, surf[1] + 2, z, fx, fy)
+        lx1, _ = to_screen(surf[0] + 150, surf[1] + 2, z, fx, fy)
+        for xx in range(int(lx0), int(lx1), 34):
+            d.line([(xx, ly), (xx + 18, ly)], fill=WHITE + (int(240 * a),), width=6)
     title(u, "PLANTE-LE", t, 4.5, 5.55, y=330, color=YEL, size=175)
     title(u, "LA POINTE VERTE", t, 5.59, 6.43, y=330, size=145)
     title(u, "AU-DESSUS DE LA TERRE", t, 6.47, None, y=330, color=YEL, size=112)
     return w, u
 
 
-cue(4.5, "pop", 0.22)
-cue(4.8, "whoosh", 0.15)
-cue(5.32, "rustle", 0.3)
+def s_kitchen(t):
+    """La poubelle puis la plantation : un seul plan continu dans la cuisine (pas de transition)."""
+    return s_bin(t) if t < 4.47 else s_plant(t)
+
+
+cue(4.62, "whoosh", 0.15)
+cue(5.0, "whoosh_up", 0.14)
+cue(5.57, "rustle", 0.3)
 cue(5.82, "pop_hi", 0.2)
 
 
@@ -264,7 +304,7 @@ for _k in range(0, 7, 2):
 
 
 # ============================================================ 5. VUE EN COUPE : IL SE DIVISE (10.05 → 14.1)
-CX, CTOP, CBOT, CWT, CWB = 540, 800, 1400, 760, 560     # pot en coupe : haut, bas, largeurs
+CX, CTOP, CBOT, CWT, CWB = 540, 900, 1455, 760, 580     # pot en coupe : haut, bas, largeurs
 SOIL_Y = CTOP + 110
 
 
@@ -296,7 +336,8 @@ def section_pot(c, t):
                         outline=(150, 74, 44), width=4)
 
 
-SPLITS = [[(0, 270)], [(-110, 210), (110, 210)], [(-175, 170), (0, 180), (175, 170)]]
+MOTHER_BW = 230                                 # l'oignon planté (au milieu)
+YOUNG = [(-205, 128, 11.95), (205, 120, 12.91)]   # les jeunes oignons : décalage, largeur, apparition
 
 
 def s_split(t):
@@ -305,22 +346,22 @@ def s_split(t):
     light_rays(w, 140, 200, t, 0.6 * warm_glow)
     shadow(w, CX, CBOT + 4, CWB * 1.05)
     section_pot(w, t)
-    # 1 → 2 → 3 bulbes (changement sans superposition)
-    stage, sc = 0, 1.0
-    if t > 11.8:
-        which, sc = swap((t - 11.8) / 0.3)
-        stage = which
-    if t > 12.8:
-        which, sc = swap((t - 12.8) / 0.3)
-        stage = 1 + which
-    for dx, bw in SPLITS[stage]:
-        onion(w, COURT, CX + dx, SOIL_Y + bulb_h(COURT, bw) * 0.92, bw * sc)
+    # au milieu, l'oignon planté : sa pousse monte très haut (court → long, sans superposition)
+    which, sc = swap((t - 11.72) / 0.3)
+    mother = COURT if which == 0 else LONG
+    onion(w, mother, CX, SOIL_Y + bulb_h(mother, MOTHER_BW) * 0.9, MOTHER_BW * sc)
+    # autour, les nouveaux oignons : plus petits, sans pousse (ils sont plus jeunes)
+    for dx, bw, t0 in YOUNG:
+        g = life(t, t0, dur=0.4)
+        if g > 0.01:
+            onion(w, OIGNON, CX + dx, SOIL_Y + 40 + bulb_h(OIGNON, bw) * 0.95, bw, s=g)
     if 10.3 < t < 11.75:
         act = min(3, int((t - 10.35) / 0.33))
         pills(u, ["S1", "S2", "S3", "S4"], act, t, 10.3, 11.7, y=560, pw=170)
     if t > 13.2:
-        sparkles(u, t, 13.2, CX, SOIL_Y + 120, 330, 10, 6)
-        tag(u, "NOUVEAUX OIGNONS !", 760, 640, t, 13.27, None, rot=-4, size=50)
+        sparkles(u, t, 13.2, CX, SOIL_Y + 160, 330, 10, 6)
+        tag(u, "JEUNES OIGNONS !", 800, 820, t, 13.27, None, rot=-4, size=50,
+            string_to=(CX + 205, SOIL_Y + 90))
     title(u, "QUELQUES SEMAINES…", t, 10.07, 11.4, y=330, size=125)
     title(u, "IL SE DIVISE", t, 11.43, 12.55, y=330, color=YEL, size=160)
     stamp(u, "EN PLUSIEURS !", 540, 340, t, 12.59, None, GREEN, 125, -6)
@@ -330,7 +371,8 @@ def s_split(t):
 cue(10.09, "whoosh", 0.16)
 for _k in range(4):
     cue(10.36 + _k * 0.33, "tick", 0.2)
-cue(11.92, "pop_hi", 0.28)
+cue(11.75, "rise", 0.18)
+cue(11.97, "pop_hi", 0.28)
 cue(12.92, "pop_hi", 0.3)
 cue(13.3, "success", 0.28)
 
@@ -416,8 +458,7 @@ cue(19.7, "sparkle", 0.25)
 
 SCENES = [
     (0.0, 1.83, s_placard),
-    (1.83, 4.47, s_bin),
-    (4.47, 7.55, s_plant),
+    (1.83, 7.55, s_kitchen),
     (7.55, 10.05, s_window),
     (10.05, 14.1, s_split),
     (14.1, 17.65, s_chives),
