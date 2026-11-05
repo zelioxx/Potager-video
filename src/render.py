@@ -167,7 +167,7 @@ arrosages recouvre centimètre sable pondre bonus verre vinaigre cidre goutte li
 abonne-toi astuces"""),
     "oignon": dict(
         scenes="scenes_oignon", dur=20.75, voice=os.path.join(AUD, "oignon", "voix.mp3"),
-        words=os.path.join(AUD, "oignon", "voix_mots.json"), out="oignon_germe_v2.mp4",
+        words=os.path.join(AUD, "oignon", "voix_mots.json"), out="oignon_germe_v3.mp4",
         highlight="""oignon germe placard jette surtout d'autres plante-le pot pointe verte au-dessus terre fenêtre
 arrosage léger semaines divise plusieurs nouveaux oignons tiges vertes mangent ciboulette abonnez-vous astuces"""),
 }
@@ -390,11 +390,12 @@ def build_audio(path):
     sf.write(path, st, sfx.SR)
 
 
-# volume « TikTok » : fort mais propre (≈ -11 LUFS, pic -1,5 dB). Compression douce : au-delà (-8/-9 LUFS),
-# la voix était trop écrasée par le limiteur et sonnait « saturée » ; TikTok ramène de toute façon le volume.
-LOUD = ("highpass=f=70,acompressor=threshold=-22dB:ratio=2.5:attack=12:release=160:makeup=2,"
-        "equalizer=f=3000:t=q:w=1.2:g=1.5,loudnorm=I=-10.5:TP=-1.5:LRA=9,"
-        "alimiter=limit=0.84:attack=5:release=80:level=false")
+# volume « TikTok » : fort et propre (≈ -9,7 LUFS, pic -1,1 dB), 1,5 dB au-dessus des vidéos de référence.
+# Compression en deux étapes douces (le limiteur ne travaille presque plus) : pas d'effet « saturé ».
+LOUD = ("highpass=f=80,acompressor=threshold=-26dB:ratio=2:attack=15:release=220:makeup=3,"
+        "acompressor=threshold=-16dB:ratio=3:attack=6:release=90:makeup=2,"
+        "equalizer=f=2500:t=q:w=1:g=2,loudnorm=I=-9:TP=-1.2:LRA=7,"
+        "alimiter=limit=0.88:attack=4:release=70:level=false")
 
 
 def main():
