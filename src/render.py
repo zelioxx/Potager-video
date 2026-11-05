@@ -172,7 +172,7 @@ abonne-toi astuces"""),
 arrosage léger semaines divise plusieurs nouveaux oignons tiges vertes mangent ciboulette abonnez-vous astuces"""),
     "eau_pates": dict(
         scenes="scenes_eau_pates", dur=21.2, voice=os.path.join(AUD, "eau_pates", "voix.mp3"),
-        words=os.path.join(AUD, "eau_pates", "voix_mots.json"), out="eau_pates_plantes_v2.mp4",
+        words=os.path.join(AUD, "eau_pates", "voix_mots.json"), out="eau_pates_plantes_v3.mp4",
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""cuisson pâtes nourrir plantes tuer détail sel salée assèche racines accumule terre refroidie
 oui temps meilleur légumes pleine minéraux abonnez-vous astuces"""),

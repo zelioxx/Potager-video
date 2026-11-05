@@ -161,10 +161,11 @@ cue(3.0, "thud", 0.3)
 
 # ============================================================ B. TOUT DÉPEND D'UN DÉTAIL : LE SEL (4.1 → 7.4)
 CB_X, CB_Y, CB_W = 470, TABLE + 40, 640
-SALT_IN = (CB_X + 40, CB_Y - 330)                # où tombe le sel dans la casserole
+PAN_WATER_Y = CB_Y + (470 - 935) * CB_W / 918   # surface de l'eau de la casserole fumante
+SALT_BOX = (CB_X - 32 + 185, 850 - 130)          # boîte de sel : l'ouverture, une fois penchée, juste au-dessus
 
 
-def salt_grains(c, t, t0, x, y, dur=0.9, n=26):
+def salt_grains(c, t, t0, x, y, dur=0.9, n=26, fall=300):
     if t < t0 or t > t0 + dur + 0.5:
         return
     d = ImageDraw.Draw(c)
@@ -173,7 +174,7 @@ def salt_grains(c, t, t0, x, y, dur=0.9, n=26):
         p = (t - t0 - r.uniform(0, dur)) / 0.45
         if 0 < p < 1:
             gx = x + r.uniform(-30, 30) + r.uniform(-20, 20) * p
-            gy = y + p * p * 300
+            gy = y + p * p * fall
             d.rectangle([gx - 5, gy - 5, gx + 5, gy + 5], fill=(252, 252, 252, 255), outline=(150, 150, 150))
 
 
@@ -186,11 +187,15 @@ def s_salt(t):
     # la boîte de sel arrive et verse
     if t > 6.2:
         q = ease_out((t - 6.22) / 0.35)
-        tilt = 120 * ease_io((t - 6.5) / 0.3)
-        ob(w, SEL, lerp(1300, 860, q), lerp(700, 640, q), 210, rot=tilt)
-        salt_grains(u, t, 6.8, 664, 760)
+        tilt = 125 * ease_io((t - 6.5) / 0.3)
+        bx, by = lerp(1300, SALT_BOX[0], q), lerp(760, SALT_BOX[1], q)
+        ob(w, SEL, bx, by, 210, rot=tilt)
+        # le sel sort de l'ouverture de la boîte et tombe dans l'eau (s'arrête à la surface)
+        a = math.radians(tilt)
+        ox, oy = bx - 226 * math.sin(a), by - 226 * math.cos(a)
+        salt_grains(u, t, 6.8, ox, oy + 10, fall=PAN_WATER_Y - oy - 10)
         if t > 6.25:
-            hl_ellipse(u, 860, 640, 190, 300, life(t, 6.3, 6.75))
+            hl_ellipse(u, bx, by, 190, 280, life(t, 6.3, 6.75))
     w.alpha_composite(shade())
     title(u, "TOUT DÉPEND", t, 4.12, 4.95, y=330, size=165)
     title(u, "D'UN SEUL DÉTAIL…", t, 4.99, 6.15, y=330, color=YEL, size=130)
@@ -287,8 +292,8 @@ def s_cool(t):
         ob(w, CASS, 560, TABLE + 40, 700 * sc, anchor="bottom")
     # pas de sel
     sg = life(t, 11.25, dur=0.3)
-    ob(w, SEL, 170, 860, 170, s=sg, rot=-8)
-    put(u, icon("nosign", 250), 170, 860, life(t, 11.45))
+    ob(w, SEL, 175, TABLE + 40, 150, s=sg, anchor="bottom")
+    put(u, icon("nosign", 230), 175, TABLE + 40 - 165, life(t, 11.45))
     if t > 12.0:
         put(u, icon("thermo", 150), 930, 760, life(t, 12.02))
         tag(u, "REFROIDIE", 880, 600, t, 12.1, None, rot=6, size=50)
@@ -309,7 +314,7 @@ cue(12.92, "ding", 0.3)
 
 
 # ============================================================ E. LE MEILLEUR : L'EAU DES LÉGUMES (14.2 → 18.1)
-VEG = [("poireau/leek_full", -150, 70, -60), ("garlic_bulb_a", 20, 110, 0), ("banque/oignon", 125, 85, 15)]
+VEG = [("poireau/leek_full", -110, 105, -35), ("garlic_bulb_a", 5, 105, 0), ("banque/oignon", 112, 115, 15)]
 MINERALS = [("K", "19", "Potassium"), ("Ca", "20", "Calcium"), ("Mg", "12", "Magnésium")]
 
 
@@ -326,7 +331,7 @@ def s_veg(t):
     for i, (name, dx, wv, rot) in enumerate(VEG):
         q = ease_in((t - 15.3 - i * 0.18) / 0.45)
         if q > 0:
-            ob(lay, name, wx + dx, lerp(250, wy + 10, q), wv * 2.2, rot=rot + 40 * q)
+            ob(lay, name, wx + dx, lerp(250, wy + 6, q), wv, rot=rot + 20 * q)
     m = Image.new("L", (W, H), 255)
     ImageDraw.Draw(m).rectangle([0, wy + 12, W, H], fill=0)
     lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), m.filter(ImageFilter.GaussianBlur(5))))
