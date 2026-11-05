@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Eau de cuisson des pâtes — Le Potager de Louis</title>
+<link rel="stylesheet" href="../../tools/potager.css">
+<style>
+  svg { overflow: visible; }
+  .btn { position: absolute; left: 280px; width: 520px; height: 116px; top: 1205px; border-radius: 60px; background: var(--vert);
+    color: var(--jaune); font-weight: 900; font-size: 54px; line-height: 116px; text-align: center; letter-spacing: 0.5px;
+    box-shadow: 0 10px 0 #0f2018, 0 22px 30px rgba(40,30,10,.35); display: none; }
+  .counter { position: absolute; font-weight: 900; color: var(--jaune); -webkit-text-stroke: 18px var(--vert); paint-order: stroke fill;
+    text-shadow: 0 12px 0 var(--vert); font-size: 120px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- A1 : la casserole de pâtes fume -->
+  <div class="scene" id="A1"><div class="bg-beige"></div>
+    <div class="shadow" style="left:230px;top:1150px;width:620px;height:70px"></div>
+    <div class="layer" id="A1pot" style="left:160px;top:640px;width:760px"></div>
+  </div>
+  <!-- A2 : on verse l'eau sur la plante -->
+  <div class="scene" id="A2"><div class="bg-beige"></div>
+    <div class="shadow" style="left:600px;top:1235px;width:340px;height:50px"></div>
+    <div class="layer" id="A2plant" style="left:560px;top:640px;width:420px"></div>
+    <svg class="layer" id="A2stream" style="left:0;top:0" width="1080" height="1920"></svg>
+    <div class="layer" id="A2pot" style="left:40px;top:520px;width:540px"></div>
+  </div>
+  <!-- B : ou les tuer -->
+  <div class="scene" id="B"><div class="bg-beige"></div>
+    <div class="shadow" style="left:330px;top:1315px;width:420px;height:56px"></div>
+    <div class="layer" id="Bplant" style="left:260px;top:510px;width:560px"></div>
+  </div>
+  <!-- C : un seul détail (loupe) -->
+  <div class="scene" id="C"><div class="bg-beige"></div>
+    <div class="shadow" style="left:230px;top:1210px;width:620px;height:70px"></div>
+    <div class="layer" id="Cpot" style="left:160px;top:700px;width:760px"></div>
+    <div class="layer" id="Cloupe" style="left:330px;top:500px;width:520px"></div>
+  </div>
+  <!-- D : le sel -->
+  <div class="scene" id="D"><div class="bg-beige"></div>
+    <div class="shadow" style="left:330px;top:1360px;width:440px;height:56px"></div>
+    <div class="layer" id="Dpot" style="left:260px;top:1000px;width:560px"></div>
+    <div class="layer" id="Dshaker" style="left:395px;top:442px;width:330px"></div>
+    <svg class="layer" id="Dgrains" style="left:0;top:0" width="1080" height="1920"></svg>
+  </div>
+  <!-- E : vue en coupe, racines et sel -->
+  <div class="scene" id="E"><div class="bg-beige"></div>
+    <div class="shadow" style="left:240px;top:1250px;width:600px;height:60px"></div>
+    <div class="layer" id="Ecut" style="left:85px;top:440px;width:910px"></div>
+  </div>
+  <!-- F1 : sans sel -->
+  <div class="scene" id="F1"><div class="bg-beige"></div>
+    <div class="shadow" style="left:400px;top:1150px;width:280px;height:44px"></div>
+    <div class="layer" id="F1shaker" style="left:395px;top:620px;width:290px"></div>
+    <svg class="layer" id="F1ban" style="left:240px;top:560px;overflow:visible" width="600" height="600" viewBox="0 0 600 600">
+      <circle cx="300" cy="300" r="265" fill="none" stroke="#c8372d" stroke-width="34"/>
+      <line x1="112" y1="112" x2="488" y2="488" stroke="#c8372d" stroke-width="34" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <!-- F2 : bien refroidie -->
+  <div class="scene" id="F2"><div class="bg-grisbleu"></div>
+    <div class="shadow" style="left:380px;top:1265px;width:240px;height:40px"></div>
+    <div class="layer" id="F2thermo" style="left:380px;top:500px;width:240px"></div>
+    <div class="counter" id="F2count" style="left:640px;top:760px"></div>
+  </div>
+  <!-- G : oui, de temps en temps -->
+  <div class="scene" id="G"><div class="bg-beige"></div>
+    <div class="shadow" style="left:640px;top:1240px;width:330px;height:50px"></div>
+    <div class="layer" id="Gplant" style="left:600px;top:650px;width:400px"></div>
+    <svg class="layer" id="Gstream" style="left:0;top:0" width="1080" height="1920"></svg>
+    <div class="layer" id="Gcan" style="left:40px;top:560px;width:560px"></div>
+    <div class="cal" id="Gcal" style="left:80px;top:180px"><div class="head"></div><div class="d"></div><div class="m"></div></div>
+  </div>
+  <!-- H/I : eau de cuisson des légumes, minéraux -->
+  <div class="scene" id="H"><div class="bg-beige"></div>
+    <div class="shadow" style="left:230px;top:1210px;width:620px;height:70px"></div>
+    <div class="layer" id="Hpot" style="left:160px;top:700px;width:760px"></div>
+    <svg class="layer" id="Hveg" style="left:0;top:0" width="1080" height="1920"></svg>
+  </div>
+  <!-- J : abonnez-vous -->
+  <div class="scene" id="J"><div class="bg-beige"></div>
+    <div class="shadow" style="left:380px;top:1150px;width:320px;height:50px"></div>
+    <div class="layer" id="Jplant" style="left:330px;top:520px;width:420px"></div>
+    <div class="btn" id="Jbtn"></div>
+  </div>
+
+  <div id="caption"></div>
+</div>
+
+<script src="../../tools/potager.js"></script>
+<script>
+const { lerp, prog, clamp, easeOut, easeIn, easeInOut, easeOutBack, mix, rng, pop } = P;
+window.DURATION = 21.13;
+
+/* ================= Illustrations SVG ================= */
+
+const STEEL = (x) => `<linearGradient id="steel${x}" x1="0" x2="1">
+  <stop offset="0" stop-color="#6f767c"/><stop offset=".18" stop-color="#b9c0c6"/><stop offset=".38" stop-color="#eef1f3"/>
+  <stop offset=".55" stop-color="#c3c9ce"/><stop offset=".85" stop-color="#8a9197"/><stop offset="1" stop-color="#626970"/></linearGradient>
+  <linearGradient id="steelRim${x}" x1="0" x2="1"><stop offset="0" stop-color="#9aa1a7"/><stop offset=".45" stop-color="#f4f6f7"/><stop offset="1" stop-color="#8d949a"/></linearGradient>`;
+
+// Casserole vue de 3/4 face. contents : 'pates' | 'legumes' | 'sel'
+function casserole(t, { water = '#e9e3cf', contents = 'pates', steam = 1, id = 'c' } = {}) {
+  const r = rng(7);
+  let inside = '';
+  if (contents === 'pates') {
+    for (let i = 0; i < 26; i++) {
+      const x = 120 + r() * 460, y = 108 + r() * 50, a = r() * 180;
+      inside += `<g transform="translate(${x},${y}) rotate(${a})"><rect x="-26" y="-9" width="52" height="18" rx="7" fill="#f3c968" stroke="#d6a142" stroke-width="3"/>
+        <line x1="-18" y1="-5" x2="18" y2="-5" stroke="#e0b155" stroke-width="2"/></g>`;
+    }
+  }
+  if (contents === 'sel') {
+    for (let i = 0; i < 40; i++) {
+      const x = 130 + r() * 440, y = 105 + r() * 50, s = 5 + r() * 7;
+      inside += `<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="#fff" stroke="#d8d8d0" stroke-width="1.5" transform="rotate(${r() * 90} ${x} ${y})"/>`;
+    }
+  }
+  // vapeur
+  let wisps = '';
+  for (let i = 0; i < 4; i++) {
+    const ph = ((t * 0.55 + i * 0.27) % 1);
+    const x = 200 + i * 100 + Math.sin(t * 2 + i) * 12, y = 80 - ph * 230;
+    const o = Math.sin(ph * Math.PI) * 0.75 * steam;
+    wisps += `<path d="M${x},${y} c-30,-40 30,-60 0,-100 c-30,-40 30,-60 0,-100" fill="none" stroke="#fff" stroke-width="${26 - ph * 10}"
+      stroke-linecap="round" opacity="${o}" filter="url(#blur${id})"/>`;
+  }
+  return `<svg viewBox="0 0 700 520" width="100%">
+    <defs>${STEEL(id)}<filter id="blur${id}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+      <clipPath id="clip${id}"><ellipse cx="350" cy="130" rx="243" ry="35"/></clipPath>
+      <radialGradient id="water${id}" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="${water}" stop-opacity="0"/></radialGradient></defs>
+    <rect x="18" y="148" width="92" height="34" rx="17" fill="#2a2a2a"/><rect x="590" y="148" width="92" height="34" rx="17" fill="#2a2a2a"/>
+    <path d="M90,130 L100,430 Q102,472 142,474 L558,474 Q598,472 600,430 L610,130 Z" fill="url(#steel${id})"/>
+    <path d="M100,430 Q102,472 142,474 L558,474 Q598,472 600,430 L600,445 Q598,488 556,490 L144,490 Q102,488 100,445 Z" fill="#555c62"/>
+    <rect x="205" y="160" width="26" height="290" rx="13" fill="#fff" opacity=".35"/>
+    <ellipse cx="350" cy="130" rx="262" ry="44" fill="url(#steelRim${id})"/>
+    <ellipse cx="350" cy="130" rx="246" ry="36" fill="#7c848a"/>
+    <ellipse cx="350" cy="133" rx="243" ry="34" fill="${water}"/>
+    <g clip-path="url(#clip${id})">${inside}<ellipse cx="350" cy="130" rx="243" ry="35" fill="url(#water${id})"/></g>
+    ${wisps}
+  </svg>`;
+}
+
+// Jeune plant en pot de terre cuite. w : 0 = en forme, 1 = mort
+function leaf(x, y, ang, sc, col1, col2) {
+  return `<g transform="translate(${x},${y}) rotate(${ang}) scale(${sc},${sc * 0.95})">
+    <path d="M0,0 C22,-34 88,-36 118,-2 C88,26 24,26 0,0 Z" fill="${col1}"/>
+    <path d="M0,0 C22,-34 88,-36 118,-2 C80,-6 30,-4 0,0 Z" fill="${col2}" opacity=".55"/>
+    <path d="M4,0 Q60,-5 112,-2" fill="none" stroke="${col2}" stroke-width="3" opacity=".9"/></g>`;
+}
+function plantTop(w, cx, base, h, k = 1) {
+  const tx = cx + 95 * w, ty = base - h + 140 * w, qx = cx - 10 * w, qy = base - h * 0.5;
+  const g1 = mix('#4f9a3a', '#a58d3c', clamp(w * 1.2)), g2 = mix('#2f6e25', '#6e5626', clamp(w * 1.2));
+  const pt = (f) => [(1 - f) ** 2 * cx + 2 * (1 - f) * f * qx + f * f * tx, (1 - f) ** 2 * base + 2 * (1 - f) * f * qy + f * f * ty];
+  let s = `<path d="M${cx},${base} Q${qx},${qy} ${tx},${ty}" fill="none" stroke="${mix('#3f7f2e', '#7a6430', w)}" stroke-width="${11 * k}" stroke-linecap="round"/>`;
+  [[0.32, 1.0], [0.58, 0.9], [0.82, 0.75]].forEach(([f, sc], i) => {
+    const [x, y] = pt(f), droop = 70 * w + i * 6 * w;
+    s += leaf(x, y, -28 + droop, sc * k, g1, g2) + leaf(x, y, 180 + 28 - droop, sc * k, g1, g2);
+  });
+  const [x, y] = pt(1);
+  s += leaf(x, y, -70 + 80 * w, 0.62 * k, g1, g2) + leaf(x, y, -110 + 120 * w, 0.62 * k, g1, g2);
+  return s;
+}
+function plant(w = 0, x = 'p') {
+  return `<svg viewBox="0 0 420 620" width="100%">
+    <defs><linearGradient id="terra${x}" x1="0" x2="1"><stop offset="0" stop-color="#a94e2b"/><stop offset=".4" stop-color="#d27a4e"/><stop offset="1" stop-color="#9e4826"/></linearGradient></defs>
+    ${plantTop(w, 210, 372, 300)}
+    <path d="M95,410 L330,410 L305,600 Q303,612 290,612 L130,612 Q117,612 115,600 Z" fill="url(#terra${x})"/>
+    <ellipse cx="210" cy="372" rx="128" ry="17" fill="#3a281d"/>
+    <rect x="76" y="366" width="268" height="54" rx="10" fill="url(#terra${x})"/>
+    <rect x="76" y="366" width="268" height="10" rx="5" fill="#e0956a" opacity=".7"/>
+  </svg>`;
+}
+
+// Pot en coupe : racines (sèches selon d) et sel accumulé (selon s)
+const CUT = (() => {
+  const r = rng(42); let speck = '';
+  for (let i = 0; i < 420; i++) {
+    const y = 215 + r() * 360, half = 225 - (y - 215) * 0.14, x = 350 + (r() * 2 - 1) * (half - 12);
+    const c = ['#24170f', '#4a3424', '#6b4c33', '#5a3e2a', '#e9e4d8'][Math.floor(r() * (r() < 0.12 ? 5 : 4))];
+    speck += `<circle cx="${x}" cy="${y}" r="${2 + r() * 5}" fill="${c}"/>`;
+  }
+  const roots = [];
+  const grow = (x, y, a, len, wd, depth) => {
+    if (depth > 4 || len < 18) return;
+    const x2 = x + Math.cos(a) * len, y2 = Math.min(560, y + Math.sin(a) * len);
+    const mx = (x + x2) / 2 + (r() - 0.5) * 30, my = (y + y2) / 2;
+    roots.push({ d: `M${x},${y} Q${mx},${my} ${x2},${y2}`, w: wd });
+    const n = depth < 2 ? 3 : 2;
+    for (let i = 0; i < n; i++) grow(x2, y2, Math.PI / 2 + (r() - 0.5) * 1.6, len * (0.62 + r() * 0.2), wd * 0.7, depth + 1);
+  };
+  for (let i = 0; i < 5; i++) grow(350, 225, Math.PI / 2 + (i - 2) * 0.42, 95, 9, 0);
+  const salt = [];
+  for (let i = 0; i < 150; i++) {
+    const top = r() < 0.35; const y = top ? 218 + r() * 20 : 230 + r() * 330;
+    const half = 225 - (y - 215) * 0.14;
+    salt.push({ x: 350 + (r() * 2 - 1) * (half - 14), y, s: 6 + r() * 9, a: r() * 90, th: r() });
+  }
+  return { speck, roots, salt };
+})();
+function cutPot(d, s) {
+  const rc = mix('#f3ead7', '#7d5a3a', d);
+  const roots = CUT.roots.map((o) => `<path d="${o.d}" fill="none" stroke="${rc}" stroke-width="${o.w * (1 - 0.45 * d)}" stroke-linecap="round"/>`).join('');
+  const salt = CUT.salt.filter((o) => o.th < s).map((o) =>
+    `<rect x="${o.x}" y="${o.y}" width="${o.s}" height="${o.s}" fill="#fbfbf8" stroke="#cfcfc6" stroke-width="1.5" transform="rotate(${o.a} ${o.x} ${o.y})"/>`).join('');
+  return `<svg viewBox="0 0 700 640" width="100%">
+    <defs><linearGradient id="terra2" x1="0" x2="1"><stop offset="0" stop-color="#a94e2b"/><stop offset=".45" stop-color="#d27a4e"/><stop offset="1" stop-color="#9e4826"/></linearGradient>
+      <linearGradient id="soil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d2a1e"/><stop offset="1" stop-color="#2a1c13"/></linearGradient></defs>
+    ${plantTop(0.55 * d, 350, 222, 220, 1.15)}
+    <path d="M92,165 L608,165 L552,598 Q550,612 536,612 L164,612 Q150,612 148,598 Z" fill="url(#terra2)"/>
+    <path d="M122,182 L578,182 L528,585 L172,585 Z" fill="#9b4a29"/>
+    <path d="M125,215 L575,215 L528,585 L172,585 Z" fill="url(#soil)"/>
+    <g>${CUT.speck}</g>${roots}${salt}
+    <path d="M125,215 L575,215" stroke="#f4f3ee" stroke-width="${10 * s}" stroke-dasharray="14 6" opacity="${s}"/>
+    <rect x="72" y="140" width="556" height="52" rx="10" fill="url(#terra2)"/>
+    <rect x="72" y="140" width="556" height="10" rx="5" fill="#e0956a" opacity=".7"/>
+  </svg>`;
+}
+
+function shaker(x) {
+  const r = rng(3); let dots = '';
+  for (let i = 0; i < 60; i++) dots += `<circle cx="${60 + r() * 180}" cy="${220 + r() * 215}" r="${1.5 + r() * 2}" fill="#d9d9d2"/>`;
+  return `<svg viewBox="0 0 300 470" width="100%">
+    <defs>${STEEL(x)}</defs>
+    <rect x="40" y="120" width="220" height="335" rx="44" fill="#e6eef0" opacity=".55" stroke="#fff" stroke-width="5"/>
+    <rect x="49" y="205" width="202" height="240" rx="36" fill="#f7f6f1"/>${dots}
+    <rect x="62" y="150" width="20" height="270" rx="10" fill="#fff" opacity=".75"/>
+    <rect x="222" y="170" width="12" height="230" rx="6" fill="#fff" opacity=".5"/>
+    <path d="M44,128 Q46,30 150,26 Q254,30 256,128 Z" fill="url(#steel${x})"/>
+    <rect x="36" y="112" width="228" height="30" rx="10" fill="url(#steelRim${x})"/>
+    ${[[120, 60], [150, 50], [180, 60], [135, 82], [165, 82]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#3c4246"/>`).join('')}
+  </svg>`;
+}
+
+function loupe() {
+  const r = rng(11); let crys = '';
+  for (let i = 0; i < 22; i++) {
+    const x = 70 + r() * 300, y = 70 + r() * 300, s = 18 + r() * 26;
+    crys += `<g transform="translate(${x},${y}) rotate(${r() * 90})"><rect x="${-s / 2}" y="${-s / 2}" width="${s}" height="${s}" rx="3" fill="#fff" stroke="#c9c7bd" stroke-width="3"/>
+      <rect x="${-s / 2 + 4}" y="${-s / 2 + 4}" width="${s / 3}" height="${s / 3}" fill="#eef5f7"/></g>`;
+  }
+  return `<svg viewBox="0 0 520 700" width="100%">
+    <defs><clipPath id="lens"><circle cx="220" cy="220" r="190"/></clipPath>
+      <radialGradient id="lensBg"><stop offset="0" stop-color="#f2eedf"/><stop offset="1" stop-color="#d8d1b8"/></radialGradient></defs>
+    <rect x="350" y="330" width="62" height="300" rx="31" fill="#1D3828" transform="rotate(-38 381 480)"/>
+    <g clip-path="url(#lens)"><rect width="440" height="440" fill="url(#lensBg)"/>${crys}
+      <ellipse cx="150" cy="120" rx="120" ry="60" fill="#fff" opacity=".35" transform="rotate(-30 150 120)"/></g>
+    <circle cx="220" cy="220" r="196" fill="none" stroke="#1D3828" stroke-width="30"/>
+    <circle cx="220" cy="220" r="178" fill="none" stroke="#fff" stroke-width="5" opacity=".6"/>
+  </svg>`;
+}
+
+function thermo(k) { // k : 0 chaud → 1 froid
+  const top = lerp(110, 470, k);
+  let ticks = '';
+  for (let y = 100; y <= 580; y += 24) ticks += `<line x1="${y % 48 === 4 ? 52 : 66}" y1="${y}" x2="92" y2="${y}" stroke="#5a3b1c" stroke-width="4"/>
+    <line x1="148" y1="${y}" x2="${y % 48 === 4 ? 188 : 174}" y2="${y}" stroke="#5a3b1c" stroke-width="4"/>`;
+  return `<svg viewBox="0 0 240 760" width="100%">
+    <defs><linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#c9975a"/><stop offset=".5" stop-color="#e6c48f"/><stop offset="1" stop-color="#c08b4f"/></linearGradient></defs>
+    <rect x="18" y="0" width="204" height="760" rx="34" fill="url(#wood)"/>${ticks}
+    <rect x="100" y="60" width="40" height="610" rx="20" fill="#fbfbfb" stroke="#d9d4cc" stroke-width="3"/>
+    <rect x="109" y="${top}" width="22" height="${660 - top}" rx="11" fill="#c0302b"/>
+    <circle cx="120" cy="672" r="48" fill="#c0302b"/><circle cx="104" cy="656" r="13" fill="#fff" opacity=".45"/>
+  </svg>`;
+}
+
+function wateringCan() {
+  return `<svg viewBox="0 0 560 420" width="100%"><defs>${STEEL('can')}</defs>
+    <path d="M190,150 Q270,10 350,150" fill="none" stroke="#8d949a" stroke-width="24" stroke-linecap="round"/>
+    <path d="M380,290 L530,140 L548,158 L404,322 Z" fill="url(#steelcan)"/>
+    <ellipse cx="540" cy="148" rx="22" ry="34" transform="rotate(45 540 148)" fill="#8d949a"/>
+    <path d="M150,150 L390,150 L412,392 Q412,404 398,404 L142,404 Q128,404 128,392 Z" fill="url(#steelcan)"/>
+    <ellipse cx="270" cy="150" rx="122" ry="20" fill="url(#steelRimcan)"/>
+    <rect x="132" y="250" width="276" height="16" fill="#8d949a" opacity=".6"/>
+  </svg>`;
+}
+
+// Légumes (coordonnées scène) : carotte, brocoli, pomme de terre
+function veg(type, x, y, rot = 0, sc = 1) {
+  if (type === 'carotte') return `<g transform="translate(${x},${y}) rotate(${rot}) scale(${sc})"><ellipse rx="34" ry="24" fill="#e7781d"/><ellipse rx="22" ry="15" fill="#f5a04a"/><ellipse rx="8" ry="5" fill="#f9be72"/></g>`;
+  if (type === 'brocoli') return `<g transform="translate(${x},${y}) rotate(${rot}) scale(${sc})"><rect x="-9" y="0" width="18" height="34" rx="8" fill="#9cc56b"/>
+    ${[[-24, -6], [0, -20], [24, -6], [-12, -24], [12, -24], [0, -2]].map(([a, b]) => `<circle cx="${a}" cy="${b}" r="20" fill="#3f7a2a"/><circle cx="${a - 5}" cy="${b - 6}" r="8" fill="#5f9d3d"/>`).join('')}</g>`;
+  return `<g transform="translate(${x},${y}) rotate(${rot}) scale(${sc})"><rect x="-32" y="-24" width="64" height="48" rx="18" fill="#e7cd8b"/><rect x="-22" y="-16" width="26" height="12" rx="6" fill="#f3e2ae"/></g>`;
+}
+
+/* ================= Montage ================= */
+const SCENES = [
+  { id: 'A1', start: 0, end: 1.55 },
+  { id: 'A2', start: 1.55, end: 2.9, zoom: [1.02, 1.07] },
+  { id: 'B', start: 2.9, end: 4.05, zoom: [1, 1.08] },
+  { id: 'C', start: 4.05, end: 6.15 },
+  { id: 'D', start: 6.15, end: 7.3 },
+  { id: 'E', start: 7.3, end: 11.1, zoom: [1, 1.1] },
+  { id: 'F1', start: 11.1, end: 11.95 },
+  { id: 'F2', start: 11.95, end: 12.85 },
+  { id: 'G', start: 12.85, end: 14.15 },
+  { id: 'H', start: 14.15, end: 18.05, zoom: [1, 1.12] },
+  { id: 'J', start: 18.05, end: 99 },
+];
+const TITLES = [
+  { text: "L'eau des<br>pâtes ?", start: 0, end: 2.85, top: 230, size: 128 },
+  { text: '1 détail', start: 4.9, end: 6.15, top: 270, size: 140, rot: 3 },
+  { text: 'Le sel', start: 6.2, end: 7.3, top: 220, size: 170 },
+  { text: 'Sans sel', start: 11.15, end: 11.95, top: 260, size: 150 },
+  { text: 'Le meilleur', start: 14.2, end: 16.6, top: 280, size: 130 },
+  { text: 'Minéraux', start: 17.2, end: 18.05, top: 250, size: 135, rot: 2 },
+  { text: 'Le potager<br>de Louis', start: 18.1, end: 99, top: 200, size: 118 },
+];
+const CAPS = P.buildCaptions([
+  { start: 0.05, end: 2.69, chunks: ["L'eau de *cuisson*", 'de tes *pâtes*', 'peut *nourrir* tes plantes'] },
+  { start: 2.93, end: 3.8, chunks: ['ou les *tuer*.'] },
+  { start: 4.1, end: 5.95, chunks: ['Tout dépend', "d'un seul *détail*."] },
+  { start: 6.22, end: 7.07, chunks: ['Le *sel*.'] },
+  { start: 7.38, end: 10.96, chunks: ["L'eau *salée*", 'assèche les *racines*', 'et le sel *s’accumule*', 'dans la *terre*.'] },
+  { start: 11.19, end: 12.69, chunks: ['*Sans sel*', 'et bien *refroidie* ?'] },
+  { start: 12.89, end: 13.15, hold: 13.29, chunks: ['*Oui*,'] },
+  { start: 13.29, end: 13.97, chunks: ['de temps en temps.'] },
+  { start: 14.22, end: 16.55, chunks: ['Mais le *meilleur*,', "c'est l'eau de cuisson", 'des *légumes*.'] },
+  { start: 16.7, end: 17.85, chunks: ['Elle est pleine', 'de *minéraux*.'] },
+  { start: 18.13, end: 19.18, chunks: ['Et pour plus', "d'*astuces*,"] },
+  { start: 19.32, end: 20.96, hold: 99, chunks: ['*abonnez-vous*', 'au *Potager de Louis*.'] },
+]);
+P.buildTitles(TITLES);
+
+const $ = (id) => document.getElementById(id);
+const VEG = [['carotte', 430, 830, 10], ['brocoli', 560, 822, -8], ['patate', 660, 842, 20], ['carotte', 610, 860, -30],
+  ['brocoli', 380, 852, 15], ['patate', 500, 862, -10], ['carotte', 720, 828, 40], ['brocoli', 300, 836, 5]];
+const MIN = [['K', 380, 16.75], ['Ca', 560, 17.0], ['Mg', 730, 17.25]];
+const DATES = [['3', 'NOV.'], ['17', 'NOV.'], ['1', 'DÉC.']];
+
+window.seek = function (t) {
+  P.scenes(SCENES, t);
+  P.titles(TITLES, t);
+  P.captions(CAPS, t);
+
+  if (t < 1.55) { // A1
+    $('A1pot').innerHTML = casserole(t, { id: 'a1' });
+    $('A1pot').style.transform = `translateY(${(1 - easeOut(prog(t, 0, 0.35))) * 60}px)`;
+  } else if (t < 2.9) { // A2 : on verse
+    const k = easeInOut(prog(t, 1.6, 2.0));
+    $('A2pot').innerHTML = casserole(t, { id: 'a2', steam: 0.6 });
+    $('A2pot').style.transform = `rotate(${k * 38}deg)`;
+    $('A2plant').innerHTML = plant(0.35 * (1 - prog(t, 2.1, 2.8)), 'a2');
+    const flow = prog(t, 1.95, 2.15);
+    $('A2stream').innerHTML = flow > 0 ? `<path d="M531,765 C600,770 ${lerp(560, 740, flow)},${lerp(780, 850, flow)} ${lerp(560, 770, flow)},${lerp(790, 1005, flow)}" fill="none" stroke="#efe9d6" stroke-width="22" stroke-linecap="round" opacity=".9"/>
+      <path d="M531,765 C600,770 ${lerp(560, 740, flow)},${lerp(780, 850, flow)} ${lerp(560, 770, flow)},${lerp(790, 1005, flow)}" fill="none" stroke="#fff" stroke-width="6" stroke-dasharray="20 30" stroke-dashoffset="${-t * 400}" opacity=".8"/>` : '';
+  } else if (t < 4.05) { // B : la plante meurt
+    $('Bplant').innerHTML = plant(easeInOut(prog(t, 2.95, 3.75)), 'b');
+  } else if (t < 6.15) { // C : loupe
+    $('Cpot').innerHTML = casserole(t, { id: 'c', contents: 'pates', steam: 0.8 });
+    const k = easeOut(prog(t, 4.15, 4.7));
+    $('Cloupe').style.transform = `translate(${(1 - k) * 700}px, ${(1 - k) * -120 + Math.sin(t * 2.4) * 8}px) rotate(${(1 - k) * 25}deg)`;
+    if (!$('Cloupe').innerHTML) $('Cloupe').innerHTML = loupe();
+  } else if (t < 7.3) { // D : salière qui verse
+    $('Dpot').innerHTML = casserole(t, { id: 'd', contents: 'pates', steam: 0.6 });
+    if (!$('Dshaker').innerHTML) $('Dshaker').innerHTML = shaker('d');
+    const k = easeInOut(prog(t, 6.15, 6.5));
+    $('Dshaker').style.transform = `rotate(${k * 160 + Math.sin(t * 22) * 4 * prog(t, 6.5, 6.6)}deg)`;
+    let g = '';
+    const r = rng(5);
+    for (let i = 0; i < 70; i++) {
+      const t0 = 6.45 + r() * 0.8, dt = t - t0, x0 = 628 + (r() - 0.5) * 50;
+      if (dt < 0) { r(); continue; }
+      const y = 905 + 900 * dt * dt + 120 * dt, s = 5 + r() * 5;
+      if (y < 1095) g += `<rect x="${x0 + dt * 30}" y="${y}" width="${s}" height="${s}" fill="#fff" stroke="#cfcfc6" stroke-width="1"/>`;
+    }
+    $('Dgrains').innerHTML = g;
+  } else if (t < 11.1) { // E : coupe
+    $('Ecut').innerHTML = cutPot(easeInOut(prog(t, 7.6, 9.2)), easeInOut(prog(t, 9.0, 10.9)));
+  } else if (t < 11.95) { // F1 : sans sel
+    if (!$('F1shaker').innerHTML) $('F1shaker').innerHTML = shaker('f');
+    const k = pop(t, 11.3, 0.3);
+    $('F1ban').style.transform = `scale(${k})`;
+    $('F1ban').style.opacity = k > 0 ? 1 : 0;
+  } else if (t < 12.85) { // F2 : refroidie
+    const k = easeInOut(prog(t, 12.05, 12.7));
+    $('F2thermo').innerHTML = thermo(k);
+    $('F2count').textContent = Math.round(lerp(95, 20, k)) + ' °C';
+  } else if (t < 14.15) { // G : arrosage de temps en temps
+    if (!$('Gcan').innerHTML) $('Gcan').innerHTML = wateringCan();
+    const k = easeInOut(prog(t, 12.85, 13.15));
+    $('Gcan').style.transform = `rotate(${k * 28}deg)`;
+    $('Gplant').innerHTML = plant(0, 'g');
+    const flow = prog(t, 13.05, 13.25);
+    $('Gstream').innerHTML = flow > 0 ? `<path d="M585,843 C640,850 ${lerp(600, 760, flow)},${lerp(850, 900, flow)} ${lerp(600, 795, flow)},${lerp(855, 1000, flow)}" fill="none" stroke="#efe9d6" stroke-width="16" stroke-linecap="round" opacity=".9"/>
+       <path d="M585,843 C640,850 760,900 795,1000" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="18 26" stroke-dashoffset="${-t * 400}" opacity="${0.8 * flow}"/>` : '';
+    const i = t < 13.35 ? 0 : t < 13.7 ? 1 : 2;
+    $('Gcal').querySelector('.d').textContent = DATES[i][0];
+    $('Gcal').querySelector('.m').textContent = DATES[i][1];
+    const ci = [12.85, 13.35, 13.7][i];
+    $('Gcal').style.transform = `scale(${pop(t, ci, 0.22)})`;
+  } else if (t < 18.05) { // H / I : légumes + minéraux
+    $('Hpot').innerHTML = casserole(t, { id: 'h', water: '#cfd6a2', contents: 'none' });
+    let s = '';
+    VEG.forEach(([ty, x, y, rot], i) => {
+      const t0 = 14.85 + i * 0.1, k = prog(t, t0, t0 + 0.35);
+      if (k <= 0) return;
+      const yy = lerp(y - 700, y, easeIn(k)) + (k >= 1 ? Math.sin(t * 3 + i) * 3 : 0);
+      s += veg(ty, x, yy, rot + (1 - k) * 90, 1.1);
+    });
+    MIN.forEach(([el, x, t0], i) => {
+      const k = prog(t, t0, t0 + 0.6);
+      if (t < t0) return;
+      const y = lerp(840, 560 - i * 30, easeOut(k)) + Math.sin(t * 3 + i) * 6, sc = easeOutBack(prog(t, t0, t0 + 0.3));
+      s += `<g transform="translate(${x},${y}) scale(${sc})"><circle r="62" fill="#FED14A" stroke="#1D3828" stroke-width="9"/>
+        <circle cx="-20" cy="-22" r="14" fill="#fff" opacity=".6"/>
+        <text y="18" text-anchor="middle" font-family="Montserrat" font-weight="900" font-size="${el.length > 1 ? 50 : 58}" fill="#1D3828">${el}</text></g>`;
+    });
+    $('Hveg').innerHTML = s;
+  } else { // J : abonnez-vous
+    $('Jplant').innerHTML = plant(-0.12 * Math.sin(t * 2) - 0.05, 'j');
+    const b = $('Jbtn');
+    const k = pop(t, 19.3, 0.3);
+    b.style.display = t >= 19.3 ? 'block' : 'none';
+    const press = t > 20.0 && t < 20.15 ? 0.92 : 1;
+    b.style.transform = `scale(${k * press})`;
+    b.textContent = t < 20.1 ? "+ S'ABONNER" : '✓ ABONNÉ';
+  }
+};
+window.seek(0);
+</script>
+</body>
+</html>

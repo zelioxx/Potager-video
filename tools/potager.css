@@ -1,0 +1,50 @@
+/* Charte graphique commune — voir references/STYLE.md */
+@font-face { font-family: 'Montserrat'; font-weight: 800; src: url('../assets/fonts/montserrat-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 900; src: url('../assets/fonts/montserrat-latin-900-normal.woff2') format('woff2'); }
+
+:root {
+  --beige-centre: #E1D4BD;
+  --beige-bas: #D7C6AE;
+  --beige-bord: #C8B79D;
+  --vert: #1D3828;
+  --jaune: #FED14A;
+  --ombre: #b3ad96;
+  --gris-bleu: #D9DEE0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+
+#stage { position: absolute; inset: 0; overflow: hidden; font-family: 'Montserrat', sans-serif; }
+
+.bg-beige { position: absolute; inset: 0;
+  background: radial-gradient(ellipse 75% 60% at 50% 46%, #E8DDC8 0%, var(--beige-centre) 40%, var(--beige-bas) 75%, var(--beige-bord) 100%); }
+.bg-grisbleu { position: absolute; inset: 0;
+  background: radial-gradient(ellipse 75% 60% at 50% 46%, #E6EAEB 0%, var(--gris-bleu) 50%, #C3CBCE 100%); }
+
+.scene { position: absolute; inset: 0; display: none; transform-origin: 50% 45%; }
+.layer { position: absolute; transform-origin: 50% 50%; }
+.shadow { position: absolute; border-radius: 50%; background: radial-gradient(closest-side, rgba(120,110,85,.55), rgba(120,110,85,0)); filter: blur(6px); }
+
+/* Sous-titres : blanc, contour vert foncé, mot-clé jaune */
+#caption { position: absolute; left: 60px; right: 60px; top: 1395px; text-align: center;
+  font-weight: 800; font-size: 66px; line-height: 1.12; color: #fff; letter-spacing: -0.5px;
+  -webkit-text-stroke: 14px var(--vert); paint-order: stroke fill; }
+#caption .k { color: var(--jaune); }
+
+/* Gros titres : jaune, contour vert épais, ombre 3D décalée */
+.title { position: absolute; left: 0; right: 0; text-align: center; font-weight: 900; text-transform: uppercase;
+  line-height: 1.0; letter-spacing: -1px; transform-origin: 50% 60%; display: none; }
+.title span { display: block; }
+.title .t-back, .title .t-front { position: absolute; left: 0; right: 0; }
+.title .t-back { color: var(--vert); -webkit-text-stroke: 26px var(--vert); paint-order: stroke fill; transform: translate(0, 14px); }
+.title .t-front { color: var(--jaune); -webkit-text-stroke: 22px var(--vert); paint-order: stroke fill; }
+
+/* Badge calendrier */
+.cal { position: absolute; width: 150px; height: 160px; background: #fbf8f1; border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(60,50,30,.35); overflow: hidden; font-weight: 900; color: var(--vert); text-align: center; }
+.cal .head { height: 38px; background: #b8322a; position: relative; }
+.cal .head::before, .cal .head::after { content: ''; position: absolute; top: -10px; width: 12px; height: 30px; border-radius: 6px; background: #5a5a5a; }
+.cal .head::before { left: 36px; } .cal .head::after { right: 36px; }
+.cal .d { font-size: 62px; line-height: 70px; margin-top: 4px; }
+.cal .m { font-size: 28px; line-height: 28px; }

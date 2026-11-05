@@ -24,6 +24,22 @@ Tout ce qui sert d'inspiration est rangé dans [`references/`](references/) :
 | 03 | Récolter les graines d'œillet d'Inde | ŒILLET FANÉ ? | 68 s |
 | 04 | Faire fleurir un cactus de Noël le 24 décembre | NOËL EN MARS ? | 70 s |
 
+## Vidéos produites
+
+| # | Sujet | Fichier |
+|---|---|---|
+| 01 | L'eau de cuisson des pâtes pour les plantes (21 s) | [`projets/01-eau-de-cuisson-pates/`](projets/01-eau-de-cuisson-pates/) |
+
 ## Générer une nouvelle vidéo
 
-À fournir : le **sujet**, le **son** (voix off), et les **images** (sinon on réutilise celles des références quand c'est pertinent).
+À fournir : le **sujet**, le **son** (voix off), et si possible les **images**.
+
+Chaque vidéo est une page HTML animée (`projets/<nom>/index.html`) qui utilise la charte commune
+(`tools/potager.css`, `tools/potager.js` : fond beige, gros titres, sous-titres avec mot-clé jaune),
+rendue image par image puis assemblée avec la voix :
+
+```bash
+node tools/render.js projets/<nom>/index.html projets/<nom>/voix.mp3 projets/<nom>/video.mp4
+```
+
+Prérequis : Node.js + Playwright (Chromium), ffmpeg.
