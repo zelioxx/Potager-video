@@ -75,6 +75,20 @@ def mineral_tile(sym, num, name, size=150):
     return im
 
 
+@lru_cache(None)
+def _bg(name, z, fx, fy):
+    return zoomed(photo(name), z, fx, fy)
+
+
+def bg_photo(name, z, fx, fy):
+    """Décor photo fourni, recadré (z, fx, fy) : les objets se posent sur la ligne TABLE de l'écran."""
+    return _bg(name, z, fx, fy).copy(), Image.new("RGBA", (W, H), (0, 0, 0, 0))
+
+
+KITCHEN = ("citron_fond_cuisine.png", 1.3, 560, 953)      # la planche à découper
+WINDOW = ("fond_fenetre.webp", 1.5, 527, 1168)            # le rebord de la fenêtre
+
+
 # ============================================================ A. LE SALON : L'EAU DE PÂTES… BIM (0 → 4.1)
 PL_X, PL_Y, PL_K = 680, 1235, 0.76               # pothos dans le coin (≈ 1 m)
 SOIL = (PL_X - 5, PL_Y - 205)                    # terre du pot
@@ -164,7 +178,7 @@ def salt_grains(c, t, t0, x, y, dur=0.9, n=26):
 
 
 def s_salt(t):
-    w, u = new_layers(background("table"))
+    w, u = bg_photo(*KITCHEN)
     s_ = life(t, 4.1, dur=0.35)
     shadow(w, CB_X, CB_Y, CB_W * 0.8 * s_)
     steam(w, t, CB_X, CB_Y - 380, 380, s_)
@@ -177,6 +191,7 @@ def s_salt(t):
         salt_grains(u, t, 6.8, 664, 760)
         if t > 6.25:
             hl_ellipse(u, 860, 640, 190, 300, life(t, 6.3, 6.75))
+    w.alpha_composite(shade())
     title(u, "TOUT DÉPEND", t, 4.12, 4.95, y=330, size=165)
     title(u, "D'UN SEUL DÉTAIL…", t, 4.99, 6.15, y=330, color=YEL, size=130)
     stamp(u, "LE SEL !", 540, 340, t, 6.22, None, RED, 170, -8)
@@ -200,8 +215,11 @@ def src2w(x, y):
     return CX0 + (x - 502) * CK, CY0 + (y - 998) * CK
 
 
+ROOTS_BG = (1.82, 680, 1023)                     # salon recadré : le pot coupé tombe pile à la place du pothos
+
+
 def s_roots(t):
-    w, u = new_layers(background("table"))
+    w, u = bg_photo("fond_salon_coin2.jpg", *ROOTS_BG)
     # racines saines → pourries : le sel descend du haut vers le bas, les racines pourrissent derrière lui
     front_src = lerp(SOIL_TOP_SRC - 10, ROOT_BOT_SRC + 25, ease_io((t - 8.3) / 1.5))
     front = src2w(0, front_src)[1]
@@ -243,6 +261,7 @@ def s_roots(t):
         tag(u, "RACINES POURRIES", 780, 560, t, 9.0, 10.0, rot=-5, size=48)
     if t > 9.85:
         tag(u, "SEL", 820, 560, t, 9.9, None, rot=5, size=60)
+    w.alpha_composite(shade())
     title(u, "L'EAU SALÉE…", t, 7.42, 8.2, y=330, size=165)
     title(u, "ASSÈCHE LES RACINES", t, 8.25, 9.8, y=330, color=RED, size=115)
     title(u, "LE SEL S'ACCUMULE", t, 9.85, None, y=330, color=YEL, size=125)
@@ -257,7 +276,7 @@ cue(9.9, "pop", 0.22)
 
 # ============================================================ D. SANS SEL, BIEN REFROIDIE : OUI, DE TEMPS EN TEMPS (11.2 → 14.2)
 def s_cool(t):
-    w, u = new_layers(background("table"))
+    w, u = bg_photo(*WINDOW)
     which, sc = swap((t - 12.05) / 0.3)            # elle refroidit : plus de bouillons ni de vapeur
     s_ = life(t, 11.2, dur=0.35)
     shadow(w, 560, TABLE + 40, 600 * s_)
@@ -276,6 +295,7 @@ def s_cool(t):
     if t > 12.89:
         put(u, icon("check", 170), 560, 640, life(t, 12.9))
         tag(u, "DE TEMPS EN TEMPS", 560, 1470 - 680, t, 13.15, None, rot=-3, size=52)
+    w.alpha_composite(shade())
     title(u, "SANS SEL", t, 11.22, 11.98, y=330, size=180)
     title(u, "ET REFROIDIE ?", t, 12.02, 12.85, y=330, color=YEL, size=160)
     stamp(u, "OUI !", 540, 340, t, 12.9, None, GREEN, 175, -8)
@@ -294,7 +314,7 @@ MINERALS = [("K", "19", "Potassium"), ("Ca", "20", "Calcium"), ("Mg", "12", "Mag
 
 
 def s_veg(t):
-    w, u = new_layers(background("table"))
+    w, u = bg_photo(*KITCHEN)
     s_ = life(t, 14.22, dur=0.35)
     X, Y, Wc = 540, TABLE + 40, 700
     shadow(w, X, Y, Wc * 0.8 * s_)
@@ -332,6 +352,7 @@ def s_veg(t):
             if q > 0:
                 put(u, mineral_tile(sym, num, nm, 170), 260 + i * 280, lerp(rim_y, 640, q), q)
         sparkles(u, t, 16.8, 540, 700, 380, 10, 9)
+    w.alpha_composite(shade())
     title(u, "LE MEILLEUR ?", t, 14.25, 15.3, y=330, size=165)
     title(u, "L'EAU DES LÉGUMES !", t, 15.35, 16.6, y=330, color=YEL, size=120)
     title(u, "PLEINE DE MINÉRAUX", t, 16.72, None, y=330, color=GREEN, size=118)
