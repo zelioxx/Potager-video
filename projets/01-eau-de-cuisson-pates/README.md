@@ -2,6 +2,7 @@
 
 - **Vidéo finale** : `eau-de-cuisson-pates.mp4` (1080×1920, 30 i/s, 21,1 s, voix normalisée à -14 LUFS)
 - **Voix off** : `voix.mp3` (fournie)
+- **Bruitages** : `bruitages.json` (sons synthétisés par `tools/sfx.py`, mixés sous la voix)
 - **Animation** : `index.html` (illustrations SVG dessinées, charte de `references/STYLE.md`)
 
 ## Texte (transcrit de la voix off)
@@ -28,8 +29,27 @@
 | 16.7 | Bulles K / Ca / Mg | MINÉRAUX |
 | 18.05 | Plante en forme + bouton S'ABONNER | LE POTAGER DE LOUIS |
 
+## Bruitages
+
+| t (s) | Son |
+|---|---|
+| 0.0 | pop (titre) + casserole qui frémit |
+| 1.5 / 4.0 / 7.3 / 11.9 / 14.1 / 18.0 | whoosh aux changements de plan |
+| 1.95 | eau versée sur la plante |
+| 2.9 | sifflet descendant (la plante fane) |
+| 4.6 | scintillement (loupe) |
+| 6.4 | salière secouée + grains |
+| 7.6 → 10.9 | craquements (racines sèches) puis cristaux de sel |
+| 11.3 | buzzer « interdit » |
+| 12.05 | tics descendants (thermomètre) |
+| 12.85 → 13.7 | pages de calendrier + arrosoir |
+| 15.2 → 15.9 | plops des légumes dans l'eau |
+| 16.75 → 17.25 | bulles K / Ca / Mg |
+| 20.0 / 20.1 | clic du bouton + ding « abonné » |
+
 ## Re-générer
 
 ```bash
-node tools/render.js projets/01-eau-de-cuisson-pates/index.html projets/01-eau-de-cuisson-pates/voix.mp3 projets/01-eau-de-cuisson-pates/eau-de-cuisson-pates.mp4
+python3 tools/sfx.py projets/01-eau-de-cuisson-pates/bruitages.json
+node tools/render.js projets/01-eau-de-cuisson-pates/index.html projets/01-eau-de-cuisson-pates/mix.wav projets/01-eau-de-cuisson-pates/eau-de-cuisson-pates.mp4
 ```

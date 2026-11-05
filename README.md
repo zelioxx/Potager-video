@@ -36,10 +36,14 @@ Tout ce qui sert d'inspiration est rangé dans [`references/`](references/) :
 
 Chaque vidéo est une page HTML animée (`projets/<nom>/index.html`) qui utilise la charte commune
 (`tools/potager.css`, `tools/potager.js` : fond beige, gros titres, sous-titres avec mot-clé jaune),
-rendue image par image puis assemblée avec la voix :
+rendue image par image puis assemblée avec la voix et les bruitages :
 
 ```bash
-node tools/render.js projets/<nom>/index.html projets/<nom>/voix.mp3 projets/<nom>/video.mp4
+python3 tools/sfx.py projets/<nom>/bruitages.json          # voix + bruitages → mix.wav
+node tools/render.js projets/<nom>/index.html projets/<nom>/mix.wav projets/<nom>/video.mp4
 ```
 
-Prérequis : Node.js + Playwright (Chromium), ffmpeg.
+Les bruitages (pop, whoosh, eau, salière, bulles, clic, ding…) sont synthétisés par `tools/sfx.py` ;
+`python3 tools/sfx.py --banque assets/sfx` exporte la banque pour l'écouter (`assets/sfx/*.wav`).
+
+Prérequis : Node.js + Playwright (Chromium), ffmpeg, Python 3 + numpy + scipy.
