@@ -170,6 +170,12 @@ abonne-toi astuces"""),
         words=os.path.join(AUD, "oignon", "voix_mots.json"), out="oignon_germe_v4.mp4",
         highlight="""oignon germe placard jette surtout d'autres plante-le pot pointe verte au-dessus terre fenêtre
 arrosage léger semaines divise plusieurs nouveaux oignons tiges vertes mangent ciboulette abonnez-vous astuces"""),
+    "eau_pates": dict(
+        scenes="scenes_eau_pates", dur=21.2, voice=os.path.join(AUD, "eau_pates", "voix.mp3"),
+        words=os.path.join(AUD, "eau_pates", "voix_mots.json"), out="eau_pates_plantes_1080x1920.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""cuisson pâtes nourrir plantes tuer détail sel salée assèche racines accumule terre refroidie
+oui temps meilleur légumes pleine minéraux abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
@@ -421,7 +427,7 @@ def main():
         f.writelines(f"file '{p}'\n" for p in parts)
     final = os.path.join(OUT, CFG["out"])
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-i", wav,
-                    "-c:v", "copy", "-af", LOUD, "-c:a", "aac", "-b:a", "192k",
+                    "-c:v", "copy", "-af", CFG.get("af", LOUD), "-c:a", "aac", "-b:a", "192k",
                     "-ar", "48000", "-shortest", "-movflags", "+faststart", final], check=True)
     print(final)
 

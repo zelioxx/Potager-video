@@ -31,3 +31,9 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `oignon.png` | Oignon jaune entier (cadre 1024) |
 | `oignon_germe_court.png` | Oignon germé, pousses vertes courtes (cadre 1024) |
 | `oignon_germe_long.png` | Oignon germé, longues tiges vertes (cadre 1024) |
+| `pothos_sain.png` | Pothos sur tuteur coco, pot terre cuite, feuilles vertes (reverdi d'après `pothos_sec`) |
+| `pothos_sec.png` | Le même pothos desséché (feuilles brunes, feuilles tombées) |
+| `pothos_coupe_racines_saines.png` / `_pourries` | Le même pothos, pot coupé en deux : racines blanches / racines brunes pourries (cadrage identique) |
+| `casserole_pates.png` | Casserole inox avec pâtes dans l'eau (froide) |
+| `casserole_pates_ebullition.png` | Casserole de pâtes en ébullition avec vapeur |
+| `sel_boite.png` | Boîte de sel fin (salière carton) |
