@@ -176,6 +176,11 @@ arrosage léger semaines divise plusieurs nouveaux oignons tiges vertes mangent 
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""cuisson pâtes nourrir plantes tuer détail sel salée assèche racines accumule terre refroidie
 oui temps meilleur légumes pleine minéraux abonnez-vous astuces"""),
+    "eau_pates2": dict(
+        scenes="scenes_eau_pates", dur=21.2, voice=os.path.join(AUD, "eau_pates2", "voix.mp3"),
+        words=os.path.join(AUD, "eau_pates2", "voix_mots.json"), out="eau_pates_plantes_v5.mp4",
+        highlight="""cuisson pâtes nourrir plantes tuer détail sel salée assèche racines accumule terre refroidie
+oui temps meilleur légumes pleine minéraux abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
