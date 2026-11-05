@@ -42,3 +42,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `citrouille.png` | Petite citrouille orange (Open Images) |
 | `kiwi_coupe.png` | Demi-kiwi, chair verte et graines noires (Open Images) |
 | `kiwis.png` | Kiwi entier + deux moitiés (Open Images) |
+| `tomate.png` / `kiwi_entier.png` / `myrtille.png` / `concombre.png` | Tomate, kiwi entier, myrtille, concombre (planche fournie, détourés) — `fraise`, `framboise`, `kiwi_coupe` remplacés par ceux de la même planche |

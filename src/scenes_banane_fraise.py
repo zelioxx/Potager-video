@@ -33,7 +33,8 @@ def cue(t, name, gain=0.5):
 
 BANANE, EPLUCHEE = "banque/banane_entiere", "banque/banane_epluchee"
 FRAISE, FRAMBOISE = "banque/fraise", "banque/framboise"
-TOMATES, KIWI, CITROUILLE = "banque/tomates_grappe", "banque/kiwi_coupe", "banque/citrouille"
+TOMATES, KIWI, CITROUILLE = "banque/tomate", "banque/kiwi_coupe", "banque/citrouille"
+KIWI_ENTIER, MYRTILLE, CONCOMBRE = "banque/kiwi_entier", "banque/myrtille", "banque/concombre"
 
 
 def badge(c, ok, x, y, s, size=150):
@@ -173,7 +174,7 @@ cue(7.62, "pop", 0.18)
 
 
 # ============================================================ C. COMME LA TOMATE, LE KIWI, MÊME LA CITROUILLE (8.6 → 11.7)
-TRIO = [(TOMATES, 200, 300, 9.15), (KIWI, 540, 330, 9.85), (CITROUILLE, 870, 340, 10.95)]
+TRIO = [(TOMATES, 200, 290, 9.15), (KIWI, 540, 300, 9.85), (CITROUILLE, 870, 330, 10.95)]
 
 
 def s_examples(t):
@@ -182,7 +183,12 @@ def s_examples(t):
         s_ = life(t, t0, dur=0.35)
         if s_ > 0.01:
             shadow(w, x, TABLE + 30, wd * 0.85 * s_)
-            ob(w, name, x, TABLE + 30, wd, s=s_, anchor="bottom")
+            if name == KIWI:   # le kiwi arrive entier, puis il est coupé : on voit ses graines
+                which, sc = swap((t - 10.25) / 0.3)
+                ob(w, KIWI_ENTIER if which == 0 else KIWI, x, TABLE + 30, (230 if which == 0 else wd) * sc * s_,
+                   anchor="bottom")
+            else:
+                ob(w, name, x, TABLE + 30, wd, s=s_, anchor="bottom")
             badge(u, True, x, TABLE - 450, life(t, t0 + 0.2), 130)
     if t > 11.05:
         sparkles(u, t, 11.1, 850, TABLE - 150, 220, 8, 5)
@@ -199,8 +205,8 @@ cue(11.1, "success", 0.25)
 
 
 # ============================================================ D. LA FRAISE : SES VRAIS FRUITS = LES PETITS GRAINS (11.7 → 15.3)
-FR_X, FR_BOT, FR_W = 540, TABLE + 30, 620
-SEEDS = [(452, 452), (382, 470), (548, 413), (515, 575), (420, 560), (600, 520), (470, 650)]   # akènes (cadre 1024)
+FR_X, FR_BOT, FR_W = 540, TABLE + 30, 470
+SEEDS = [(292, 337), (501, 335), (671, 346), (243, 445), (392, 457), (592, 444), (765, 426), (493, 540)]   # akènes
 
 
 def s_strawberry(t):
@@ -210,10 +216,10 @@ def s_strawberry(t):
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     ob(lay, FRAISE, FR_X, FR_BOT, FR_W, s=s_, anchor="bottom")
     w.alpha_composite(lay)
-    k = FR_W / (925 - 152)
+    k = FR_W / (813 - 210)
 
     def P(x, y):
-        return FR_X + (x - 538) * k, FR_BOT + (y - 861) * k
+        return FR_X + (x - 511.5) * k, FR_BOT + (y - 948) * k
 
     # les petits grains : entourés un par un
     if t > 13.95:
@@ -223,11 +229,11 @@ def s_strawberry(t):
     # la loupe sur la peau
     g = life(t, 12.9, 13.9, dur=0.35)
     if g > 0.01:
-        cx, cy = P(452, 470)
-        lens(u, lay, cx, cy, 80, 300, 760, 200, g)
+        cx, cy = P(470, 470)
+        lens(u, lay, cx, cy, 70, 290, 760, 200, g)
     if t > 13.0:
         tag(u, "VRAIS FRUITS !", 800, TABLE - 640, t, 13.25, None, rot=-5, size=56,
-            string_to=P(600, 520) if t > 14.0 else None)
+            string_to=P(592, 444) if t > 14.0 else None)
     title(u, "ET LA FRAISE ?", t, 11.8, 12.85, y=330, color=YEL, size=150)
     title(u, "SES VRAIS FRUITS…", t, 12.9, 13.9, y=330, size=135)
     title(u, "LES PETITS GRAINS !", t, 13.95, None, y=330, color=YEL, size=120)
@@ -245,7 +251,7 @@ def s_rasp(t):
     s_ = life(t, 15.35, dur=0.35)
     shake = math.sin(t * 60) * 8 * fade(t, 16.5, 16.85, 0.02, 0.2) if 16.5 < t < 16.85 else 0.0
     shadow(w, 540, TABLE + 30, 460 * s_)
-    ob(w, FRAMBOISE, 540 + shake, TABLE + 30, 560, s=s_, anchor="bottom")
+    ob(w, FRAMBOISE, 540 + shake, TABLE + 30, 480, s=s_, anchor="bottom")
     badge(u, False, 830, TABLE - 520, life(t, 16.55), 170)
     title(u, "LA FRAMBOISE ?", t, 15.4, 16.45, y=330, color=YEL, size=140)
     stamp(u, "PAS UNE BAIE !", 540, 340, t, 16.5, None, RED, 125, -7)
@@ -260,21 +266,29 @@ cue(16.52, "alert2", 0.3)
 def s_end(t):
     w, u = new_layers(background("table"))
     light_rays(w, 540, 300, t, 0.6)
-    items = [(BANANE, 200, 340, True, -6), (FRAISE, 545, 230, False, 0), (FRAMBOISE, 870, 240, False, 0)]
-    for i, (name, x, wd, ok, rot) in enumerate(items):
-        s_ = life(t, 18.0 + i * 0.1, dur=0.35)
+    baies = [(BANANE, 100, 165, -6), (TOMATES, 262, 125, 0), (KIWI, 390, 125, 0), (MYRTILLE, 490, 80, 0),
+             (CONCOMBRE, 590, 130, -20)]
+    non = [(FRAISE, 800, 125, 0), (FRAMBOISE, 960, 125, 0)]
+    for i, (name, x, wd, rot) in enumerate(baies + non):
+        s_ = life(t, 18.0 + i * 0.07, dur=0.35)
         shadow(w, x, TABLE + 30, wd * 0.8 * s_)
         ob(w, name, x, TABLE + 30, wd, s=s_, anchor="bottom", rot=rot)
-        badge(u, ok, x, TABLE - 300, life(t, 18.2 + i * 0.1), 120)
-    put(u, logo_img(280), 540, 620, life(t, 18.05, dur=0.45))
-    sparkles(u, t, 18.15, 540, 620, 230, 10, 12)
+    ga = life(t, 18.45, dur=0.3)
+    if ga > 0.01:
+        tag(u, "BAIES", 340, TABLE - 300, t, 18.45, None, rot=-4, size=56)
+        badge(u, True, 340, TABLE - 410, ga, 110)
+        tag(u, "PAS DES BAIES", 880, TABLE - 300, t, 18.55, None, rot=4, size=44)
+        badge(u, False, 880, TABLE - 410, life(t, 18.55, dur=0.3), 110)
+        ImageDraw.Draw(w).line([(695, TABLE - 220), (695, TABLE + 60)], fill=DARK + (160,), width=6)
+    put(u, logo_img(250), 540, 560, life(t, 18.05, dur=0.45))
+    sparkles(u, t, 18.15, 540, 560, 210, 10, 12)
     clicked = t > 19.5
     btn = button_img("ABONNÉ" if clicked else "S'ABONNER", (120, 120, 120) if clicked else RED, 70)
     press = 1 - 0.08 * math.sin(math.pi * clamp((t - 19.45) / 0.15))
-    put(u, btn, 540, 880, life(t, 18.35) * press)
+    put(u, btn, 540, 790, life(t, 18.35) * press)
     if t > 18.95:
         k = ease_out((t - 18.95) / 0.45)
-        put(u, icon("cursor", 110), lerp(880, 640, k), lerp(1130, 920, k), 1)
+        put(u, icon("cursor", 110), lerp(880, 640, k), lerp(1040, 830, k), 1)
     title(u, "PLUS D'ASTUCES ?", t, 18.0, None, y=330, color=YEL, size=135)
     return w, u
 

@@ -183,7 +183,7 @@ oui temps meilleur légumes pleine minéraux abonnez-vous astuces"""),
 oui temps meilleur légumes pleine minéraux abonnez-vous astuces"""),
     "banane_fraise": dict(
         scenes="scenes_banane_fraise", dur=20.9, voice=os.path.join(AUD, "banane_fraise", "voix.mp3"),
-        words=os.path.join(AUD, "banane_fraise", "voix_mots.json"), out="banane_fraise_baie_1080x1920.mp4",
+        words=os.path.join(AUD, "banane_fraise", "voix_mots.json"), out="banane_fraise_baie_v2.mp4",
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""banane baie fraise non suite fruit charnu graines cachées l'intérieur tomate kiwi citrouille
 vrais fruits petits grains peau framboise abonnez-vous astuces"""),
