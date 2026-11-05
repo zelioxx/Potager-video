@@ -43,3 +43,5 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `kiwi_coupe.png` | Demi-kiwi, chair verte et graines noires (Open Images) |
 | `kiwis.png` | Kiwi entier + deux moitiés (Open Images) |
 | `tomate.png` / `kiwi_entier.png` / `myrtille.png` / `concombre.png` | Tomate, kiwi entier, myrtille, concombre (planche fournie, détourés) — `fraise`, `framboise`, `kiwi_coupe` remplacés par ceux de la même planche |
+| `chenille.png` / `chenille_arquee.png` | Chenille de machaon, à plat / arquée (tête à droite) |
+| `loupe.png` | Loupe laiton et manche bois ; verre transparent (centre ≈ 287,370, rayon ≈ 205 dans le cadre 1024) |
