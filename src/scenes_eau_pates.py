@@ -90,60 +90,129 @@ WINDOW = ("fond_fenetre.webp", 1.5, 527, 1168)            # le rebord de la fen�
 
 
 # ============================================================ A. LE SALON : L'EAU DE PÂTES… BIM (0 → 4.1)
-PL_X, PL_Y, PL_K = 680, 1235, 0.76               # pothos dans le coin (≈ 1 m)
-SOIL = (PL_X - 5, PL_Y - 205)                    # terre du pot
-PAN_K = 380 / 918
-PAN_RIM = (115, 500)                             # bord gauche de la casserole (cadre 1024)
-PAN_C = (565, 587)
-POUR_C = (930, 760)                              # centre de la casserole quand elle verse
-POUR_ROT = 52
+class Cam:
+    """Caméra : le décor est recadré (z, fx, fy) comme zoomed(), et les objets sont dessinés APRÈS, directement
+    à la bonne taille (k * z) : ils restent nets au lieu d'être agrandis avec l'image."""
+
+    def __init__(self, z, fx, fy):
+        self.z = z
+        cw, ch = W / z, H / z
+        self.x0 = min(max(fx - cw / 2, 0), W - cw)
+        self.y0 = min(max(fy - ch / 2, 0), H - ch)
+        self.fx, self.fy = fx, fy
+
+    def p(self, x, y):
+        return (x - self.x0) * self.z, (y - self.y0) * self.z
+
+    def bg(self, name):
+        return zoomed(_bg(name, 1.0, 540, 960), self.z, self.fx, self.fy).copy()
 
 
-def pan_rim_world(cx, cy, rot):
-    dx, dy = (PAN_RIM[0] - PAN_C[0]) * PAN_K, (PAN_RIM[1] - PAN_C[1]) * PAN_K
+PL_X, PL_Y, PL_K = 680, 1235, 0.76               # pothos dans le coin (≈ 1 m), coordonnées de la photo
+SOIL = (PL_X - 10, PL_Y - 200)                   # terre du pot
+PAN_W = 300
+PAN_K = PAN_W / 918
+PAN_RIM = (112, 470)                             # bec : bord gauche de la casserole fumante (cadre 1024)
+PAN_C = (565.5, 587)                            # centre de la casserole (bbox) dans son cadre 1024
+LIP = (880, 770)                                 # bec quand elle verse : au-dessus du feuillage, à droite
+POUR_ROT = 64
+
+
+def pan_center(lip, rot):
+    """Position (centre de la casserole, comme ob() l'attend) pour que le bec soit en `lip` une fois inclinée.
+    ob()/spr() font tourner l'image autour du centre de son cadre 1024, pas du centre de la casserole."""
+    k = PAN_K
+    vx, vy = (PAN_RIM[0] - 512) * k, (PAN_RIM[1] - 512) * k
     a = math.radians(rot)
-    return cx + dx * math.cos(a) + dy * math.sin(a), cy - dx * math.sin(a) + dy * math.cos(a)
+    rx, ry = vx * math.cos(a) + vy * math.sin(a), -vx * math.sin(a) + vy * math.cos(a)
+    fx, fy = lip[0] - rx, lip[1] - ry                  # centre du cadre
+    return fx - (512 - PAN_C[0]) * k, fy - (512 - PAN_C[1]) * k
 
 
-def salon(t, dry_t=None):
-    w = photo("fond_salon_coin2.jpg").copy()
-    shadow(w, PL_X, PL_Y, 300, 80)
+def pour_stream(c, cam, t, lip, a=1.0):
+    """Eau de cuisson qui coule du bec : nappe translucide et trouble qui s'affine en tombant, reflets qui
+    descendent, quelques gouttes qui s'échappent, vapeur (eau chaude)."""
+    if a <= 0.01:
+        return
+    g, vy = 2200.0, -40.0
+    ground = SOIL[1] + 8
+    tau_end = (-vy + math.sqrt(vy * vy + 2 * g * (ground - lip[1]))) / g
+    vx = (SOIL[0] + 25 - lip[0]) / tau_end           # elle arrive sur la terre du pot
+    n = 22
+    pts = [(lip[0] + vx * tau_end * i / n, lip[1] + vy * tau_end * i / n + 0.5 * g * (tau_end * i / n) ** 2)
+           for i in range(n + 1)]
+    sp = [cam.p(x, y) for x, y in pts]
+    z = cam.z
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    left, right = [], []
+    for i, (x, y) in enumerate(sp):
+        q = i / n
+        x2, y2 = sp[min(n, i + 1)] if i < n else sp[i]
+        x1, y1 = sp[max(0, i - 1)]
+        nx, ny = -(y2 - y1), (x2 - x1)
+        ln = math.hypot(nx, ny) or 1
+        wid = (15 - 7 * q) * z * (1 + 0.12 * math.sin(q * 22 - t * 26))
+        left.append((x + nx / ln * wid, y + ny / ln * wid))
+        right.append((x - nx / ln * wid, y - ny / ln * wid))
+    d.polygon(left + right[::-1], fill=(226, 220, 200, int(150 * a)))      # eau trouble (amidon)
+    d.line(left, fill=(250, 248, 238, int(170 * a)), width=max(2, int(2.5 * z)))
+    for k in range(3):                                                     # reflets qui filent vers le bas
+        ph = (t * 2.4 + k / 3) % 1.0
+        i0 = int(ph * (n - 3))
+        d.line(sp[i0:i0 + 3], fill=(255, 255, 255, int(220 * a)), width=max(2, int(3 * z)))
+    r = np.random.default_rng(int(t * 30))
+    for k in range(7):                                                     # gouttes échappées
+        q = r.uniform(0.15, 1.0)
+        x, y = sp[int(q * n)]
+        x += r.uniform(-24, 24) * z
+        rr = r.uniform(2, 4.5) * z
+        d.ellipse([x - rr, y - rr * 1.4, x + rr, y + rr * 1.4], fill=(240, 236, 222, int(200 * a)))
+    c.alpha_composite(lay.filter(ImageFilter.GaussianBlur(0.9)))
+    # vapeur le long du filet (eau bouillante)
+    mx, my = cam.p(lip[0] - 30, lip[1] + 40)
+    steam(c, t * 1.3, mx, my, 120 * z, 0.75 * a, 4)
+
+
+def draw_plant(w, t, cam, dry_t=None):
+    px, py = cam.p(PL_X, PL_Y)
+    shadow(w, px, py, 300 * cam.z, 80)
     if dry_t is None:
-        pothos(w, SAIN, PL_X, PL_Y, PL_K)
+        pothos(w, SAIN, px, py, PL_K * cam.z)
     else:
         which, sc = swap((t - dry_t) / 0.3)
         shake = math.sin(t * 70) * 8 * fade(t, dry_t, dry_t + 0.45, 0.02, 0.2) if dry_t < t < dry_t + 0.45 else 0.0
-        pothos(w, SAIN if which == 0 else SEC, PL_X + shake, PL_Y, PL_K * sc)
-    return w
+        pothos(w, SAIN if which == 0 else SEC, px + shake, py, PL_K * cam.z * sc)
 
 
 def s_salon(t):
-    w = salon(t, 2.95)
+    zk = ease_io((t - 2.9) / 0.6)
+    cam = Cam(lerp(1.25, 1.4, zk), 640, lerp(900, 930, zk))
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    cin = ease_out((t - 0.15) / 0.4)
-    tilt = ease_io((t - 0.5) / 0.3)
+    cin = ease_out((t - 0.15) / 0.45)
+    tilt = ease_io((t - 0.55) / 0.3)
     cout = ease_in((t - 2.35) / 0.35)
-    if 0.15 < t < 2.7:
-        cx, cy = lerp(1350, POUR_C[0], cin) + 500 * cout, lerp(400, POUR_C[1], cin) - 300 * cout
+    flowing = 0.82 < t < 2.4
+    w = cam.bg("fond_salon_coin2.jpg")
+    # ordre de profondeur : décor → plante → filet d'eau (versé devant, sur la terre) → casserole (au premier plan)
+    draw_plant(w, t, cam, 2.95)
+    if flowing:
+        pour_stream(w, cam, t, LIP, fade(t, 0.82, 2.4, 0.06, 0.15))
+    if 0.15 < t < 2.75:   # la casserole, devant la plante (plus près de nous)
         rot = POUR_ROT * tilt * (1 - cout)
-        steam(w, t, cx - 40, cy - 120, 260, 0.9)
-        ob(w, CASS_HOT, cx, cy, 380, rot=rot)
-        if 0.75 < t < 2.4:   # l'eau de cuisson trouble qui coule dans le pot
-            rim = pan_rim_world(cx, cy, rot)
-            a = fade(t, 0.75, 2.4, 0.08, 0.15)
-            ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-            d = ImageDraw.Draw(ov)
-            pts = [(lerp(rim[0], SOIL[0] + 30, q) - math.sin(q * math.pi) * 25, lerp(rim[1], SOIL[1], q * q))
-                   for q in [i / 14 for i in range(15)]]
-            d.line(pts, fill=(236, 228, 205, int(215 * a)), width=26, joint="curve")
-            d.line([(x - 5, y) for x, y in pts], fill=(255, 252, 240, int(170 * a)), width=7, joint="curve")
-            w.alpha_composite(ov.filter(ImageFilter.GaussianBlur(1)))
-            steam(w, t + 0.3, SOIL[0] + 40, SOIL[1] - 20, 160, 0.6 * a, 4)
-            particles(w, t, t - (t % 0.3), SOIL[0] + 30, SOIL[1], 6, int(t * 10) % 7, col=(240, 232, 210), size=6,
-                      up=150, dur=0.3)
+        cx, cy = pan_center(LIP, rot)
+        cx, cy = cx + (1 - cin) * 520 + cout * 520, cy - (1 - cin) * 260 - cout * 260
+        sx, sy = cam.p(cx, cy)
+        if not flowing:
+            steam(w, t, sx, sy - 90 * cam.z, 200 * cam.z, 0.8)
+        ob(w, CASS_HOT, sx, sy, PAN_W * cam.z, rot=rot)
+        if flowing:   # éclaboussures sur la terre, entre les feuilles
+            gx, gy = cam.p(SOIL[0] - 20, SOIL[1] - 10)
+            particles(w, t, t - (t % 0.25), gx, gy, 7, int(t * 12) % 9, col=(238, 232, 214), size=4 * cam.z,
+                      up=170, spread=140, dur=0.25)
     if 2.95 < t < 4.1:   # BIM : feuilles qui tombent, poussière sèche
-        particles(w, t, 2.97, PL_X, PL_Y - 380, 18, 7, col=(150, 120, 70), size=12, up=200, dur=1.0)
-    w = zoomed(w, lerp(1.25, 1.4, ease_io((t - 2.9) / 0.6)), 640, lerp(900, 930, ease_io((t - 2.9) / 0.6)))
+        bx, by = cam.p(PL_X, PL_Y - 380)
+        particles(w, t, 2.97, bx, by, 18, 7, col=(150, 120, 70), size=12, up=200, dur=1.0)
     if 2.95 < t < 3.25:   # flash
         w.alpha_composite(Image.new("RGBA", (W, H), (255, 255, 255, int(150 * (1 - (t - 2.95) / 0.3)))))
     w.alpha_composite(shade())
@@ -224,44 +293,52 @@ ROOTS_BG = (1.82, 680, 1023)                     # salon recadré : le pot coup�
 
 
 def s_roots(t):
-    w, u = bg_photo("fond_salon_coin2.jpg", *ROOTS_BG)
+    zk = ease_io((t - 7.45) / 0.6)
+    cam = Cam(lerp(1.0, 1.9, zk), CX0, lerp(960, src2w(0, 880)[1], zk))
+    z = cam.z
+    w = zoomed(_bg("fond_salon_coin2.jpg", *ROOTS_BG), z, cam.fx, cam.fy).copy()
+    u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+
+    def V(x, y):    # point de la photo du pot coupé → écran
+        return cam.p(*src2w(x, y))
+
     # racines saines → pourries : le sel descend du haut vers le bas, les racines pourrissent derrière lui
-    front_src = lerp(SOIL_TOP_SRC - 10, ROOT_BOT_SRC + 25, ease_io((t - 8.3) / 1.5))
-    front = src2w(0, front_src)[1]
+    front = V(0, lerp(SOIL_TOP_SRC - 10, ROOT_BOT_SRC + 25, ease_io((t - 8.3) / 1.5)))[1]
+    bx, by = cam.p(CX0, CY0)
     ok, ko = Image.new("RGBA", (W, H), (0, 0, 0, 0)), Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    place(ok, COUPE_OK, FULL, CK, 502, 998, CX0, CY0)
+    place(ok, COUPE_OK, FULL, CK * z, 502, 998, bx, by)
     if t > 8.3:
-        place(ko, COUPE_KO, FULL, CK, 502, 998, CX0, CY0)
+        place(ko, COUPE_KO, FULL, CK * z, 502, 998, bx, by)
         m = Image.new("L", (W, H), 0)
         d = ImageDraw.Draw(m)
-        pts = [(x, front + math.sin(x * 0.03 + t * 3) * 14) for x in range(0, W + 20, 20)]
+        pts = [(x, front + math.sin(x * 0.03 / z + t * 3) * 14 * z) for x in range(0, W + 20, 20)]
         d.polygon([(0, 0), (W, 0)] + pts[::-1], fill=255)
         m = m.filter(ImageFilter.GaussianBlur(12))
         ko.putalpha(Image.composite(ko.getchannel("A"), Image.new("L", (W, H), 0), m))
         ok.putalpha(Image.composite(Image.new("L", (W, H), 0), ok.getchannel("A"), m))
-    shadow(w, CX0, CY0, 360)
+    shadow(w, bx, by, 360 * z)
     w.alpha_composite(ok)
     w.alpha_composite(ko)
     # le sel tombe sur la terre, puis s'accumule dans la terre (cristaux blancs)
-    salt_grains(w, t, 7.5, src2w(525, 0)[0], src2w(0, SOIL_TOP_SRC)[1] - 300, dur=0.7)
+    top_y = V(0, SOIL_TOP_SRC)[1]
+    salt_grains(w, t, 7.5, V(525, 0)[0], top_y - 300 * z, dur=0.7, fall=300 * z)
     if t > 8.3:
         d = ImageDraw.Draw(w)
         r = np.random.default_rng(9)
         acc = ease_out((t - 9.85) / 1.0)
         n = int(20 + 160 * acc)
-        x0, x1 = src2w(410, 0)[0], src2w(640, 0)[0]
+        x0, x1 = V(410, 0)[0], V(640, 0)[0]
+        bot = V(0, ROOT_BOT_SRC)[1]
+        gs = 1.6 * z
         for i in range(n):
-            lo = src2w(0, SOIL_TOP_SRC)[1]
-            gy = r.uniform(lo, max(lo + 1, min(front, src2w(0, ROOT_BOT_SRC)[1])))
+            gy = r.uniform(top_y, max(top_y + 1, min(front, bot)))
             gx = r.uniform(x0, x1)
             if gy < front:
-                d.rectangle([gx - 3, gy - 3, gx + 3, gy + 3], fill=(252, 252, 252, 235))
+                d.rectangle([gx - gs, gy - gs, gx + gs, gy + gs], fill=(252, 252, 252, 235))
         if 8.3 < t < 9.9:   # le front salé
             ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-            ImageDraw.Draw(ov).rectangle([x0, front - 14, x1, front + 14], fill=(255, 255, 255, 90))
+            ImageDraw.Draw(ov).rectangle([x0, front - 7 * z, x1, front + 7 * z], fill=(255, 255, 255, 90))
             w.alpha_composite(ov.filter(ImageFilter.GaussianBlur(8)))
-    zk = ease_io((t - 7.45) / 0.6)
-    w = zoomed(w, lerp(1.0, 1.9, zk), CX0, lerp(960, src2w(0, 880)[1], zk))
     if t > 8.5:
         tag(u, "RACINES POURRIES", 780, 560, t, 9.0, 10.0, rot=-5, size=48)
     if t > 9.85:
@@ -374,9 +451,10 @@ cue(17.0, "success", 0.28)
 
 # ============================================================ F. LE POTHOS EN FORME + ABONNE-TOI (18.1 → fin)
 def s_end(t):
-    w = salon(t)
+    cam = Cam(1.25, 640, 900)
+    w = cam.bg("fond_salon_coin2.jpg")
+    draw_plant(w, t, cam)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    w = zoomed(w, 1.25, 640, 900)
     w.alpha_composite(shade())
     sparkles(u, t, 18.2, 600, 760, 330, 10, 7)
     clicked = t > 19.3
