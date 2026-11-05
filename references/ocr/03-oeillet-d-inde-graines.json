@@ -1,0 +1,858 @@
+[
+{
+"t": 0.0,
+"ocr": "174:CEILLETFANE? | 248:Dans l'ceillet d'lnde fane"
+},
+{
+"t": 0.25,
+"ocr": "174:CEILLETFANE? | 247:Dans l'oeillet dInde fane"
+},
+{
+"t": 0.5,
+"ocr": "175:CEILLETFANE? | 249:Dans l'oeillet d'lnde fane"
+},
+{
+"t": 1.0,
+"ocr": "174:CEILLETFANE? | 251:que vous arrachez"
+},
+{
+"t": 1.25,
+"ocr": "172:CEILLETFANE? | 249:que vous arrachez"
+},
+{
+"t": 1.5,
+"ocr": "247:que vous arrachez,"
+},
+{
+"t": 1.75,
+"ocr": "244:que vous arrachez,"
+},
+{
+"t": 2.0,
+"ocr": "770:que vous arrachez,"
+},
+{
+"t": 2.25,
+"ocr": "766:il y a une trentaine"
+},
+{
+"t": 2.5,
+"ocr": "170:UNE | 244:TRENTAINE | 767:il y a une trentaine"
+},
+{
+"t": 2.75,
+"ocr": "247:TRENTAINE | 767:il y a une trentaine"
+},
+{
+"t": 3.0,
+"ocr": "246:TRENTAINE | 766:d'oeillets d'lnde."
+},
+{
+"t": 3.5,
+"ocr": "246:TRENTAINE | 769:doeillets d'lnde."
+},
+{
+"t": 3.75,
+"ocr": "156:UNE | 215:TRENTAINE | 768:Sortez-les"
+},
+{
+"t": 4.0,
+"ocr": "768:Sortez-les"
+},
+{
+"t": 4.25,
+"ocr": "764:cette semaine,"
+},
+{
+"t": 4.5,
+"ocr": "765:cette semaine,"
+},
+{
+"t": 4.75,
+"ocr": "766:cette semaine,"
+},
+{
+"t": 5.25,
+"ocr": "765:avant la gelee..."
+},
+{
+"t": 5.5,
+"ocr": "767:avant la gelee..."
+},
+{
+"t": 6.0,
+"ocr": "763:et en mai,"
+},
+{
+"t": 6.25,
+"ocr": "766:et en mai,"
+},
+{
+"t": 6.5,
+"ocr": "774:vous ne rachetez rien."
+},
+{
+"t": 6.75,
+"ocr": "773:vous ne rachetez rien."
+},
+{
+"t": 7.0,
+"ocr": "771:Vous ne rachetez rien."
+},
+{
+"t": 7.25,
+"ocr": "772:Vous ne rachetez rien."
+},
+{
+"t": 7.5,
+"ocr": "774:vous ne rachetez rien."
+},
+{
+"t": 7.75,
+"ocr": "247:Prenez la fleur"
+},
+{
+"t": 8.0,
+"ocr": "246:Prenez la fleur"
+},
+{
+"t": 8.5,
+"ocr": "766:Prenez la fleur"
+},
+{
+"t": 8.75,
+"ocr": "770:la plus moche du pied"
+},
+{
+"t": 9.0,
+"ocr": "769:la plus moche du pied"
+},
+{
+"t": 9.5,
+"ocr": "771:la plus moche du pied."
+},
+{
+"t": 9.75,
+"ocr": "772:la plus moche du pied."
+},
+{
+"t": 10.0,
+"ocr": "489:OCT. | 764:Vous comprendrez"
+},
+{
+"t": 10.25,
+"ocr": "486:OCT. | 766:Vous comprendrez"
+},
+{
+"t": 10.5,
+"ocr": "478:JANV, | 766:Vous comprendrez"
+},
+{
+"t": 10.75,
+"ocr": "505:JUILLET | 765:juillet. | 768:en"
+},
+{
+"t": 11.0,
+"ocr": "508:JUILLET | 765:juillet."
+},
+{
+"t": 11.25,
+"ocr": "195:Pas d'oeillets ?"
+},
+{
+"t": 11.5,
+"ocr": "193:Pas doeillets?"
+},
+{
+"t": 11.75,
+"ocr": "193:Pas d'ceillets?"
+},
+{
+"t": 12.0,
+"ocr": "195:Demandez-en"
+},
+{
+"t": 12.25,
+"ocr": "194:Demandez-en"
+},
+{
+"t": 12.5,
+"ocr": "200:une au voisin."
+},
+{
+"t": 12.75,
+"ocr": "201:une au voisin"
+},
+{
+"t": 13.0,
+"ocr": "198:une au voisin."
+},
+{
+"t": 13.25,
+"ocr": "763:Bon,"
+},
+{
+"t": 13.75,
+"ocr": "761:je sais,"
+},
+{
+"t": 14.0,
+"ocr": "765:je sais,"
+},
+{
+"t": 14.5,
+"ocr": "764:la jolie orange"
+},
+{
+"t": 14.75,
+"ocr": "763:la jolie orange"
+},
+{
+"t": 15.0,
+"ocr": "766:la jolie orange"
+},
+{
+"t": 15.25,
+"ocr": "765:fait envie."
+},
+{
+"t": 15.5,
+"ocr": "767:fait envie."
+},
+{
+"t": 16.25,
+"ocr": "764:Sauf que dedans,"
+},
+{
+"t": 16.5,
+"ocr": "765:Sauf que dedans,"
+},
+{
+"t": 17.0,
+"ocr": "769:tout est blanc et mou."
+},
+{
+"t": 17.5,
+"ocr": "768:tout est blanc et mou."
+},
+{
+"t": 17.75,
+"ocr": "769:tout est blanc et mou."
+},
+{
+"t": 18.0,
+"ocr": "770:tout est blanc et mou."
+},
+{
+"t": 18.5,
+"ocr": "766:Cherchez la brune"
+},
+{
+"t": 18.75,
+"ocr": "765:Cherchez | 768:la brune"
+},
+{
+"t": 19.0,
+"ocr": "172:LABRUNE | 770:Cherchez la brune"
+},
+{
+"t": 19.25,
+"ocr": "170:LABRUNE | 769:qui craque,"
+},
+{
+"t": 19.5,
+"ocr": "170:LABRUNE | 773:qui craque,"
+},
+{
+"t": 19.75,
+"ocr": "165:LABRUNE | 770:et cassez-la."
+},
+{
+"t": 20.0,
+"ocr": "770:et cassez-la."
+},
+{
+"t": 20.5,
+"ocr": "656:Posez-la"
+},
+{
+"t": 20.75,
+"ocr": "655:sur une assiette..."
+},
+{
+"t": 21.0,
+"ocr": "658:sur une assiette..."
+},
+{
+"t": 21.25,
+"ocr": "659:sur une assiette..."
+},
+{
+"t": 21.75,
+"ocr": "646:et la,"
+},
+{
+"t": 22.0,
+"ocr": "649:et la,"
+},
+{
+"t": 22.5,
+"ocr": "661:un perce-oreille"
+},
+{
+"t": 23.0,
+"ocr": "660:en sort en courant!"
+},
+{
+"t": 23.25,
+"ocr": "661:en sort en courant!"
+},
+{
+"t": 24.0,
+"ocr": "656:Il dormait la."
+},
+{
+"t": 24.25,
+"ocr": "657:I dormait la."
+},
+{
+"t": 24.5,
+"ocr": "656:I dormait la."
+},
+{
+"t": 25.0,
+"ocr": "766:Serrez le bas"
+},
+{
+"t": 25.5,
+"ocr": "768:Serrez le bas"
+},
+{
+"t": 25.75,
+"ocr": "766:et tirez"
+},
+{
+"t": 26.25,
+"ocr": "762:les petales secs."
+},
+{
+"t": 26.5,
+"ocr": "766:les petales secs."
+},
+{
+"t": 27.0,
+"ocr": "765:Toutes les graines"
+},
+{
+"t": 27.25,
+"ocr": "766:Toutes les graines"
+},
+{
+"t": 27.75,
+"ocr": "762:glissent dun coup,"
+},
+{
+"t": 28.25,
+"ocr": "762:glissent d'un coup,"
+},
+{
+"t": 28.5,
+"ocr": "765:glissent dun coup,"
+},
+{
+"t": 28.75,
+"ocr": "770:comme des allumettes"
+},
+{
+"t": 29.5,
+"ocr": "767:noires au bout blond."
+},
+{
+"t": 29.75,
+"ocr": "770:noires au bout blond."
+},
+{
+"t": 30.0,
+"ocr": "768:noires au bout blond."
+},
+{
+"t": 30.25,
+"ocr": "771:noires au bout blond."
+},
+{
+"t": 30.5,
+"ocr": "766:Pourquoi autant?"
+},
+{
+"t": 31.25,
+"ocr": "765:Parce qu'un ceillet"
+},
+{
+"t": 31.5,
+"ocr": "767:Parce qu'un ceillet"
+},
+{
+"t": 32.0,
+"ocr": "766:d'lnde n'est"
+},
+{
+"t": 32.25,
+"ocr": "768:dlnde n'est"
+},
+{
+"t": 32.5,
+"ocr": ""
+},
+{
+"t": 33.5,
+"ocr": "766:c'est un bouquet"
+},
+{
+"t": 33.75,
+"ocr": "768:c'est un bouquet"
+},
+{
+"t": 34.0,
+"ocr": "768:cest un bouquet"
+},
+{
+"t": 34.25,
+"ocr": "765:de petites fleurs,"
+},
+{
+"t": 34.5,
+"ocr": "762:de petites fleurs,"
+},
+{
+"t": 34.75,
+"ocr": "765:de petites fleurs,"
+},
+{
+"t": 35.25,
+"ocr": "766:chacune"
+},
+{
+"t": 35.5,
+"ocr": "773:avec sa graine."
+},
+{
+"t": 36.0,
+"ocr": "772:avec sa graine."
+},
+{
+"t": 36.5,
+"ocr": "761:Jetez les plates,"
+},
+{
+"t": 36.75,
+"ocr": "762:Jetez les plates,"
+},
+{
+"t": 37.0,
+"ocr": "763:Jetez les plates,"
+},
+{
+"t": 37.25,
+"ocr": "766:elles sont vides."
+},
+{
+"t": 37.5,
+"ocr": "765:elles sont vides."
+},
+{
+"t": 37.75,
+"ocr": "767:elles sont vides."
+},
+{
+"t": 38.25,
+"ocr": "766:Sechez-les"
+},
+{
+"t": 38.5,
+"ocr": "766:une semaine,"
+},
+{
+"t": 38.75,
+"ocr": "370:OCT. | 473:14 | 764:une semaine,"
+},
+{
+"t": 39.0,
+"ocr": "380:OCT. | 764:une semaine,"
+},
+{
+"t": 39.25,
+"ocr": "381:OCT. | 766:puis pliez-en une..."
+},
+{
+"t": 39.5,
+"ocr": "765:puis pliez-en une..."
+},
+{
+"t": 39.75,
+"ocr": "766:puis pliez-en une..."
+},
+{
+"t": 40.0,
+"ocr": "768:puis pliez-en une..."
+},
+{
+"t": 40.5,
+"ocr": "768:elle casse net?"
+},
+{
+"t": 41.0,
+"ocr": "176:CASSENET | 770:elle casse net?"
+},
+{
+"t": 41.25,
+"ocr": "176:CASSENET | 767:Elle est seche."
+},
+{
+"t": 41.5,
+"ocr": "176:CASSENET | 766:Elle est seche."
+},
+{
+"t": 41.75,
+"ocr": "168:CASSENET | 769:Elle estseche"
+},
+{
+"t": 42.0,
+"ocr": "767:Elle est seche."
+},
+{
+"t": 42.25,
+"ocr": ""
+},
+{
+"t": 43.0,
+"ocr": "765:dans une enveloppe"
+},
+{
+"t": 43.25,
+"ocr": "767:dans une enveloppe"
+},
+{
+"t": 43.5,
+"ocr": "766:dans une enveloppe"
+},
+{
+"t": 43.75,
+"ocr": "767:en papier,"
+},
+{
+"t": 44.25,
+"ocr": "771:avec vos graines"
+},
+{
+"t": 44.75,
+"ocr": "765:de tomates."
+},
+{
+"t": 45.0,
+"ocr": "767:de tomates."
+},
+{
+"t": 45.25,
+"ocr": "769:de tomates."
+},
+{
+"t": 45.5,
+"ocr": "762:J'ai enferme"
+},
+{
+"t": 45.75,
+"ocr": "767:Jal enferme"
+},
+{
+"t": 46.0,
+"ocr": "767:Jai enferme"
+},
+{
+"t": 46.25,
+"ocr": "767:les miennes humides"
+},
+{
+"t": 46.5,
+"ocr": "768:les miennes humides"
+},
+{
+"t": 46.75,
+"ocr": "764:en bocal.."
+},
+{
+"t": 47.0,
+"ocr": "766:en bocal..."
+},
+{
+"t": 47.25,
+"ocr": "765:en bocal.."
+},
+{
+"t": 47.5,
+"ocr": "766:elles ont fait"
+},
+{
+"t": 47.75,
+"ocr": "768:elles ont fait"
+},
+{
+"t": 48.0,
+"ocr": "766:du duvet gris."
+},
+{
+"t": 48.5,
+"ocr": "767:du duvet gris."
+},
+{
+"t": 49.0,
+"ocr": "488:OCT. | 766:En mars,"
+},
+{
+"t": 49.25,
+"ocr": "493:MARS | 766:En mars,"
+},
+{
+"t": 49.5,
+"ocr": "496:MARS | 766:En mars,"
+},
+{
+"t": 49.75,
+"ocr": "766:avec vos tomates,"
+},
+{
+"t": 50.25,
+"ocr": "770:avec vos tomates,"
+},
+{
+"t": 50.5,
+"ocr": "767:couchez-en trois"
+},
+{
+"t": 50.75,
+"ocr": "769:couchez-en trois"
+},
+{
+"t": 51.0,
+"ocr": "766:par godet,"
+},
+{
+"t": 51.25,
+"ocr": "175:3PARGODET | 769:par godet,"
+},
+{
+"t": 51.75,
+"ocr": "175:3PARGODET | 763:au chaud,"
+},
+{
+"t": 52.0,
+"ocr": "175:3PARGODET | 765:au chaud,"
+},
+{
+"t": 52.25,
+"ocr": "773:sous un demi-centimetre"
+},
+{
+"t": 52.75,
+"ocr": "771:sous un demi-centimetre"
+},
+{
+"t": 53.0,
+"ocr": "312:V2cm | 771:sous un demi-centimetre"
+},
+{
+"t": 53.25,
+"ocr": "765:de terreau."
+},
+{
+"t": 53.5,
+"ocr": "310:12cm | 766:de terreau."
+},
+{
+"t": 53.75,
+"ocr": "309:12cm | 767:de terreau."
+},
+{
+"t": 54.0,
+"ocr": "309:V2cm | 760:Une semaine apres,"
+},
+{
+"t": 54.25,
+"ocr": "766:Une semaine apres,"
+},
+{
+"t": 54.75,
+"ocr": "762:Une semaine apres,"
+},
+{
+"t": 55.0,
+"ocr": "766:deux languettes"
+},
+{
+"t": 55.5,
+"ocr": "770:vertes percent."
+},
+{
+"t": 55.75,
+"ocr": "771:vertes percent."
+},
+{
+"t": 56.25,
+"ocr": "501:MI-MAI | 764:Mi-mai,"
+},
+{
+"t": 56.5,
+"ocr": "503:MI-MAI | 769:plantez-les au pied"
+},
+{
+"t": 56.75,
+"ocr": "195:plantez-les aupied"
+},
+{
+"t": 57.0,
+"ocr": "194:plantez-les au pied"
+},
+{
+"t": 57.5,
+"ocr": "198:des tomates."
+},
+{
+"t": 57.75,
+"ocr": "197:des tomates"
+},
+{
+"t": 58.0,
+"ocr": "197:des tomates."
+},
+{
+"t": 58.25,
+"ocr": "191:Et si la barquette"
+},
+{
+"t": 58.75,
+"ocr": "192:Et si la barquette"
+},
+{
+"t": 59.0,
+"ocr": "189:etait hybride,"
+},
+{
+"t": 59.25,
+"ocr": "190:etait hybride,"
+},
+{
+"t": 59.5,
+"ocr": "189:etait hybride,"
+},
+{
+"t": 60.0,
+"ocr": "195:sun-sanbianb"
+},
+{
+"t": 60.25,
+"ocr": "195:changeront de couleur."
+},
+{
+"t": 60.5,
+"ocr": "197:changeront de couleur."
+},
+{
+"t": 60.75,
+"ocr": "198:changeront de couleur."
+},
+{
+"t": 61.25,
+"ocr": "498:MI-MAI | 763:En Jufllet,"
+},
+{
+"t": 61.5,
+"ocr": "503:JUILLET | 762:En juillet,"
+},
+{
+"t": 61.75,
+"ocr": "506:JUILLET | 762:En juillet,"
+},
+{
+"t": 62.0,
+"ocr": "508:JUILLET | 762:En juillet,"
+},
+{
+"t": 62.25,
+"ocr": "243:la plus moche"
+},
+{
+"t": 62.5,
+"ocr": "179:LAPLUS MOCHE | 243:laplus moche"
+},
+{
+"t": 62.75,
+"ocr": "179:LA PLUSMOCHE | 245:d'octobre borde"
+},
+{
+"t": 63.0,
+"ocr": "179:LA PLUS MOCHE | 245:d'octobreborde"
+},
+{
+"t": 63.25,
+"ocr": "244:d'octobre borde"
+},
+{
+"t": 63.75,
+"ocr": "250:vos tomates"
+},
+{
+"t": 64.25,
+"ocr": "246:d'orange.."
+},
+{
+"t": 64.5,
+"ocr": "245:d'orange.."
+},
+{
+"t": 64.75,
+"ocr": "246:d'orange.."
+},
+{
+"t": 65.0,
+"ocr": "247:et quand vous les frolez,"
+},
+{
+"t": 65.25,
+"ocr": "243:et quand vous les frolez,"
+},
+{
+"t": 65.5,
+"ocr": "245:et quand vous les frolez,"
+},
+{
+"t": 66.25,
+"ocr": "245:Vos doigts sentent"
+},
+{
+"t": 66.5,
+"ocr": "245:vos doigts sentent"
+},
+{
+"t": 66.75,
+"ocr": "247:Vos doigts sentent"
+},
+{
+"t": 67.0,
+"ocr": "243:I'oeillet dlnde."
+},
+{
+"t": 67.25,
+"ocr": "244:oeillet d'lnde."
+},
+{
+"t": 67.5,
+"ocr": "247:I'oeillet d'lnde."
+},
+{
+"t": 67.75,
+"ocr": "244:Loeillet d'Inde"
+},
+{
+"t": 68.0,
+"ocr": ""
+}
+]

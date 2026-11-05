@@ -1,0 +1,950 @@
+[
+{
+"t": 0.0,
+"ocr": "165:NOEL | 274:ENMARS? | 557:24 | 596:DEC | 733:Il s'appelle cactus | 779:deNoel..."
+},
+{
+"t": 0.25,
+"ocr": "166:NOEL | 274:ENMARS? | 556:24 | 596:DEC | 734:Il s'appelle cactus | 776:de Noel..."
+},
+{
+"t": 0.5,
+"ocr": "166:NOEL | 274:ENMARS? | 555:24 | 596:DEC | 734:Il s'appelle cactus | 777:de Noel...."
+},
+{
+"t": 0.75,
+"ocr": "165:NOEL | 274:ENMARS? | 554:24 | 597:DEC | 737:Il s'appelle cactus | 777:de Noel..."
+},
+{
+"t": 1.0,
+"ocr": "165:NOEL | 274:ENMARS? | 554:24 | 596:DEC | 737:Il s'appelle cactus | 779:de Noel..."
+},
+{
+"t": 1.25,
+"ocr": "164:NOEL | 274:ENMARS? | 596:DEC | 738:Il s'appelle cactus | 776:de Noel..."
+},
+{
+"t": 1.5,
+"ocr": "165:NOEL | 274:ENMARS? | 550:24 | 593:DEC | 738:Il s'appelle cactus | 777:de Noel.."
+},
+{
+"t": 1.75,
+"ocr": "165:NOEL | 274:ENMARS? | 553:24 | 595:DEC | 738:Il s'appelle cactus | 778:de Noel..."
+},
+{
+"t": 2.0,
+"ocr": "165:NOEL | 274:ENMARS? | 552:24 | 594:DEC | 738:Il s'appelle cactus | 778:de Noel..."
+},
+{
+"t": 2.25,
+"ocr": "165:NOEL | 274:ENMARS? | 550:24 | 594:DEC | 775:et il fleurit en mars."
+},
+{
+"t": 2.5,
+"ocr": "165:NOEL | 274:ENMARS? | 550:24 | 594:DEC | 773:et il fleurit en mars."
+},
+{
+"t": 2.75,
+"ocr": "166:NOEL | 270:ENMARS? | 566:MARS | 779:et il fleurit en mars."
+},
+{
+"t": 3.0,
+"ocr": "166:NOEL | 276:ENMARS? | 571:MARS | 780:et il fleurit en mars."
+},
+{
+"t": 3.25,
+"ocr": "166:NOEL | 276:ENMARS? | 570:MARS | 780:et il fleurit en mars."
+},
+{
+"t": 3.5,
+"ocr": "568:OCT | 770:Ce soir,"
+},
+{
+"t": 3.75,
+"ocr": "569:OCT | 770:Ce soir,"
+},
+{
+"t": 4.0,
+"ocr": "568:OCT | 769:Ce soir,"
+},
+{
+"t": 4.25,
+"ocr": "568:OCT | 771:Ce soir,"
+},
+{
+"t": 4.5,
+"ocr": "568:OCT | 775:sortez-le du salon."
+},
+{
+"t": 4.75,
+"ocr": "567:OCT | 781:sortez-le du salon."
+},
+{
+"t": 5.0,
+"ocr": "780:sortez-le du salon."
+},
+{
+"t": 5.25,
+"ocr": "781:sortez-le du salon"
+},
+{
+"t": 5.5,
+"ocr": "732:Et le vingt-quatre | 773:decembre,"
+},
+{
+"t": 5.75,
+"ocr": "286:DECEMBRE | 737:Et le vingt-quatre | 774:decembre,"
+},
+{
+"t": 6.25,
+"ocr": "286:DECEMBRE | 736:Et le vingt-quatre | 772:decembre,"
+},
+{
+"t": 6.75,
+"ocr": "286:DECEMBRE | 774:Il sera en fleurs..."
+},
+{
+"t": 7.0,
+"ocr": "286:DECEMBRE | 776:il sera en fleurs..."
+},
+{
+"t": 7.25,
+"ocr": "286:DECEMBRE | 776:Il sera en fleurs..."
+},
+{
+"t": 7.5,
+"ocr": "286:DECEMBRE | 777:ll sera en fleurs..."
+},
+{
+"t": 8.0,
+"ocr": "142:DECEMBRE | 736:si personne"
+},
+{
+"t": 8.25,
+"ocr": "736:si personne | 779:ne le tourne."
+},
+{
+"t": 8.5,
+"ocr": "736:si personne"
+},
+{
+"t": 8.75,
+"ocr": "737:si personne"
+},
+{
+"t": 9.0,
+"ocr": "736:si personne"
+},
+{
+"t": 9.5,
+"ocr": "735:Bon, qu'il vienne | 781:de mamie"
+},
+{
+"t": 9.75,
+"ocr": "737:Bon, qu'il vienne | 779:de mamie"
+},
+{
+"t": 10.0,
+"ocr": "738:Bon, qu'il vienne | 779:de mamie"
+},
+{
+"t": 10.25,
+"ocr": "738:Bon, qu'il vienne | 777:de mamie"
+},
+{
+"t": 10.5,
+"ocr": "738:Bon, qu'il vienne | 780:de mamie"
+},
+{
+"t": 10.75,
+"ocr": "737:ou du supermarché | 783:posez-le"
+},
+{
+"t": 11.0,
+"ocr": "738:ou du supermarche | 784:posez-le"
+},
+{
+"t": 11.75,
+"ocr": "738:ou du supermarche, | 784:posez-le"
+},
+{
+"t": 12.0,
+"ocr": "739:ou du supermarche | 781:posez-le"
+},
+{
+"t": 12.25,
+"ocr": "778:dans la chambre"
+},
+{
+"t": 12.5,
+"ocr": "781:dans la chambre"
+},
+{
+"t": 12.75,
+"ocr": "778:qu'on ne chauffe pas,"
+},
+{
+"t": 13.0,
+"ocr": "775:qu'on ne chauffe pas,"
+},
+{
+"t": 13.25,
+"ocr": "782:qu'on ne chauffe pas,"
+},
+{
+"t": 13.5,
+"ocr": "776:devant la fenetre."
+},
+{
+"t": 13.75,
+"ocr": "777:devant la fenetre."
+},
+{
+"t": 14.0,
+"ocr": "779:devant la fenetre."
+},
+{
+"t": 14.25,
+"ocr": "780:devant la fenetre."
+},
+{
+"t": 14.5,
+"ocr": "730:Quinze degres, | 778:Cest parfait."
+},
+{
+"t": 14.75,
+"ocr": "203:15°℃ | 736:Quinze degres, | 779:Cest parfait."
+},
+{
+"t": 15.0,
+"ocr": "203:15°℃ | 735:Quinze degres | 776:Cest parfait."
+},
+{
+"t": 15.25,
+"ocr": "203:15°℃ | 736:Quinze degres, | 779:Cest parfait."
+},
+{
+"t": 15.5,
+"ocr": "204:15°℃ | 733:Quinze degres | 779:C'est parfait."
+},
+{
+"t": 15.75,
+"ocr": "776:Faites un point"
+},
+{
+"t": 16.0,
+"ocr": "779:Faites un point"
+},
+{
+"t": 16.25,
+"ocr": "734:de feutre sur le pot. | 776:cote vitre."
+},
+{
+"t": 16.5,
+"ocr": "735:de feutre sur le pot | 776:cote vitre."
+},
+{
+"t": 16.75,
+"ocr": "733:de feutre sur le pot | 776:cote vitre."
+},
+{
+"t": 17.0,
+"ocr": "738:de feutre sur le pot, | 776:cote vitre."
+},
+{
+"t": 17.25,
+"ocr": "734:de feutre sur le pot, | 774:cote vitre."
+},
+{
+"t": 17.5,
+"ocr": "736:de feutre sur le pot | 778:cote vitre."
+},
+{
+"t": 18.0,
+"ocr": "778:Fermez la porte,"
+},
+{
+"t": 18.25,
+"ocr": "771:Fermez la porte,"
+},
+{
+"t": 18.5,
+"ocr": "329:OCT | 775:Fermez la porte,"
+},
+{
+"t": 18.75,
+"ocr": "327:OCT | 739:et le soir, n'allumez"
+},
+{
+"t": 19.0,
+"ocr": "328:OCT | 734:et le soir, n'allumez"
+},
+{
+"t": 19.25,
+"ocr": "327:OCT | 734:et le soir, n'allumez"
+},
+{
+"t": 19.5,
+"ocr": "734:et le soir, n'allumez"
+},
+{
+"t": 19.75,
+"ocr": "736:et le soir, n'allumez"
+},
+{
+"t": 20.0,
+"ocr": "0:OCT | 736:et le soir, n'allumez"
+},
+{
+"t": 20.5,
+"ocr": "775:Pourquoi le noir ?"
+},
+{
+"t": 20.75,
+"ocr": "778:Pourquoi le noir?"
+},
+{
+"t": 21.25,
+"ocr": "774:Parce qu'il ne compte"
+},
+{
+"t": 21.5,
+"ocr": "777:Parce qu'il ne compte"
+},
+{
+"t": 21.75,
+"ocr": "778:Parce qu'il ne compte"
+},
+{
+"t": 22.0,
+"ocr": "779:pas les jours..."
+},
+{
+"t": 22.25,
+"ocr": "780:pas les jours..."
+},
+{
+"t": 22.5,
+"ocr": "778:pas les jours..."
+},
+{
+"t": 23.0,
+"ocr": "774:il compte les nuits."
+},
+{
+"t": 23.25,
+"ocr": "777:il compte les nuits."
+},
+{
+"t": 23.5,
+"ocr": "778:il compte les nuits."
+},
+{
+"t": 24.0,
+"ocr": "777:D'ailleurs, au Bresil."
+},
+{
+"t": 24.5,
+"ocr": "780:D'ailleurs, au Bresil,"
+},
+{
+"t": 24.75,
+"ocr": "779:D'ailleurs, au Bresil,"
+},
+{
+"t": 25.0,
+"ocr": "744:il vit accroche | 782:aux arbres,"
+},
+{
+"t": 25.25,
+"ocr": "737:il vit accroche | 780:aux arbres,"
+},
+{
+"t": 25.5,
+"ocr": "739:il vit accroche | 782:aux arbres,"
+},
+{
+"t": 25.75,
+"ocr": "738:il vit accroche | 782:aux arbres,"
+},
+{
+"t": 26.0,
+"ocr": "737:ilvit accroche | 781:auxarbres,"
+},
+{
+"t": 26.25,
+"ocr": "737:il vit accroche | 782:aux arbres,"
+},
+{
+"t": 26.5,
+"ocr": "781:et on l'appelle.."
+},
+{
+"t": 26.75,
+"ocr": "779:et on l'appelle.."
+},
+{
+"t": 27.0,
+"ocr": "781:et on l'appelle."
+},
+{
+"t": 27.25,
+"ocr": "777:la fleur de mai"
+},
+{
+"t": 27.5,
+"ocr": "778:la fleur de mai."
+},
+{
+"t": 27.75,
+"ocr": "780:la fleur de mai."
+},
+{
+"t": 28.0,
+"ocr": "175:MAI | 778:Eh oui: leur mal,"
+},
+{
+"t": 28.25,
+"ocr": "188:MAI | 776:Eh oui: leur mai"
+},
+{
+"t": 28.5,
+"ocr": "191:MAI | 779:Eh oui: leur mai"
+},
+{
+"t": 28.75,
+"ocr": "191:MAI | 779:Eh oui:leur mai"
+},
+{
+"t": 29.0,
+"ocr": "191:MAI | 777:Eh oui: leur mai"
+},
+{
+"t": 29.25,
+"ocr": "179:MAI | 780:Eh oui: leur mai"
+},
+{
+"t": 29.5,
+"ocr": "194:MAI | 781:Eh oui : leur mai"
+},
+{
+"t": 29.75,
+"ocr": "194:MAI | 780:c'est notre novembre."
+},
+{
+"t": 30.0,
+"ocr": "226:ENBRE | 784:c'est notre novembre."
+},
+{
+"t": 30.25,
+"ocr": "221:NOVEMBRE | 782:c'est notre novembre."
+},
+{
+"t": 30.5,
+"ocr": "220:NOVEMBRE | 783:c'est notre novembre."
+},
+{
+"t": 30.75,
+"ocr": "731:Sauf qu'au salon | 777:chauffe,"
+},
+{
+"t": 31.0,
+"ocr": "734:Sauf qu'au salon | 777:chauffe,"
+},
+{
+"t": 31.25,
+"ocr": "734:Sauf qu'au salon | 772:chauffe,"
+},
+{
+"t": 31.75,
+"ocr": "736:avec la lampe | 780:jusqu'a minuit..."
+},
+{
+"t": 32.0,
+"ocr": "734:avec la lampe | 778:jusqu'a minuit..."
+},
+{
+"t": 32.25,
+"ocr": "734:avec la lampe | 774:Jjusqua minuit..."
+},
+{
+"t": 32.5,
+"ocr": "736:avec la lampe | 776:Jusqua minuit..."
+},
+{
+"t": 33.25,
+"ocr": "736:c'est léte | 780:tous les soirs."
+},
+{
+"t": 33.5,
+"ocr": "736:c'estlete | 777:tous les soirs."
+},
+{
+"t": 33.75,
+"ocr": "735:c'est ete | 777:tous les soirs."
+},
+{
+"t": 34.0,
+"ocr": "735:c'est l'ete | 778:tous les soirs."
+},
+{
+"t": 34.5,
+"ocr": "741:Ensuite, enfoncez | 780:un doigt"
+},
+{
+"t": 34.75,
+"ocr": "735:Ensuite,enfoncez | 780:un doigt"
+},
+{
+"t": 35.25,
+"ocr": "740:Ensuite,enfoncez | 780:un doigt"
+},
+{
+"t": 35.5,
+"ocr": "740:Ensuite,enfoncez | 778:un doigt"
+},
+{
+"t": 35.75,
+"ocr": "778:dans la terre."
+},
+{
+"t": 36.0,
+"ocr": "783:dans la terre"
+},
+{
+"t": 36.25,
+"ocr": "783:dans la terre."
+},
+{
+"t": 36.5,
+"ocr": "783:dansla terre."
+},
+{
+"t": 36.75,
+"ocr": "776:Seche?"
+},
+{
+"t": 37.0,
+"ocr": "777:Seche?"
+},
+{
+"t": 37.25,
+"ocr": "779:Arrosez."
+},
+{
+"t": 38.0,
+"ocr": "779:Humide ?"
+},
+{
+"t": 38.25,
+"ocr": "777:Humide?"
+},
+{
+"t": 38.5,
+"ocr": "780:Attendez."
+},
+{
+"t": 38.75,
+"ocr": "777:Attendez."
+},
+{
+"t": 39.0,
+"ocr": "778:Attendez."
+},
+{
+"t": 39.25,
+"ocr": "330:OCT | 684:Vers le vingt | 732:novembre, | 781:approchez-vous."
+},
+{
+"t": 39.5,
+"ocr": "323:20 | 689:Vers le vingt | 733:novembre, | 781:approchez-vous."
+},
+{
+"t": 39.75,
+"ocr": "364:20 | 440:NOV | 689:Vers le vingt | 733:novembre, | 780:approchez-vous."
+},
+{
+"t": 40.0,
+"ocr": "374:20 | 452:NOV | 690:Vers le vingt | 733:novembre, | 780:approchez-vous."
+},
+{
+"t": 40.25,
+"ocr": "313:20 | 393:NOV | 689:Vers le vingt | 733:novembre, | 780:approchez-vous."
+},
+{
+"t": 40.5,
+"ocr": "689:Vers le vingt | 736:novembre, | 781:approchez-vous."
+},
+{
+"t": 40.75,
+"ocr": "691:Vers le vingt | 737:novembre, | 780:approchez-vous."
+},
+{
+"t": 41.0,
+"ocr": "693:Vers le vingt | 741:novembre, | 781:approchez-vous."
+},
+{
+"t": 41.25,
+"ocr": "773:Au bout des tiges,"
+},
+{
+"t": 41.75,
+"ocr": "777:Au bout des tiges,"
+},
+{
+"t": 42.0,
+"ocr": "740:des bosses roses | 778:pointent,"
+},
+{
+"t": 42.25,
+"ocr": "732:des bosses roses | 775:pointent,"
+},
+{
+"t": 42.5,
+"ocr": "736:desbossesroses | 777:pointent,"
+},
+{
+"t": 42.75,
+"ocr": "736:desbosses roses | 775:pointent,"
+},
+{
+"t": 43.0,
+"ocr": "734:des bosses roses | 775:pointent,"
+},
+{
+"t": 43.25,
+"ocr": "734:des bosses roses | 776:pointent,"
+},
+{
+"t": 43.5,
+"ocr": "735:comme des tetes | 776:drepingle."
+},
+{
+"t": 43.75,
+"ocr": "739:comme des tetes | 776:drepingle."
+},
+{
+"t": 44.0,
+"ocr": "738:comme des tetes | 773:d'epingle."
+},
+{
+"t": 44.25,
+"ocr": "738:Comme des tetes | 773:d'epingle."
+},
+{
+"t": 44.75,
+"ocr": ""
+},
+{
+"t": 45.0,
+"ocr": "781:Ses boutons!"
+},
+{
+"t": 45.5,
+"ocr": "737:Et la, gardez la terre | 778:juste humide,"
+},
+{
+"t": 45.75,
+"ocr": "738:Et la, gardez la terre | 777:juste humide,"
+},
+{
+"t": 46.0,
+"ocr": "738:Et lagardez la terre | 777:juste humide,"
+},
+{
+"t": 46.25,
+"ocr": "738:Et la, gardez la terre | 781:juste.humide,"
+},
+{
+"t": 46.5,
+"ocr": "738:Et la, gardez la terre | 777:juste.humide,"
+},
+{
+"t": 46.75,
+"ocr": "737:Et la, gardez la terre | 775:juste.humide,"
+},
+{
+"t": 47.25,
+"ocr": "737:Et la, gardez la terre | 780:juste.humide,"
+},
+{
+"t": 47.5,
+"ocr": "780:et ne touchez"
+},
+{
+"t": 48.0,
+"ocr": "780:plus au pot."
+},
+{
+"t": 48.25,
+"ocr": "781:plus au pot."
+},
+{
+"t": 48.5,
+"ocr": "782:plus au pot."
+},
+{
+"t": 48.75,
+"ocr": "735:Vous connaissez | 778:la scene:"
+},
+{
+"t": 49.0,
+"ocr": "735:Vous connaissez | 776:lascene:"
+},
+{
+"t": 49.25,
+"ocr": "734:Vous connaissez | 774:la scene:"
+},
+{
+"t": 49.5,
+"ocr": "734:Vous connaissez | 778:lascene日"
+},
+{
+"t": 49.75,
+"ocr": "735:quelqu'un le tourne, | 782:pour voir.."
+},
+{
+"t": 50.0,
+"ocr": "730:quelqu'un le tourne, | 782:pour voir..."
+},
+{
+"t": 50.25,
+"ocr": "734:quelqu'un le tourne, | 782:pour voir.."
+},
+{
+"t": 50.5,
+"ocr": "734:quelqu'un le tourne, | 781:pour voir..."
+},
+{
+"t": 50.75,
+"ocr": "732:quelqu'un le tourne, | 779:pour voir.."
+},
+{
+"t": 51.0,
+"ocr": "732:quelqu'un le tourne, | 782:pour voir.."
+},
+{
+"t": 51.75,
+"ocr": "734:et quelques jours | 779:apres,trois boutons"
+},
+{
+"t": 52.0,
+"ocr": "737:et quelques jours | 779:apres,trois boutons"
+},
+{
+"t": 52.25,
+"ocr": "738:et quelquesjours | 776:apres,trois boutons"
+},
+{
+"t": 52.75,
+"ocr": "738:et quelques jours | 778:apres,trois boutons"
+},
+{
+"t": 53.0,
+"ocr": "738:et quelques jours | 777:apres,trois boutons"
+},
+{
+"t": 53.25,
+"ocr": "780:trainent sur le rebord."
+},
+{
+"t": 53.5,
+"ocr": "777:trainent sur le rebord."
+},
+{
+"t": 53.75,
+"ocr": "778:trainent sur le rebord."
+},
+{
+"t": 54.0,
+"ocr": "777:trainent sur le rebord."
+},
+{
+"t": 54.5,
+"ocr": "736:Personne n'avoue, | 776:évidemment."
+},
+{
+"t": 54.75,
+"ocr": "734:Personne n'avoue, | 776:évidemment."
+},
+{
+"t": 55.25,
+"ocr": "734:Personne n'avoue, | 775:evidemment."
+},
+{
+"t": 55.5,
+"ocr": "776:Du coup, cette année,"
+},
+{
+"t": 55.75,
+"ocr": "774:Du coup, cette annee,"
+},
+{
+"t": 56.0,
+"ocr": "778:Du coup, cette annee,"
+},
+{
+"t": 56.5,
+"ocr": "779:Du coup, cette annee,"
+},
+{
+"t": 57.0,
+"ocr": "733:le point reste cote | 777:vitre."
+},
+{
+"t": 57.25,
+"ocr": "736:le point reste cote | 777:vitre."
+},
+{
+"t": 57.5,
+"ocr": "736:le point reste cote | 776:vitre."
+},
+{
+"t": 57.75,
+"ocr": "736:le point reste cote | 775:vitre."
+},
+{
+"t": 58.0,
+"ocr": "736:le point reste cote | 774:vitre."
+},
+{
+"t": 58.25,
+"ocr": "736:le point reste cote | 775:vitre."
+},
+{
+"t": 58.5,
+"ocr": "772:Et le salon,"
+},
+{
+"t": 58.75,
+"ocr": "776:Et le salon,"
+},
+{
+"t": 59.0,
+"ocr": "779:pour le reveillon?"
+},
+{
+"t": 60.0,
+"ocr": "308:20 | 371:NOV | 727:Laissez-le la: | 777:c'est vous qui irez"
+},
+{
+"t": 60.25,
+"ocr": "306:20 | 372:NOV | 733:Laissez-le la: | 777:c'est vous qui irez"
+},
+{
+"t": 60.5,
+"ocr": "312:20 | 380:NOV | 734:Laissez-lela: | 777:c'est vous qui irez"
+},
+{
+"t": 60.75,
+"ocr": "322:20 | 395:NOV | 733:Laissez-le la: | 776:c'est vous qui irez"
+},
+{
+"t": 61.0,
+"ocr": "329:20 | 407:NOV | 731:Laissez-le la: | 776:c'est vous qui irez"
+},
+{
+"t": 61.25,
+"ocr": "334:20 | 414:NOV | 773:le voir."
+},
+{
+"t": 61.5,
+"ocr": "334:20 | 414:NOV | 775:le voir."
+},
+{
+"t": 61.75,
+"ocr": "335:20 | 415:NOV | 738:Le vingt-quatre | 779:au matin,"
+},
+{
+"t": 62.0,
+"ocr": "335:24 | 734:Le vingt-quatre | 776:au matin,"
+},
+{
+"t": 62.25,
+"ocr": "334:24 | 408:DEC | 734:Le vingt-quatre | 774:au matin,"
+},
+{
+"t": 62.5,
+"ocr": "333:24 | 408:DEC | 734:Le vingt-quatre | 773:au matin,"
+},
+{
+"t": 62.75,
+"ocr": "334:24 | 407:DEC | 733:Le vingt-quatre | 776:au matin,"
+},
+{
+"t": 63.0,
+"ocr": "333:24 | 407:DEC | 732:Le vingt-quatre | 776:au matin,"
+},
+{
+"t": 63.25,
+"ocr": "332:24 | 407:DEC | 773:ouvrez la porte."
+},
+{
+"t": 63.5,
+"ocr": "347:24 | 418:DEC | 781:ouvrez la porte."
+},
+{
+"t": 63.75,
+"ocr": "784:ouvrez la porte."
+},
+{
+"t": 64.0,
+"ocr": "783:ouvrez la porte."
+},
+{
+"t": 64.25,
+"ocr": "735:Le point | 778:n'a pas bouge"
+},
+{
+"t": 64.5,
+"ocr": "734:Le point | 774:n'a pas bouge."
+},
+{
+"t": 64.75,
+"ocr": "733:Le point | 779:n'a pas bouge."
+},
+{
+"t": 65.0,
+"ocr": "735:Le point | 778:n'a pas bouge"
+},
+{
+"t": 65.5,
+"ocr": "778:et au bout des tiges,"
+},
+{
+"t": 65.75,
+"ocr": "773:et au bout des tiges,"
+},
+{
+"t": 66.25,
+"ocr": "780:et au bout des tiges,"
+},
+{
+"t": 66.5,
+"ocr": "784:sortent"
+},
+{
+"t": 66.75,
+"ocr": "781:sortent"
+},
+{
+"t": 67.25,
+"ocr": "778:sortent"
+},
+{
+"t": 67.75,
+"ocr": "774:leur pinceau blanc."
+},
+{
+"t": 68.0,
+"ocr": "775:leur pinceau blanc."
+},
+{
+"t": 68.25,
+"ocr": "776:leur pinceau blanc."
+},
+{
+"t": 69.0,
+"ocr": ""
+}
+]

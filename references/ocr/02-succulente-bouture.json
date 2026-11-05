@@ -1,0 +1,982 @@
+[
+{
+"t": 0.0,
+"ocr": "174:UNE FEUILLE | 238:TOMBE | 776:Une"
+},
+{
+"t": 0.25,
+"ocr": "175:UNE FEUILLE | 239:TOMBE | 778:Une feuille"
+},
+{
+"t": 0.5,
+"ocr": "175:UNEFEUILLE | 240:TOMBE | 780:Une feuille tombe"
+},
+{
+"t": 0.75,
+"ocr": "174:UNE FEUILLE | 239:TOMBE"
+},
+{
+"t": 1.0,
+"ocr": "175:UNE FEUILLE | 239:TOMBE"
+},
+{
+"t": 1.25,
+"ocr": "174:UNE FEUILLE | 240:TOMBE | 779:de votre plante"
+},
+{
+"t": 1.5,
+"ocr": "173:UNEFEUILLE | 240:TOMBE | 779:de votre plante grasse..."
+},
+{
+"t": 1.75,
+"ocr": "174:UNEFEUILLE | 240:TOMBE | 779:de votre plante grasse..."
+},
+{
+"t": 2.0,
+"ocr": "175:UNEFEUILLE | 240:TOMBE | 780:de votre plante grasse..."
+},
+{
+"t": 2.25,
+"ocr": "175:UNE FEUILLE | 239:TOMBE | 782:et"
+},
+{
+"t": 2.5,
+"ocr": "174:UNEFEUILLE | 240:TOMBE | 783:et si"
+},
+{
+"t": 2.75,
+"ocr": "174:UNEFEUILLE | 238:TOMBE | 783:et si cetait"
+},
+{
+"t": 3.0,
+"ocr": "175:UNEFEUILLE | 242:TOMBE | 337:EXPRES? | 781:et si cetait expres?"
+},
+{
+"t": 3.25,
+"ocr": "175:UNEFEUILLE | 240:TOMBE | 337:EXPRES? | 781:et si cetait expres?"
+},
+{
+"t": 3.5,
+"ocr": "175:UNEFEUILLE | 240:TOMBE | 337:EXPRES? | 780:et si cetait expres?"
+},
+{
+"t": 3.75,
+"ocr": "768:Ne la"
+},
+{
+"t": 4.0,
+"ocr": "769:Ne la jetez"
+},
+{
+"t": 4.25,
+"ocr": "770:Ne la jetez pas:"
+},
+{
+"t": 4.75,
+"ocr": "775:Cest"
+},
+{
+"t": 5.0,
+"ocr": "778:cest comme"
+},
+{
+"t": 5.25,
+"ocr": "776:cest comme ga"
+},
+{
+"t": 5.5,
+"ocr": "776:quelle fait"
+},
+{
+"t": 5.75,
+"ocr": "776:des bebes."
+},
+{
+"t": 6.5,
+"ocr": "770:Posez-la"
+},
+{
+"t": 6.75,
+"ocr": "771:Posez-la a"
+},
+{
+"t": 7.0,
+"ocr": "773:Posez-la a sec,"
+},
+{
+"t": 7.25,
+"ocr": "780:et"
+},
+{
+"t": 7.5,
+"ocr": "783:etson"
+},
+{
+"t": 7.75,
+"ocr": "781:et son bebe"
+},
+{
+"t": 8.0,
+"ocr": "781:et son bebe va"
+},
+{
+"t": 8.25,
+"ocr": "776:la boire."
+},
+{
+"t": 8.5,
+"ocr": "776:laboire."
+},
+{
+"t": 8.75,
+"ocr": "776:la boire."
+},
+{
+"t": 9.0,
+"ocr": "777:Toute."
+},
+{
+"t": 9.5,
+"ocr": ""
+},
+{
+"t": 9.75,
+"ocr": "772:D'abord,"
+},
+{
+"t": 10.0,
+"ocr": "789:ramassez-La"
+},
+{
+"t": 10.25,
+"ocr": "783:ramassez-la日"
+},
+{
+"t": 10.75,
+"ocr": "782:ramassez-la日"
+},
+{
+"t": 11.0,
+"ocr": "778:ferme,"
+},
+{
+"t": 11.25,
+"ocr": ""
+},
+{
+"t": 11.5,
+"ocr": "776:bout"
+},
+{
+"t": 11.75,
+"ocr": "776:le bout net?"
+},
+{
+"t": 12.0,
+"ocr": "775:le bout net?"
+},
+{
+"t": 12.25,
+"ocr": "768:Cest"
+},
+{
+"t": 12.5,
+"ocr": "771:Cest bon."
+},
+{
+"t": 12.75,
+"ocr": "774:Cassée"
+},
+{
+"t": 13.0,
+"ocr": "774:Cassee en"
+},
+{
+"t": 13.25,
+"ocr": "775:Cassée en deux?"
+},
+{
+"t": 13.5,
+"ocr": "769:Elle"
+},
+{
+"t": 13.75,
+"ocr": "770:Elle ne fera"
+},
+{
+"t": 14.0,
+"ocr": "772:Elle ne fera rien."
+},
+{
+"t": 14.5,
+"ocr": "781:Pour en"
+},
+{
+"t": 14.75,
+"ocr": "783:Pour en avoir"
+},
+{
+"t": 15.0,
+"ocr": "777:Pour en avoir dix,"
+},
+{
+"t": 15.25,
+"ocr": "171:10"
+},
+{
+"t": 15.5,
+"ocr": "171:10 | 779:tournez"
+},
+{
+"t": 15.75,
+"ocr": "775:tournez doucement"
+},
+{
+"t": 16.0,
+"ocr": "170:10 | 775:tournez doucement"
+},
+{
+"t": 16.25,
+"ocr": "780:celles"
+},
+{
+"t": 16.5,
+"ocr": "780:celles du bas:"
+},
+{
+"t": 16.75,
+"ocr": "778:celles du bas:"
+},
+{
+"t": 17.0,
+"ocr": "770:elles"
+},
+{
+"t": 17.25,
+"ocr": "772:elles lachent"
+},
+{
+"t": 17.5,
+"ocr": "770:elles lachent net."
+},
+{
+"t": 17.75,
+"ocr": "771:elles lachent net."
+},
+{
+"t": 18.0,
+"ocr": ""
+},
+{
+"t": 18.25,
+"ocr": "778:Sur un aloe"
+},
+{
+"t": 18.5,
+"ocr": "776:Sur un aloe vera,"
+},
+{
+"t": 19.25,
+"ocr": "769:laissez"
+},
+{
+"t": 19.5,
+"ocr": "772:laissez tomber:"
+},
+{
+"t": 19.75,
+"ocr": "770:laissez tomber:"
+},
+{
+"t": 20.0,
+"ocr": "781:sa"
+},
+{
+"t": 20.25,
+"ocr": "778:sa feuille"
+},
+{
+"t": 20.5,
+"ocr": "778:sa feuflle pourrit."
+},
+{
+"t": 20.75,
+"ocr": "778:sa feuille pourrit."
+},
+{
+"t": 21.0,
+"ocr": "777:Pas"
+},
+{
+"t": 21.25,
+"ocr": "774:Pas de plante"
+},
+{
+"t": 21.5,
+"ocr": "776:Pas de plante grasse?"
+},
+{
+"t": 22.0,
+"ocr": "776:Demandez"
+},
+{
+"t": 22.25,
+"ocr": "778:Demandez trois"
+},
+{
+"t": 22.5,
+"ocr": "772:feuilles"
+},
+{
+"t": 22.75,
+"ocr": ""
+},
+{
+"t": 23.0,
+"ocr": "774:a une voisine."
+},
+{
+"t": 23.25,
+"ocr": "771:a une voisine."
+},
+{
+"t": 23.5,
+"ocr": "774:a une voisine."
+},
+{
+"t": 23.75,
+"ocr": "772:Ensuite,"
+},
+{
+"t": 24.0,
+"ocr": "771:Ensuite,"
+},
+{
+"t": 24.25,
+"ocr": "777:laissez-les"
+},
+{
+"t": 24.75,
+"ocr": "186:3JOURS | 773:jours"
+},
+{
+"t": 25.0,
+"ocr": "186:3JOURS | 772:jours a lombre:"
+},
+{
+"t": 25.25,
+"ocr": "186:3JOURS | 771:jours a l'ombre:"
+},
+{
+"t": 25.5,
+"ocr": "185:3JOURS | 779:le"
+},
+{
+"t": 25.75,
+"ocr": "774:le bout"
+},
+{
+"t": 26.0,
+"ocr": "778:une"
+},
+{
+"t": 26.25,
+"ocr": "772:une croute."
+},
+{
+"t": 26.5,
+"ocr": "773:une croute."
+},
+{
+"t": 26.75,
+"ocr": "776:Puis"
+},
+{
+"t": 27.0,
+"ocr": "778:Puis couchez-les"
+},
+{
+"t": 27.25,
+"ocr": "776:Puis couchez-les"
+},
+{
+"t": 27.5,
+"ocr": "777:sur une"
+},
+{
+"t": 27.75,
+"ocr": "777:sur une soucoupe"
+},
+{
+"t": 28.0,
+"ocr": ""
+},
+{
+"t": 28.25,
+"ocr": "776:de terreau"
+},
+{
+"t": 28.5,
+"ocr": "781:pour"
+},
+{
+"t": 28.75,
+"ocr": "778:pour plantes"
+},
+{
+"t": 29.0,
+"ocr": "776:pour plantes grasses."
+},
+{
+"t": 29.5,
+"ocr": "777:Luniversel"
+},
+{
+"t": 29.75,
+"ocr": "778:Luniversel"
+},
+{
+"t": 30.0,
+"ocr": "774:Luniversel pur,"
+},
+{
+"t": 30.25,
+"ocr": "773:Luniversel pur,"
+},
+{
+"t": 30.75,
+"ocr": ""
+},
+{
+"t": 31.0,
+"ocr": "771:laissez-le au"
+},
+{
+"t": 31.25,
+"ocr": "772:laissez-le au sac:"
+},
+{
+"t": 31.5,
+"ocr": "780:cest"
+},
+{
+"t": 31.75,
+"ocr": "776:cest une éponge."
+},
+{
+"t": 32.0,
+"ocr": "775:Cest une éponge."
+},
+{
+"t": 32.5,
+"ocr": "772:Et"
+},
+{
+"t": 32.75,
+"ocr": "776:Et de l'eau?"
+},
+{
+"t": 33.25,
+"ocr": "168:PASUNE | 230:GOUTTE | 779:Pas"
+},
+{
+"t": 33.5,
+"ocr": "172:PASUNE | 233:GOUTTE | 779:Pas une"
+},
+{
+"t": 33.75,
+"ocr": "172:PASUNE | 235:GOUTTE | 779:Pas une goutte."
+},
+{
+"t": 34.0,
+"ocr": "172:PASUNE | 235:GOUTTE | 780:Pas une goutte."
+},
+{
+"t": 34.25,
+"ocr": "771:Soupesez-en"
+},
+{
+"t": 34.75,
+"ocr": "772:Soupesez-en une:"
+},
+{
+"t": 35.5,
+"ocr": ""
+},
+{
+"t": 36.25,
+"ocr": "774:ferme..."
+},
+{
+"t": 36.5,
+"ocr": "773:ferme..."
+},
+{
+"t": 36.75,
+"ocr": "775:Cest"
+},
+{
+"t": 37.0,
+"ocr": "778:cest une"
+},
+{
+"t": 37.25,
+"ocr": "778:C'est une gourde."
+},
+{
+"t": 37.75,
+"ocr": "770:Bon,"
+},
+{
+"t": 38.0,
+"ocr": "769:Bon,"
+},
+{
+"t": 38.25,
+"ocr": "784:avouez:"
+},
+{
+"t": 38.5,
+"ocr": ""
+},
+{
+"t": 38.75,
+"ocr": "775:le premier"
+},
+{
+"t": 39.0,
+"ocr": "772:le premier soir,"
+},
+{
+"t": 39.25,
+"ocr": "782:Larrosez | 786:vous"
+},
+{
+"t": 39.5,
+"ocr": "780:L'arrosez | 786:vous"
+},
+{
+"t": 39.75,
+"ocr": "781:quand"
+},
+{
+"t": 40.0,
+"ocr": "778:quand meme..."
+},
+{
+"t": 40.25,
+"ocr": ""
+},
+{
+"t": 40.5,
+"ocr": "784:et en"
+},
+{
+"t": 40.75,
+"ocr": "777:et en trois jours,"
+},
+{
+"t": 41.0,
+"ocr": "776:et en trois jours,"
+},
+{
+"t": 41.25,
+"ocr": "779:sa"
+},
+{
+"t": 41.5,
+"ocr": "778:sa base"
+},
+{
+"t": 41.75,
+"ocr": "777:sa base tourne"
+},
+{
+"t": 42.0,
+"ocr": "782:en"
+},
+{
+"t": 42.25,
+"ocr": "174:GELEE | 783:engelee"
+},
+{
+"t": 42.5,
+"ocr": "174:GELEE"
+},
+{
+"t": 42.75,
+"ocr": "773:Du coup"
+},
+{
+"t": 43.0,
+"ocr": "774:Du coup"
+},
+{
+"t": 43.25,
+"ocr": "783:posez la"
+},
+{
+"t": 43.5,
+"ocr": "778:posez la soucoupe"
+},
+{
+"t": 43.75,
+"ocr": "766:a la"
+},
+{
+"t": 44.0,
+"ocr": "770:a la fenetre"
+},
+{
+"t": 44.25,
+"ocr": ""
+},
+{
+"t": 44.75,
+"ocr": "773:la plus claire,"
+},
+{
+"t": 45.25,
+"ocr": "776:et regardez-la"
+},
+{
+"t": 45.5,
+"ocr": "773:et regardez-la"
+},
+{
+"t": 45.75,
+"ocr": "777:de"
+},
+{
+"t": 46.0,
+"ocr": "777:de loin."
+},
+{
+"t": 46.25,
+"ocr": "770:Un"
+},
+{
+"t": 46.5,
+"ocr": "768:Un mois"
+},
+{
+"t": 46.75,
+"ocr": "765:Un mois apres,"
+},
+{
+"t": 47.0,
+"ocr": "767:Un mois apres,"
+},
+{
+"t": 47.25,
+"ocr": "781:penchez-vous:"
+},
+{
+"t": 47.5,
+"ocr": "783:penchez-vous日"
+},
+{
+"t": 47.75,
+"ocr": "785:penchez-vous:"
+},
+{
+"t": 48.0,
+"ocr": "775:des"
+},
+{
+"t": 48.25,
+"ocr": "772:des fils"
+},
+{
+"t": 48.5,
+"ocr": "774:des fils roses"
+},
+{
+"t": 48.75,
+"ocr": "789:sortent"
+},
+{
+"t": 49.0,
+"ocr": "787:sortent de"
+},
+{
+"t": 49.25,
+"ocr": "785:sortent dela"
+},
+{
+"t": 49.5,
+"ocr": "784:sortent de la crotte."
+},
+{
+"t": 50.0,
+"ocr": "770:La"
+},
+{
+"t": 50.25,
+"ocr": "774:La seulement"
+},
+{
+"t": 50.5,
+"ocr": "776:La seulement"
+},
+{
+"t": 50.75,
+"ocr": "787:brumisez"
+},
+{
+"t": 51.0,
+"ocr": "785:brumisez"
+},
+{
+"t": 51.25,
+"ocr": "781:brumisez la terre,"
+},
+{
+"t": 51.75,
+"ocr": "783:une"
+},
+{
+"t": 52.0,
+"ocr": "779:unefoispar"
+},
+{
+"t": 52.25,
+"ocr": "779:une fois par semaine."
+},
+{
+"t": 52.75,
+"ocr": "779:En"
+},
+{
+"t": 53.0,
+"ocr": "777:En janvier,"
+},
+{
+"t": 53.25,
+"ocr": "779:En janvier,"
+},
+{
+"t": 53.5,
+"ocr": "779:une"
+},
+{
+"t": 53.75,
+"ocr": "780:une rosette"
+},
+{
+"t": 54.25,
+"ocr": ""
+},
+{
+"t": 54.5,
+"ocr": "778:ala"
+},
+{
+"t": 54.75,
+"ocr": "781:ala base,"
+},
+{
+"t": 55.0,
+"ocr": "781:alabase,"
+},
+{
+"t": 55.25,
+"ocr": "788:comme"
+},
+{
+"t": 55.5,
+"ocr": "786:comme une"
+},
+{
+"t": 55.75,
+"ocr": "787:comme une lentille!"
+},
+{
+"t": 56.0,
+"ocr": ""
+},
+{
+"t": 56.25,
+"ocr": "774:Sur"
+},
+{
+"t": 56.5,
+"ocr": ""
+},
+{
+"t": 57.25,
+"ocr": "778:sept ou"
+},
+{
+"t": 57.5,
+"ocr": "780:sept ou huit"
+},
+{
+"t": 57.75,
+"ocr": "773:parell,"
+},
+{
+"t": 58.0,
+"ocr": "773:pareil,"
+},
+{
+"t": 58.75,
+"ocr": "779:pour zero"
+},
+{
+"t": 59.0,
+"ocr": "778:pour zero euro."
+},
+{
+"t": 59.5,
+"ocr": "769:Sauf"
+},
+{
+"t": 59.75,
+"ocr": "775:Sauf que"
+},
+{
+"t": 60.0,
+"ocr": "773:Sauf que laei"
+},
+{
+"t": 60.25,
+"ocr": "786:feuille"
+},
+{
+"t": 60.5,
+"ocr": "780:feuille"
+},
+{
+"t": 60.75,
+"ocr": "780:feuille se"
+},
+{
+"t": 61.0,
+"ocr": "785:comme"
+},
+{
+"t": 61.25,
+"ocr": "780:comme"
+},
+{
+"t": 61.5,
+"ocr": "781:comme unraisin"
+},
+{
+"t": 61.75,
+"ocr": "782:comme unraisin"
+},
+{
+"t": 62.0,
+"ocr": "780:comme unraisin sec"
+},
+{
+"t": 62.25,
+"ocr": "781:comme unraisin sec日"
+},
+{
+"t": 62.5,
+"ocr": "778:le bebe"
+},
+{
+"t": 62.75,
+"ocr": "779:lebebe"
+},
+{
+"t": 63.0,
+"ocr": "780:le bebe la"
+},
+{
+"t": 63.25,
+"ocr": "780:le bebe laboit."
+},
+{
+"t": 63.5,
+"ocr": ""
+},
+{
+"t": 63.75,
+"ocr": "775:Enmars,"
+},
+{
+"t": 64.0,
+"ocr": "775:En mars,"
+},
+{
+"t": 64.25,
+"ocr": ""
+},
+{
+"t": 64.5,
+"ocr": "782:effleurez-la:"
+},
+{
+"t": 65.0,
+"ocr": "782:effleurez-la日"
+},
+{
+"t": 65.25,
+"ocr": "776:il n'en"
+},
+{
+"t": 65.5,
+"ocr": "778:iln'enreste"
+},
+{
+"t": 65.75,
+"ocr": "786:que"
+},
+{
+"t": 66.0,
+"ocr": "782:quela"
+},
+{
+"t": 66.25,
+"ocr": "783:quelapeau."
+},
+{
+"t": 66.5,
+"ocr": "778:et"
+},
+{
+"t": 66.75,
+"ocr": "773:et le bebe"
+},
+{
+"t": 67.0,
+"ocr": "772:et le bebe"
+},
+{
+"t": 67.25,
+"ocr": "780:tui,"
+},
+{
+"t": 67.5,
+"ocr": ""
+},
+{
+"t": 67.75,
+"ocr": "777:estplein"
+},
+{
+"t": 68.0,
+"ocr": "787:comme"
+},
+{
+"t": 68.25,
+"ocr": "785:commeune"
+},
+{
+"t": 68.5,
+"ocr": "785:comme une gourde."
+},
+{
+"t": 68.75,
+"ocr": "784:comme une gourde."
+},
+{
+"t": 69.25,
+"ocr": ""
+}
+]
