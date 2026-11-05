@@ -37,3 +37,8 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `casserole_pates.png` | Casserole inox avec pâtes dans l'eau (froide) |
 | `casserole_pates_ebullition.png` | Casserole de pâtes en ébullition avec vapeur |
 | `sel_boite.png` | Boîte de sel fin (salière carton) |
+| `fraise.png` | Fraise entière avec ses sépales (Open Images) |
+| `framboise.png` | Framboise sur la plante (Open Images) |
+| `citrouille.png` | Petite citrouille orange (Open Images) |
+| `kiwi_coupe.png` | Demi-kiwi, chair verte et graines noires (Open Images) |
+| `kiwis.png` | Kiwi entier + deux moitiés (Open Images) |
