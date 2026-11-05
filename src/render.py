@@ -189,7 +189,7 @@ oui temps meilleur légumes pleine minéraux abonnez-vous astuces"""),
 vrais fruits petits grains peau framboise abonnez-vous astuces"""),
     "parler_plantes": dict(
         scenes="scenes_parler_plantes", dur=21.4, voice=os.path.join(AUD, "parler_plantes", "voix.mp3"),
-        words=os.path.join(AUD, "parler_plantes", "voix_mots.json"), out="parler_plantes_1080x1920.mp4",
+        words=os.path.join(AUD, "parler_plantes", "voix_mots.json"), out="parler_plantes_v2.mp4",
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""parles plantes moque science comprennent mots sentent vibrations étude réagissent bruit
 chenille mange feuilles vrai secret regardes soin abonnez-vous astuces"""),

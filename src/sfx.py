@@ -323,6 +323,30 @@ def stir(d=0.55):
     return norm(x * env, 0.75)
 
 
+def _ha(f0, d, bright=1.0):
+    """Une syllabe « ha » : souffle (h) puis voyelle « a » (impulsions glottales filtrées par deux formants)."""
+    t = _t(d)
+    f = f0 * (1.06 - 0.12 * t / d)
+    ph = np.cumsum(f) / SR
+    saw = 2 * (ph % 1.0) - 1
+    voiced = _bp(saw, 600, 1000) * 1.0 + _bp(saw, 1050, 1500) * 0.55 * bright + _lp(saw, 450) * 0.35
+    h = _bp(rng.standard_normal(len(t)), 900, 3200) * np.exp(-t / 0.02) * 0.6
+    env = np.clip(t / 0.015, 0, 1) * np.exp(-3.2 * t / d)
+    return (voiced * env + h).astype(np.float32)
+
+
+def laugh(d=1.3):
+    """Petits rires (« ha ha ha » de plusieurs personnes)."""
+    out = np.zeros(int(d * SR) + SR // 2, np.float32)
+    for v, (f0, start, n, gap, amp, br) in enumerate([(260, 0.0, 6, 0.155, 1.0, 1.0), (205, 0.07, 5, 0.17, 0.8, 0.8),
+                                                      (310, 0.18, 5, 0.14, 0.6, 1.2)]):
+        for k in range(n):
+            syl = _ha(f0 * (1 - 0.035 * k), 0.12, br) * amp * (1 - 0.1 * k)
+            o = int((start + k * gap + rng.uniform(-0.01, 0.01)) * SR)
+            out[o: o + len(syl)] += syl[: len(out) - o]
+    return norm(out[: int(d * SR)], 0.75)
+
+
 BANK = {
     "whoosh": lambda: whoosh(0.42),
     "whoosh_up": lambda: whoosh(0.38, up=True),
@@ -355,6 +379,7 @@ BANK = {
     "alert3": lambda: alert(311.1),
     "squeak": squeak,
     "stir": stir,
+    "laugh": laugh,
 }
 
 

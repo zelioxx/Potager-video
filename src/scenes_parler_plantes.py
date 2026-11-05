@@ -9,9 +9,10 @@ Volume de la voix gardé tel qu'envoyé (render.py « af »).
 18.2–fin S'abonner + logo.
 """
 import math
+from functools import lru_cache
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from gfx import (W, H, YEL, RED, GREEN, CREAM, DARK, WHITE, background, put, title, life, fade, ease_out, ease_io,
                  ease_in, clamp, lerp, icon, tag, button_img, hl_ellipse, particles, light_rays, text_img, F_BLACK,
@@ -72,50 +73,107 @@ def waves(c, t, x, y, a=1.0, n=4, rmax=330, ang=(-50, 50), col=WHITE, speed=1.2)
 
 
 def magnifier(w, cx, cy, k, zoom=1.9, rot=0.0):
-    """Pose la loupe (photo) avec le centre du verre en (cx, cy) ; dans le verre, le décor de `w` agrandi."""
+    """Pose la loupe (photo) avec le centre du verre en (cx, cy) ; dans le verre, le décor de `w` agrandi.
+    L'image tourne autour de son centre : on compense pour que le verre reste exactement sur (cx, cy)."""
     r = GLASS_R * k
     src = w.crop((int(cx - r / zoom), int(cy - r / zoom), int(cx + r / zoom), int(cy + r / zoom)))
     src = src.resize((int(2 * r), int(2 * r)), Image.BICUBIC)
     m = Image.new("L", src.size, 0)
     ImageDraw.Draw(m).ellipse([0, 0, src.width - 1, src.height - 1], fill=255)
-    w.paste(src, (int(cx - r), int(cy - r)), m)
-    place(w, LOUPE, FULL, k, *GLASS_C, cx, cy, 1.0, rot)
+    w.paste(src, (int(round(cx - r)), int(round(cy - r))), m)
+    vx, vy = (GLASS_C[0] - 512) * k, (GLASS_C[1] - 512) * k
+    a = math.radians(rot)
+    rx, ry = vx * math.cos(a) + vy * math.sin(a), -vx * math.sin(a) + vy * math.cos(a)
+    place(w, LOUPE, FULL, k, 512, 512, cx - rx, cy - ry, 1.0, rot)
+
+
+def say_bubble(c, txt, n, x, y, s, size=58):
+    """Bulle de taille fixe (celle de la phrase complète) ; seules les n premières lettres sont écrites.
+    La pointe part vers la gauche, vers celui qui parle."""
+    if s <= 0.01:
+        return
+    lines = ["Coucou ma belle !", "Tu as soif ?"]
+    imgs = [text_img(ln, F_BLACK, size, DARK) for ln in lines]
+    w_ = max(i.width for i in imgs) + 90
+    h_ = sum(i.height for i in imgs) + 40 + 60
+    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    x0, y0 = x - w_ / 2, y - h_ / 2
+    tail = [(x0 + 40, y0 + h_ * 0.62), (x0 - 70, y0 + h_ * 0.95), (x0 + 30, y0 + h_ * 0.86)]
+    d.rounded_rectangle([x0 + 6, y0 + 8, x0 + w_ + 6, y0 + h_ + 8], radius=50, fill=DARK)
+    d.polygon([(px + 5, py + 7) for px, py in tail], fill=DARK)
+    d.rounded_rectangle([x0, y0, x0 + w_, y0 + h_], radius=50, fill=WHITE, outline=DARK, width=7)
+    d.polygon(tail, fill=WHITE, outline=DARK)
+    d.line([tail[0], tail[2]], fill=WHITE, width=10)
+    yy = y0 + 50
+    left = n
+    for ln, im in zip(lines, imgs):
+        k = max(0, min(len(ln), left))
+        left -= len(ln) + 1
+        if k > 0:
+            part = text_img(ln[:k], F_BLACK, size, DARK)
+            ov.alpha_composite(part, (int(x0 + 45), int(yy)))
+        yy += im.height + 20
+    if s < 0.999:
+        ov = ov.resize((W, H))
+        bb = ov.getbbox()
+        if bb:
+            cx, cy = (bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2
+            piece = ov.crop(bb)
+            piece = piece.resize((max(1, int(piece.width * s)), max(1, int(piece.height * s))))
+            c.alpha_composite(piece, (int(cx - piece.width / 2), int(cy - piece.height / 2)))
+        return
+    c.alpha_composite(ov)
+
+
+@lru_cache(None)
+def emoji(ch, size):
+    f = ImageFont.truetype("/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf", 109)
+    im = Image.new("RGBA", (160, 160), (0, 0, 0, 0))
+    ImageDraw.Draw(im).text((10, 10), ch, font=f, embedded_color=True)
+    im = im.crop(im.getbbox())
+    return im.resize((size, int(im.height * size / im.width)), Image.LANCZOS)
 
 
 # ============================================================ A. LE SALON : TU PARLES À TES PLANTES ? (0 → 5.5)
+SAY = "Coucou ma belle ! Tu as soif ?"
+LAUGHS = [(840, 640, 1.72, -12), (230, 900, 1.9, 10), (860, 1040, 2.08, 8), (560, 560, 2.26, -6)]
+
+
 def s_salon(t):
     zk = ease_io((t - 3.3) / 0.8)
     cam = Cam(lerp(1.25, 1.5, zk), lerp(640, 680, zk), lerp(900, 880, zk))
     w = cam.bg("fond_salon_coin2.jpg")
     draw_plant(w, t, cam)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    # la loupe : « ce que dit la science »
-    if t > 4.0:
+    if t > 4.0:   # la loupe : « ce que dit la science »
         q = ease_out((t - 4.0) / 0.5)
         sweep = math.sin((t - 4.5) * 2.2) * 60 if t > 4.5 else 0
-        lx, ly = lerp(1300, 600 + sweep, q), lerp(1300, 760, q)
-        magnifier(w, lx, ly, 0.75, rot=15)
+        magnifier(w, lerp(1300, 600 + sweep, q), lerp(1300, 760, q), 0.75, rot=15)
     w.alpha_composite(shade())
-    bubble(u, "COUCOU MA BELLE !", 330, 640, life(t, 0.2, 1.6, dur=0.3), tail=(1, 1))
-    bubble(u, "TU AS SOIF ?", 300, 820, life(t, 0.85, 1.6, dur=0.3), tail=(1, 1))
-    if 1.65 < t < 3.3:
-        for i, (hx, hy, rot, t0) in enumerate([(230, 650, -10, 1.7), (840, 560, 8, 1.85), (300, 1000, 6, 2.0),
-                                               (850, 920, -6, 2.15)]):
-            wob = math.sin((t - t0) * 14 + i) * 5
-            tag(u, "HAHA !", hx, hy + wob, t, t0, 3.25, rot=rot + wob, size=60)
-    title(u, "TU PARLES À TES PLANTES ?", t, 0.05, 1.6, y=330, color=YEL, size=108)
-    title(u, "TOUT LE MONDE SE MOQUE…", t, 1.65, 3.2, y=330, color=RED, size=105)
+    # 1) toi (à gauche) tu parles à la plante : la phrase s'écrit lettre par lettre dans une bulle fixe
+    if t < 1.75:
+        s_ = life(t, 0.1, 1.68, dur=0.3)
+        put(u, emoji("🗣", 180), 125 - 60 * (1 - s_), 900, s_)
+        say_bubble(u, SAY, int(clamp((t - 0.25) / 1.1) * len(SAY)), 560, 760, s_)
+    # 2) tout le monde se moque : des visages qui rient aux larmes, secoués par le rire
+    if 1.7 < t < 3.3:
+        for i, (x, y, t0, rot) in enumerate(LAUGHS):
+            g = life(t, t0, 3.25, dur=0.25)
+            shake = math.sin((t - t0) * 30 + i) * 7
+            put(u, emoji("😂", 190), x + shake * 0.4, y + abs(shake), g, rot + shake)
+    title(u, "TU PARLES À TES PLANTES ?", t, 0.05, 1.65, y=330, color=YEL, size=108)
+    title(u, "TOUT LE MONDE SE MOQUE…", t, 1.7, 3.2, y=330, color=RED, size=105)
     title(u, "ATTENDS…", t, 3.25, 4.6, y=330, size=170)
     stamp(u, "LA SCIENCE !", 540, 340, t, 4.65, None, GREEN, 140, -7)
     return w, u
 
 
-cue(0.22, "pop", 0.22)
-cue(0.87, "pop", 0.2)
-cue(1.7, "pop_hi", 0.16)
-cue(1.85, "pop_hi", 0.16)
-cue(2.0, "pop_hi", 0.16)
-cue(2.15, "pop_hi", 0.16)
+cue(0.15, "pop", 0.2)
+for _k in range(6):
+    cue(0.3 + _k * 0.17, "tick", 0.08)            # la phrase qui s'écrit
+cue(1.72, "laugh", 0.42)
+cue(2.2, "laugh", 0.3)
 cue(4.02, "whoosh", 0.18)
 cue(4.68, "ding", 0.3)
 
