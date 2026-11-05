@@ -347,6 +347,17 @@ def laugh(d=1.3):
     return norm(out[: int(d * SR)], 0.75)
 
 
+def laugh_crowd():
+    """Vrais rires humains (enregistrements CC0 mélangés, assets/audio/sfx/rires_humains.wav)."""
+    import os
+    import soundfile as sf
+    p = os.path.join(os.path.dirname(__file__), "..", "assets", "audio", "sfx", "rires_humains.wav")
+    x, sr = sf.read(p, dtype="float32")
+    if sr != SR:
+        x = np.interp(np.linspace(0, len(x) - 1, int(len(x) * SR / sr)), np.arange(len(x)), x).astype(np.float32)
+    return x
+
+
 BANK = {
     "whoosh": lambda: whoosh(0.42),
     "whoosh_up": lambda: whoosh(0.38, up=True),
@@ -380,6 +391,7 @@ BANK = {
     "squeak": squeak,
     "stir": stir,
     "laugh": laugh,
+    "laugh_crowd": laugh_crowd,
 }
 
 

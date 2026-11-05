@@ -142,7 +142,8 @@ LAUGHS = [(840, 640, 1.72, -12), (230, 900, 1.9, 10), (860, 1040, 2.08, 8), (560
 
 def s_salon(t):
     zk = ease_io((t - 3.3) / 0.8)
-    cam = Cam(lerp(1.25, 1.5, zk), lerp(640, 680, zk), lerp(900, 880, zk))
+    z0 = lerp(1.12, 1.25, ease_out(t / 1.7))           # on s'approche doucement de la plante
+    cam = Cam(lerp(z0, 1.5, zk), lerp(640, 680, zk), lerp(900, 880, zk))
     w = cam.bg("fond_salon_coin2.jpg")
     draw_plant(w, t, cam)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -151,11 +152,6 @@ def s_salon(t):
         sweep = math.sin((t - 4.5) * 2.2) * 60 if t > 4.5 else 0
         magnifier(w, lerp(1300, 600 + sweep, q), lerp(1300, 760, q), 0.75, rot=15)
     w.alpha_composite(shade())
-    # 1) toi (à gauche) tu parles à la plante : la phrase s'écrit lettre par lettre dans une bulle fixe
-    if t < 1.75:
-        s_ = life(t, 0.1, 1.68, dur=0.3)
-        put(u, emoji("🗣", 180), 125 - 60 * (1 - s_), 900, s_)
-        say_bubble(u, SAY, int(clamp((t - 0.25) / 1.1) * len(SAY)), 560, 760, s_)
     # 2) tout le monde se moque : des visages qui rient aux larmes, secoués par le rire
     if 1.7 < t < 3.3:
         for i, (x, y, t0, rot) in enumerate(LAUGHS):
@@ -170,10 +166,7 @@ def s_salon(t):
 
 
 cue(0.15, "pop", 0.2)
-for _k in range(6):
-    cue(0.3 + _k * 0.17, "tick", 0.08)            # la phrase qui s'écrit
-cue(1.72, "laugh", 0.42)
-cue(2.2, "laugh", 0.3)
+cue(1.68, "laugh_crowd", 0.55)
 cue(4.02, "whoosh", 0.18)
 cue(4.68, "ding", 0.3)
 
