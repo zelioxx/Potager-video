@@ -167,7 +167,7 @@ arrosages recouvre centimètre sable pondre bonus verre vinaigre cidre goutte li
 abonne-toi astuces"""),
     "oignon": dict(
         scenes="scenes_oignon", dur=20.75, voice=os.path.join(AUD, "oignon", "voix.mp3"),
-        words=os.path.join(AUD, "oignon", "voix_mots.json"), out="oignon_germe_v3.mp4",
+        words=os.path.join(AUD, "oignon", "voix_mots.json"), out="oignon_germe_v4.mp4",
         highlight="""oignon germe placard jette surtout d'autres plante-le pot pointe verte au-dessus terre fenêtre
 arrosage léger semaines divise plusieurs nouveaux oignons tiges vertes mangent ciboulette abonnez-vous astuces"""),
 }
@@ -390,12 +390,14 @@ def build_audio(path):
     sf.write(path, st, sfx.SR)
 
 
-# volume « TikTok » : fort et propre (≈ -9,7 LUFS, pic -1,1 dB), 1,5 dB au-dessus des vidéos de référence.
-# Compression en deux étapes douces (le limiteur ne travaille presque plus) : pas d'effet « saturé ».
-LOUD = ("highpass=f=80,acompressor=threshold=-26dB:ratio=2:attack=15:release=220:makeup=3,"
+# volume « TikTok » : fort (≈ -8,7 LUFS, pic -1 dB) et pensé pour les haut-parleurs de téléphone : basses inutiles
+# coupées (< 130 Hz), voix mise en avant (2,6 kHz), compression en deux étapes douces, puis +4,5 dB dans un limiteur
+# à relâche lente (réduction médiane < 1 dB) : plus fort sans l'effet « saturé ».
+LOUD = ("highpass=f=130:p=2,equalizer=f=250:t=q:w=1:g=-2,"
+        "acompressor=threshold=-26dB:ratio=2:attack=15:release=220:makeup=3,"
         "acompressor=threshold=-16dB:ratio=3:attack=6:release=90:makeup=2,"
-        "equalizer=f=2500:t=q:w=1:g=2,loudnorm=I=-9:TP=-1.2:LRA=7,"
-        "alimiter=limit=0.88:attack=4:release=70:level=false")
+        "equalizer=f=2600:t=q:w=1:g=3,equalizer=f=5500:t=q:w=1:g=1.5,loudnorm=I=-10.5:TP=-1.0:LRA=6,"
+        "volume=4.5dB,alimiter=limit=0.85:attack=5:release=120:level=false")
 
 
 def main():
