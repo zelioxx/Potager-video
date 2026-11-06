@@ -37,8 +37,8 @@ RIDEAU, TRINGLE, LUNE = "banque/rideau", "banque/tringle", "banque/lune_pleine"
 FULL = (0, 0, 1024, 1024)
 POT_S, POT_F = (517, 965, 264), (520, 960, 334)          # pot dans chaque photo : centre x, bas, largeur
 
-PANES = [(30, 0, 450, 1290), (600, 0, 920, 1290)]       # vitres (photo de la fenêtre, 1080 x 1920)
-SILL_BACK, SILL_FRONT = 1420, 1492                      # sur le rebord : contre la vitre / au bord, côté pièce
+PANES = [(62, 0, 448, 1284), (605, 0, 918, 1247)]       # vitres (photo de la fenêtre, 1080 x 1920), au pixel près
+SILL_BACK, SILL_FRONT = 1448, 1512                      # sur le rebord : contre la vitre / au bord, côté pièce
 PLANT_X, POT_W = 330, 165
 ROD_Y, CURT_TOP, CURT_BOT = 108, 122, 1388
 
@@ -88,8 +88,8 @@ def snow(c, t, a):
         x0, y0, x1, y1 = PANES[r.integers(0, 2)]
         sp = r.uniform(70, 150)
         x = r.uniform(x0, x1) + math.sin(t * 1.5 + r.uniform(0, 6)) * 14
-        y = (r.uniform(0, 1300) + t * sp) % 1290
-        if x0 < x < x1:
+        y = y0 + (r.uniform(0, 1300) + t * sp) % (y1 - y0)
+        if x0 + 4 < x < x1 - 4 and y < y1 - 6:   # elle ne tombe que derrière les vitres (dehors)
             s = r.uniform(2, 5)
             d.ellipse([x - s, y - s, x + s, y + s], fill=(255, 255, 255, int(220 * a)))
 
