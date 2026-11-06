@@ -48,3 +48,17 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `rideau.png` / `tringle.png` | Rideau lin beige, tringle métal (recadrés au plus juste : on les étire en largeur) |
 | `orchidee_saine.png` / `orchidee_fanee.png` | Phalaenopsis blanc en pot rose : en forme / gelé (fleurs fanées, feuilles jaunes) |
 | `lune_croissant.png` / `lune_demi.png` / `lune_pleine.png` | Phases de la lune |
+
+## Décors (photos de fond, dans `assets/images/source_utilisateur/`, chargées avec `photo(nom)`)
+
+| Fichier | Décor | Où poser les objets |
+|---|---|---|
+| `decor_cuisine_planche_fenetre.jpg` | Cuisine lumineuse : planche à découper, basilic, huile d'olive, torchon, fenêtre sur Paris, évier à droite | sur la planche |
+| `decor_salon_table_fenetre.jpg` | Salon : petite table en bois devant une porte-fenêtre, bibliothèque, radiateur, canapé, tapis | sur la table |
+| `decor_rebord_fenetre_radiateur.jpg` | Gros plan d'un large rebord de fenêtre blanc, radiateur en fonte dessous | sur le rebord |
+| `decor_fenetre_double_radiateur.jpg` | Fenêtre double vue de face, rebord blanc, radiateur en fonte dessous | sur le rebord |
+| `decor_evier_cuisine_soir.jpg` | Évier inox avec mitigeur, plan de travail en bois, fenêtre de nuit (le soir) | sur le plan de travail, dans l'évier |
+| `fond_fenetre.webp` | Fenêtre de cuisine (vue sur Paris), rebord en pierre, radiateur, évier | sur le rebord |
+| `fond_salon_coin.webp` / `fond_salon_coin2.jpg` | Coin du salon (table ronde, chaussons, tapis) | sur la table ronde, au sol |
+| `fond_placard.webp` | Étagère de cuisine (bocaux, paniers d'oignons et de pommes) | dans les paniers |
+| `citron_fond_cuisine.png` / `citron_fond_buffet.png` | Cuisine avec planche / buffet du salon | sur la planche / le buffet |
