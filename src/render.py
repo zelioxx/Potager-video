@@ -195,7 +195,7 @@ vrais fruits petits grains peau framboise abonnez-vous astuces"""),
 chenille mange feuilles vrai secret regardes soin abonnez-vous astuces"""),
     "plantes_fenetre": dict(
         scenes="scenes_plantes_fenetre", dur=23.8, voice=os.path.join(AUD, "plantes_fenetre", "voix.mp3"),
-        words=os.path.join(AUD, "plantes_fenetre", "voix_mots.json"), out="plantes_fenetre_gel_v2.mp4",
+        words=os.path.join(AUD, "plantes_fenetre", "voix_mots.json"), out="plantes_fenetre_gel_v3.mp4",
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""plante fenêtre hiver geler nuit vitre glacée feuille touche noircit meurt pire piège rideau
 fermé coincée froid éloigne-la 20 cm côté pièce soir abonnez-vous astuces"""),

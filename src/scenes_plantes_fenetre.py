@@ -37,10 +37,11 @@ RIDEAU, TRINGLE, LUNE = "banque/rideau", "banque/tringle", "banque/lune_pleine"
 FULL = (0, 0, 1024, 1024)
 POT_S, POT_F = (517, 965, 264), (520, 960, 334)          # pot dans chaque photo : centre x, bas, largeur
 
-PANES = [(62, 0, 448, 1284), (605, 0, 918, 1247)]       # vitres (photo de la fenêtre, 1080 x 1920), au pixel près
+PANES = [(62, 0, 448, 1292), (605, 0, 918, 1271)]       # vitres (photo de la fenêtre, 1080 x 1920), au pixel près
+PANE_BOT = [((62, 1292), (448, 1272)), ((605, 1271), (918, 1246))]   # bas des vitres, en biais (perspective)
 SILL_BACK, SILL_FRONT = 1448, 1512                      # sur le rebord : contre la vitre / au bord, côté pièce
 PLANT_X, POT_W = 330, 165
-ROD_Y, CURT_TOP, CURT_BOT = 108, 122, 1388
+ROD_Y, CURT_TOP, CURT_BOT = 140, 104, 1388          # le haut des rideaux est accroché sur la barre (barre 116 → 134)
 
 
 # ------------------------------------------------------------- givre, neige, nuit
@@ -51,9 +52,10 @@ def frost_base():
     r = np.random.default_rng(3)
     dist = np.full((1920, 1080), 1e6, np.float32)
     yy, xx = np.mgrid[:1920, :1080]
-    for x0, y0, x1, y1 in PANES:
-        inside = (xx >= x0) & (xx <= x1) & (yy >= y0) & (yy <= y1)
-        d = np.minimum(np.minimum(xx - x0, x1 - xx), np.minimum(yy - y0, y1 - yy)).astype(np.float32)
+    for (x0, y0, x1, y1), ((bx0, by0), (bx1, by1)) in zip(PANES, PANE_BOT):
+        yb = by0 + (xx - bx0) * (by1 - by0) / (bx1 - bx0)          # bas de la vitre, en biais
+        inside = (xx >= x0) & (xx <= x1) & (yy >= y0) & (yy <= yb)
+        d = np.minimum(np.minimum(xx - x0, x1 - xx), np.minimum(yy - y0, yb - yy)).astype(np.float32)
         dist = np.where(inside, np.minimum(dist, d), dist)
 
     def nz(sig):
@@ -89,7 +91,9 @@ def snow(c, t, a):
         sp = r.uniform(70, 150)
         x = r.uniform(x0, x1) + math.sin(t * 1.5 + r.uniform(0, 6)) * 14
         y = y0 + (r.uniform(0, 1300) + t * sp) % (y1 - y0)
-        if x0 + 4 < x < x1 - 4 and y < y1 - 6:   # elle ne tombe que derrière les vitres (dehors)
+        (bx0, by0), (bx1, by1) = PANE_BOT[PANES.index((x0, y0, x1, y1))]
+        yb = by0 + (x - bx0) * (by1 - by0) / (bx1 - bx0)
+        if x0 + 4 < x < x1 - 4 and y < yb - 6:   # elle ne tombe que derrière les vitres (dehors)
             s = r.uniform(2, 5)
             d.ellipse([x - s, y - s, x + s, y + s], fill=(255, 255, 255, int(220 * a)))
 
