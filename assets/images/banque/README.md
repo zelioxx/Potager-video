@@ -60,6 +60,7 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `decor_evier_cuisine_soir.jpg` | Évier inox avec mitigeur, plan de travail en bois, fenêtre de nuit (le soir) | sur le plan de travail, dans l'évier |
 | `fond_fenetre.webp` | Fenêtre de cuisine (vue sur Paris), rebord en pierre, radiateur, évier | sur le rebord |
 | `fond_salon_coin.webp` / `fond_salon_coin2.jpg` | Coin du salon (table ronde, chaussons, tapis) | sur la table ronde, au sol |
+| `decor_placard_sous_evier.jpg` | Placard bas sous l'évier, porte ouverte (panier en osier, produits, boîte transparente) | sur l'étagère du haut (devant le panier : 445, 1038) |
 | `fond_placard.webp` | Étagère de cuisine (bocaux, paniers d'oignons et de pommes) | dans les paniers |
 | `citron_fond_cuisine.png` / `citron_fond_buffet.png` | Cuisine avec planche / buffet du salon | sur la planche / le buffet |
 | `fraisier_bouton` → `fraisier_fruit_vert` (6 étapes) | Hampe de fraisier : bouton, bouton, fleur qui s'ouvre, fleur, sans pétales, fruit vert (tige en bas) |

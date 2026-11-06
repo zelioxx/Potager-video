@@ -2,7 +2,7 @@
 
 Volume de la voix gardé tel qu'envoyé (render.py « af »). Décors fournis : placard, plan de travail de la cuisine,
 rebord de fenêtre, jardin à la terre retournée.
-0–4.35    le placard : une pomme de terre verte, « elle peut te rendre malade ».
+0–4.35    le placard sous l'évier : une pomme de terre verte, « elle peut te rendre malade ».
 4.35–11.2 le plan de travail : elle germe, verdit ; coupée en deux : la solanine ; ne la mange pas.
 11.2–13.15 … mais ne la jette pas.
 13.15–14.65 le rebord de fenêtre : elle germe à la lumière, dans une boîte à œufs.
@@ -35,7 +35,7 @@ def cue(t, name, gain=0.5):
 B = "banque/"
 PDT, GERMEE, VERTE, COUPEE = B + "pdt", B + "pdt_germee", B + "pdt_verte", B + "pdt_verte_coupee"
 BOITE, JEUNE, FLEURI, PANIER = B + "boite_oeufs_vide", B + "pdt_jeune_plant", B + "pdt_plant_fleuri", B + "panier_pdt"
-PLACARD, CUISINE = "fond_placard.webp", "decor_cuisine_planche_fenetre.jpg"
+PLACARD, CUISINE = "decor_placard_sous_evier.jpg", "decor_cuisine_planche_fenetre.jpg"
 REBORD, JARDIN = "decor_rebord_fenetre_radiateur.jpg", "tulipes_fond_sol_nu.png"
 
 
@@ -48,25 +48,25 @@ def no(u, ch, x, y, s, size=170):
 
 
 # ============================================================ A. LE PLACARD (0 → 4.35)
-PL = (575, 1588)                                 # sur l'étagère du bas, entre les deux paniers
+PL = (445, 1038)                                 # placard sous l'évier : étagère du haut, devant le panier en osier
 
 
 def s_placard(t):
     zin = ease_io(t / 0.9)
     zout = ease_io((t - 2.6) / 0.8)
     z = lerp(lerp(1.15, 2.3, zin), 1.35, zout)
-    cam = Cam(z, lerp(560, PL[0], zin * (1 - zout)), lerp(1250, PL[1] - 120, zin) * (1 - zout) + 1350 * zout)
+    cam = Cam(z, lerp(lerp(540, PL[0], zin), 540, zout), lerp(lerp(1150, PL[1] - 60, zin), 1180, zout))
     w = cam.bg(PLACARD)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     x, y = cam.p(*PL)
-    shadow(w, x, y, 95 * cam.z, 70)
-    ob(w, VERTE, x, y, 105 * cam.z, anchor="bottom", s=life(t, 0.05, dur=0.35))
+    shadow(w, x, y, 90 * cam.z, 80)
+    ob(w, VERTE, x, y, 100 * cam.z, anchor="bottom", s=life(t, 0.05, dur=0.35))
     w.alpha_composite(shade())
     if 1.75 < t < 2.65:
         put(u, emoji("🤢", 200), 820, 760, life(t, 1.8, 2.6))
     if t > 2.75:
         hl_ellipse(u, x, y - 45 * cam.z, 85 * cam.z, 55 * cam.z, life(t, 2.8))
-        tag(u, "ELLE EST LÀ !", 300, 700, t, 2.85, None, rot=-5, size=56, string_to=(x - 60 * cam.z, y - 60 * cam.z))
+        tag(u, "ELLE EST LÀ !", 760, 560, t, 2.85, None, rot=-5, size=56, string_to=(x - 60 * cam.z, y - 60 * cam.z))
     title(u, "CETTE POMME DE TERRE…", t, 0.05, 1.7, y=330, color=YEL, size=115)
     stamp(u, "PEUT TE RENDRE MALADE !", 540, 340, t, 1.75, 2.6, RED, 95, -6)
     title(u, "DANS TON PLACARD !", t, 2.65, None, y=330, size=125)
