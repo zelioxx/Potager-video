@@ -205,6 +205,12 @@ fermé coincée froid éloigne-la 20 cm côté pièce soir abonnez-vous astuces"
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""fraise fruit pire partie rouge manges base gonflée fleur vrais fruits petits grains peau
 chaque grain graine seule 200 fruits jamais pareille abonnez-vous astuces"""),
+    "pommes_de_terre": dict(
+        scenes="scenes_pommes_de_terre", dur=21.75, voice=os.path.join(AUD, "pommes_de_terre", "voix.mp3"),
+        words=os.path.join(AUD, "pommes_de_terre", "voix_mots.json"), out="pommes_de_terre_1080x1920.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""pomme terre malade placard germe verte poison solanine mange jette lumière plante-la printemps
+seule patate récoltes dizaine abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

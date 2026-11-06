@@ -68,3 +68,6 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `akene.png` / `panier_fraises.png` | Un akène (graine) ; panier en osier rempli de fraises |
 | `foliole_fraisier.png` | Foliole de fraisier (Open Images) : on en assemble 3 par feuille |
 | `fraisier_pot.png` | Plant de fraisier en pot terre cuite (fleurs, fraises vertes et rouges) — bas du pot (515, 979), largeur du pot 420 |
+| `pdt.png` / `pdt_germee.png` / `pdt_verte.png` / `pdt_verte_coupee.png` | Pomme de terre (fraîchement récoltée) / germée / verte / coupée en deux (bords verts) |
+| `boite_oeufs_vide.png` / `boite_oeufs.png` | Boîte à œufs en carton ouverte, vide / avec 2 œufs |
+| `pdt_jeune_plant.png` / `pdt_plant_fleuri.png` / `panier_pdt.png` | Jeune pied de pomme de terre sur sa butte / pied fleuri / panier de pommes de terre |
