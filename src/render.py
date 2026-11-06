@@ -201,7 +201,7 @@ chenille mange feuilles vrai secret regardes soin abonnez-vous astuces"""),
 fermé coincée froid éloigne-la 20 cm côté pièce soir abonnez-vous astuces"""),
     "fraises": dict(
         scenes="scenes_fraises", dur=21.75, voice=os.path.join(AUD, "fraises", "voix.mp3"),
-        words=os.path.join(AUD, "fraises", "voix_mots.json"), out="fraises_origine_1080x1920.mp4",
+        words=os.path.join(AUD, "fraises", "voix_mots.json"), out="fraises_origine_v2.mp4",
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""fraise fruit pire partie rouge manges base gonflée fleur vrais fruits petits grains peau
 chaque grain graine seule 200 fruits jamais pareille abonnez-vous astuces"""),

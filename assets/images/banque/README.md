@@ -67,3 +67,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `fraise_peau_macro.jpg` | Gros plan de la peau d'une fraise (akènes) — à mettre dans une loupe |
 | `akene.png` / `panier_fraises.png` | Un akène (graine) ; panier en osier rempli de fraises |
 | `foliole_fraisier.png` | Foliole de fraisier (Open Images) : on en assemble 3 par feuille |
+| `fraisier_pot.png` | Plant de fraisier en pot terre cuite (fleurs, fraises vertes et rouges) — bas du pot (515, 979), largeur du pot 420 |

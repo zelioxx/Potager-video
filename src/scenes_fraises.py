@@ -54,18 +54,21 @@ def img(name):
     return Image.open(os.path.join(IMG, name + ".png")).convert("RGBA")
 
 
+RED_PAD = 600                                   # marge en haut : la fraise mûre dépasse le cadre 1024 d'origine
+
+
 @lru_cache(None)
 def red_stage():
-    """Dernière étape : la tige du fruit vert portant la fraise mûre (tête gonflée et rouge)."""
-    base = img(STAGES[5][0]).copy()
-    a = np.asarray(base).copy()
+    """Dernière étape : la tige du fruit vert portant la fraise mûre (tête gonflée et rouge), sans rien rogner."""
+    a = np.asarray(img(STAGES[5][0])).copy()
     a[:STAGES[5][3] + 25, :, 3] = 0                        # on garde la tige, sans la tête verte
-    out = Image.fromarray(a)
+    out = Image.new("RGBA", (1024, 1024 + RED_PAD), (0, 0, 0, 0))
+    out.alpha_composite(Image.fromarray(a), (0, RED_PAD))
     f = img(GROSSE).rotate(180, resample=Image.BICUBIC)     # pointe en haut, sépales sur la tige
     k = 423 * 1.35 / 689
     f = f.resize((int(1024 * k), int(1024 * k)), Image.LANCZOS)
     ax, ay = (1024 - 515) * k, (1024 - 75) * k              # pédoncule de la fraise retournée
-    out.alpha_composite(f, (int(540 - ax), int(STAGES[5][3] + 30 - ay)))
+    out.alpha_composite(f, (int(540 - ax), int(RED_PAD + STAGES[5][3] + 30 - ay)))
     return out
 
 
@@ -74,7 +77,9 @@ def stage_img(i):
 
 
 def stage_anchor(i):
-    s = STAGES[min(i, 5)]
+    if i >= 6:
+        return 540, 960 + RED_PAD
+    s = STAGES[i]
     return s[1], s[2]
 
 
@@ -102,56 +107,28 @@ def pivot(c, key, px, py, X, Y, k, rot=0.0, alpha=1.0):
     c.alpha_composite(can, (int(X - R), int(Y - R)))
 
 
-# ------------------------------------------------------------- le plant de fraisier en pot
-LEAVES = [(-80, 0.7, 0), (-55, 1.0, 0), (-30, 1.15, 1), (-5, 1.25, 0), (18, 1.1, 1), (42, 1.05, 0), (65, 0.85, 1),
-          (88, 0.6, 0), (-95, 0.5, 1)]
-FLOWERS = [(-28, 1.05, 0.0), (22, 0.95, 0.35), (55, 0.8, 0.7)]      # angle, longueur, décalage d'âge
+# ------------------------------------------------------------- le plant de fraisier en pot (photo fournie)
+PLANT = B + "fraisier_pot"
+PLANT_BOT, PLANT_POT_W = (515, 979), 420         # bas du pot et largeur du pot dans la photo (cadre 1024)
 
 
-def trifoliate(c, x, y, ang, s):
-    """Feuille de fraisier : trois folioles (photo) en éventail au bout du pétiole."""
-    for d in (-40, 0, 40):
-        pivot(c, (B + "foliole_fraisier", 0), 300, 560, x, y, s * (0.85 if d else 1.0), -(ang + d))
-
-
-def plant(c, X, Ybot, pw, stage, wob=0.0):
-    """Plant de fraisier : pot (photo) de largeur pw, bas en (X, Ybot) ; stage 0..6 = âge des fleurs/fruits."""
-    k = pw / 674
-    shadow(c, X, Ybot, pw * 0.95, 70)
-    place(c, POT, (0, 0, 1254, 1254), k, 628, 1025, X, Ybot)
-    sx, sy = X + (624 - 628) * k, Ybot + (412 - 1025) * k
-    s = pw / 300
-    d = ImageDraw.Draw(c)
-    tips = []
-    for ang, ln, front in LEAVES:
-        a = math.radians(ang + wob * math.sin(ang))
-        tx, ty = sx + math.sin(a) * 150 * ln * s, sy - math.cos(a) * 150 * ln * s
-        tips.append((tx, ty, ang, front))
-    for tx, ty, ang, front in tips:          # feuilles du fond
-        if not front:
-            d.line([(sx, sy), (tx, ty)], fill=(78, 128, 52), width=max(2, int(5 * s)))
-            trifoliate(c, tx, ty, ang, 0.13 * s)
-    for tx, ty, ang, front in tips:          # feuilles de devant
-        if front:
-            d.line([(sx, sy), (tx, ty)], fill=(84, 138, 56), width=max(2, int(5 * s)))
-            trifoliate(c, tx, ty, ang, 0.13 * s)
-    for ang, ln, off in FLOWERS:             # hampes florales : bouton → fleur → fruit
-        st = int(clamp(stage - off * 1.5, 0, 6))
-        x0, y0 = stage_anchor(st)
-        pivot(c, (None, st), x0, y0, sx + math.sin(math.radians(ang)) * 12 * s, sy, 0.34 * ln * s, -ang * 0.8)
+def plant(c, X, Ybot, pw, s=1.0):
+    k = pw / PLANT_POT_W
+    shadow(c, X, Ybot, pw * 1.1 * s, 75)
+    place(c, PLANT, FULL, k, *PLANT_BOT, X, Ybot, s)
 
 
 # ============================================================ A. LA CUISINE : PAS UN FRUIT (0 → 3.55)
-P_X, P_Y, P_W = 330, 1600, 260                   # plant en pot sur la planche (coordonnées de la photo)
+P_X, P_Y, P_W = 315, 1600, 235                   # plant en pot sur la planche (coordonnées de la photo)
 K_X, K_Y, K_W = 770, 1610, 330                   # panier de fraises
 F_X, F_Y = 555, 1655                             # la fraise qui sort du panier (devant, sur la planche)
 
 
-def kitchen(t, cam, stage=6.0, wob=0.0, hop=None):
+def kitchen(t, cam, ps=1.0):
     w = cam.bg(KITCHEN)
     z = cam.z
     px, py = cam.p(P_X, P_Y)
-    plant(w, px, py, P_W * z, stage, wob)
+    plant(w, px, py, P_W * z, ps)
     kx, ky = cam.p(K_X, K_Y)
     shadow(w, kx, ky, K_W * z * 0.9, 70)
     ob(w, PANIER, kx, ky, K_W * z, anchor="bottom")
@@ -160,7 +137,7 @@ def kitchen(t, cam, stage=6.0, wob=0.0, hop=None):
 
 def s_intro(t):
     cam = Cam(lerp(1.15, 1.3, ease_io(t / 3.5)), 560, 1300)
-    w = kitchen(t, cam, wob=math.sin(t * 2) * 3)
+    w = kitchen(t, cam)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     z = cam.z
     hop = ease_io((t - 0.75) / 0.45)                 # une fraise saute du panier
@@ -244,19 +221,94 @@ def macro():
     return Image.open(os.path.join(IMG, B + "fraise_peau_macro.jpg")).convert("RGBA")
 
 
-def lens_disc(c, cx, cy, r, zoom=1.0, off=(0, 0)):
-    """Disque rempli de la photo macro de la peau (les grains), centré en (cx, cy)."""
+ZOOM = 2.4                                      # grossissement de la loupe
+
+
+MACRO_SEEDS = [(241, 70), (164, 158), (265, 199), (101, 241), (46, 141)]   # grains entiers de la photo macro
+SEED_SP = 125                                    # écart entre deux grains dans la fraise grossie (px)
+
+
+@lru_cache(None)
+def skin_big():
+    """La grosse fraise rendue à la taille vue dans la loupe. Le corps est refait : fond rouge + les vrais grains
+    de la photo macro posés en quinconce (pas de raccord), assombri selon le volume de la photo d'origine.
+    Renvoie l'image et la position des grains (pixels de l'image)."""
+    from scipy.ndimage import gaussian_filter
+    kb = SW / 689 * ZOOM
+    S = int(1024 * kb)
+    f = img(GROSSE).resize((S, S), Image.LANCZOS)
+    a = np.asarray(f).astype(np.float32)
+    r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
+    from scipy.ndimage import binary_fill_holes, binary_opening
+    sepal = (g > r + 15) & (al > 120)                      # sépales verts : on les garde tels quels
+    body = binary_opening((al > 180) & ~sepal, iterations=3)
+    body = gaussian_filter(binary_fill_holes(body).astype(np.float32), 3)
+    rng = np.random.default_rng(4)
+    noise = gaussian_filter(rng.standard_normal((S, S)).astype(np.float32), 40)
+    noise = noise / (np.abs(noise).max() + 1e-6)
+    base = np.dstack([203 * (1 + 0.08 * noise), 22 * (1 + 0.3 * noise), 14 + 0 * noise])
+    skin = Image.fromarray(base.clip(0, 255).astype(np.uint8)).convert("RGBA")
     m = macro()
-    side = int(2 * r)
-    src = m.crop((0, 0, m.width, m.height))
-    s = side * zoom / min(src.size)
-    im = src.resize((int(src.width * s), int(src.height * s)), Image.BICUBIC)
-    lay = Image.new("RGBA", (side, side), (0, 0, 0, 0))
-    lay.paste(im, (int(side / 2 - im.width / 2 + off[0] * s), int(side / 2 - im.height / 2 + off[1] * s)))
-    mk = Image.new("L", (side, side), 0)
-    ImageDraw.Draw(mk).ellipse([0, 0, side - 1, side - 1], fill=255)
-    lay.putalpha(mk)
-    c.alpha_composite(lay, (int(cx - r), int(cy - r)))
+    t = SEED_SP / 112
+    R = 46
+    patches = []
+    for x, y in MACRO_SEEDS:
+        p = m.crop((x - R, y - R - 6, x + R, y + R - 6)).resize((int(2 * R * t), int(2 * R * t)), Image.LANCZOS)
+        mk = Image.new("L", p.size, 0)
+        ImageDraw.Draw(mk).ellipse([4, 4, p.width - 5, p.height - 5], fill=255)
+        p.putalpha(mk.filter(ImageFilter.GaussianBlur(p.width * 0.08)))
+        patches.append(p)
+    seeds = []
+    row = 0
+    for y in range(-SEED_SP, S + SEED_SP, int(SEED_SP * 0.86)):
+        for x in range(-SEED_SP, S + SEED_SP, SEED_SP):
+            X = x + (SEED_SP // 2 if row % 2 else 0) + rng.uniform(-8, 8)
+            Y = y + rng.uniform(-6, 6)
+            p = patches[rng.integers(0, len(patches))]
+            skin.alpha_composite(p, (int(X - p.width / 2), int(Y - p.height / 2)))
+            if 0 <= int(Y) < S and 0 <= int(X) < S and body[int(Y), int(X)] > 0.9:
+                seeds.append((X, Y + 6 * t))
+        row += 1
+    tx = np.asarray(skin).astype(np.float32)[..., :3]
+    lum = gaussian_filter((0.3 * r + 0.59 * g + 0.11 * b), 22)
+    ref = np.percentile(lum[body > 0.5], 70) if (body > 0.5).any() else 1
+    shade_ = np.clip(lum / max(ref, 1), 0.5, 1.03)[..., None]
+    rgb = a[..., :3] * (1 - body[..., None]) + np.clip(tx * shade_, 0, 255) * body[..., None]
+    out = Image.fromarray(np.dstack([rgb, al]).clip(0, 255).astype(np.uint8), "RGBA")
+    return out, tuple(seeds)
+
+
+@lru_cache(None)
+def bg_table():
+    return background("table").convert("RGBA")
+
+
+def magnified(cx, cy, r):
+    """Ce que montre le verre de rayon r centré en (cx, cy) : la scène grossie ZOOM fois, avec la déformation
+    d'une lentille (centre plus grossi, bords resserrés), un vignettage et un reflet."""
+    from scipy.ndimage import map_coordinates
+    D = int(2 * r)
+    rr = r / ZOOM
+    lay = bg_table().crop((int(cx - rr), int(cy - rr), int(cx + rr), int(cy + rr))).resize((D, D), Image.BICUBIC)
+    kf = SW / 689
+    ox = int((SX - 514.5 * kf - cx) * ZOOM + r)
+    oy = int((SY - 968 * kf - cy) * ZOOM + r)
+    sk = skin_big()[0]
+    lay.paste(sk, (ox, oy), sk)
+    src = np.asarray(lay).astype(np.float32)
+    yy, xx = np.mgrid[:D, :D].astype(np.float32)
+    dx, dy = (xx - r) / r, (yy - r) / r
+    rho = np.sqrt(dx * dx + dy * dy)
+    f = 0.78 + 0.22 * rho * rho                          # lentille : on prélève plus près du centre
+    sx, sy = r + dx * f * r, r + dy * f * r
+    out = np.stack([map_coordinates(src[..., ch], [sy, sx], order=1, mode="nearest") for ch in range(4)], -1)
+    vig = np.clip(1 - 0.35 * np.clip(rho - 0.7, 0, 1) / 0.3, 0.6, 1)[..., None]
+    out[..., :3] *= vig
+    hl = np.exp(-(((dx + 0.42) ** 2) / 0.02 + ((dy + 0.48) ** 2) / 0.006)) * 70   # reflet du verre
+    out[..., :3] += hl[..., None]
+    out[..., 3] = np.where(rho <= 1, 255, 0)
+    im = Image.fromarray(out.clip(0, 255).astype(np.uint8), "RGBA")
+    return im.filter(ImageFilter.GaussianBlur(0.4))
 
 
 def loupe(c, cx, cy, k, rot=15):
@@ -271,6 +323,31 @@ SW = 560
 LX, LY = 600, 800                                # centre du verre de la loupe
 
 
+@lru_cache(None)
+def final_grain():
+    """Le grain réel le plus proche du centre de la loupe en fin de plongée (cx, cy, r = 540, 830, 400), position
+    à l'écran après la déformation de la lentille."""
+    cx, cy, r = 540, 830, 400
+    kf = SW / 689
+    ox = (SX - 514.5 * kf - cx) * ZOOM + r
+    oy = (SY - 968 * kf - cy) * ZOOM + r
+    best, bd = (cx, cy), 1e18
+    for x, y in skin_big()[1]:
+        dx, dy = (ox + x - r) / r, (oy + y - r) / r
+        rs = math.hypot(dx, dy)
+        if rs >= 0.95 or rs < 1e-6:
+            continue
+        lo, hi = 0.0, 1.0                    # rho tel que rho * (0.78 + 0.22 rho²) = rs
+        for _ in range(30):
+            mid = (lo + hi) / 2
+            lo, hi = (mid, hi) if mid * (0.78 + 0.22 * mid * mid) < rs else (lo, mid)
+        X, Y = cx + dx / rs * lo * r, cy + dy / rs * lo * r
+        d = (X - 520) ** 2 + (Y - 810) ** 2
+        if d < bd:
+            best, bd = (X, Y), d
+    return best
+
+
 def s_grains(t):
     w, u = new_layers(background("table"))
     s_ = life(t, 7.32, dur=0.35)
@@ -283,7 +360,7 @@ def s_grains(t):
         r = lerp(GLASS_R * 1.25, 400, grow)
         cx, cy = lerp(1300, LX, q), lerp(1300, LY, q)
         cx, cy = lerp(cx, 540, grow), lerp(cy, 830, grow)
-        lens_disc(w, cx, cy, r, zoom=lerp(1.0, 1.25, grow))
+        w.alpha_composite(magnified(cx, cy, r), (int(cx - r), int(cy - r)))
         if grow < 0.98:
             loupe(w, cx, cy, r / GLASS_R, 15)
         else:
@@ -294,7 +371,7 @@ def s_grains(t):
             tag(u, "VRAIS FRUITS !", 290, 560, t, 9.25, None, rot=-5, size=54, string_to=(cx - 60, cy - 60))
     # « chaque grain cache une graine » : un grain s'ouvre, la graine apparaît
     if t > 10.7:
-        gx, gy = 540 - 40, 830 - 15
+        gx, gy = final_grain()
         hl_ellipse(u, gx, gy, 62, 80, life(t, 10.75))
         a = life(t, 11.25, dur=0.35)
         if a > 0.01:
@@ -375,8 +452,8 @@ cue(15.32, "success", 0.24)
 # ============================================================ F. PLUS JAMAIS PAREILLE + ABONNE-TOI (16.6 → fin)
 def s_end(t):
     cam = Cam(lerp(1.45, 1.25, ease_io((t - 16.6) / 0.7)), 560, 1320)
-    stage = lerp(2.0, 6.0, ease_io((t - 16.75) / 1.6))    # le plant fleurit et donne ses fraises en accéléré
-    w = kitchen(t, cam, stage, wob=math.sin(t * 2) * 3)
+    ps = 1 + 0.06 * math.sin(math.pi * clamp((t - 16.75) / 0.35))   # le plant « rebondit »
+    w = kitchen(t, cam, ps)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     z = cam.z
     w.alpha_composite(shade())
