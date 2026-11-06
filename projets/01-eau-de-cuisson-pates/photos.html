@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Eau de cuisson des pâtes — vraies photos + 3D</title>
+<link rel="stylesheet" href="../../tools/potager.css">
+<script type="importmap">
+{ "imports": {
+  "three": "../../node_modules/three/build/three.module.js",
+  "three/addons/": "../../node_modules/three/examples/jsm/",
+  "https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/+esm": "../../tools/opentype-shim.js"
+} }
+</script>
+<style>
+  img.ph { position: absolute; transform-origin: 50% 50%; user-select: none; }
+  .bgphoto { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+  .floor-shadow { position: absolute; border-radius: 50%; background: radial-gradient(closest-side, rgba(70,55,35,.55), rgba(70,55,35,0)); filter: blur(8px); }
+  #night { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse 70% 55% at 50% 48%, rgba(20,35,80,.35), rgba(5,10,30,.9)); mix-blend-mode: multiply; }
+  #nightblue { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: rgb(80,110,205); mix-blend-mode: multiply; }
+  #cold { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: rgba(120,170,230,.28); mix-blend-mode: soft-light; }
+  #flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: #eef3ff; }
+  #gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  .lens { position: absolute; border-radius: 50%; overflow: hidden; }
+  .btn { position: absolute; left: 270px; width: 540px; height: 120px; top: 1185px; border-radius: 60px; background: #d8352a;
+    color: #fff; font-family: 'Montserrat'; font-weight: 900; font-size: 56px; line-height: 120px; text-align: center;
+    box-shadow: 0 10px 0 #8e1d15, 0 24px 34px rgba(40,30,10,.4); display: none; }
+  .btn.ok { background: var(--vert); box-shadow: 0 10px 0 #0f2018, 0 24px 34px rgba(40,30,10,.4); color: var(--jaune); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- A1 : casserole qui bout dans la cuisine -->
+  <div class="scene" id="A1">
+    <img class="bgphoto" id="A1bg" src="../../assets/images/source_utilisateur/citron_fond_cuisine.png">
+    <div class="floor-shadow" style="left:250px;top:1290px;width:700px;height:80px"></div>
+    <img class="ph" id="A1pot" src="../../assets/images/banque/casserole_pates_ebullition.png" style="left:150px;top:560px;width:860px">
+  </div>
+  <!-- A2 : on verse l'eau de cuisson sur la plante -->
+  <div class="scene" id="A2"><div class="bg-beige"></div>
+    <div class="floor-shadow" style="left:640px;top:1285px;width:300px;height:50px"></div>
+    <img class="ph" id="A2plant" src="../../assets/images/banque/pothos_sain.png" style="left:460px;top:700px;width:635px">
+    <img class="ph" id="A2pot" src="../../assets/images/banque/casserole_pates.png" style="left:-20px;top:560px;width:600px">
+  </div>
+  <!-- B : ou les tuer (la nuit tombe, il pleut, la plante sèche) -->
+  <div class="scene" id="B"><div class="bg-beige"></div>
+    <div class="floor-shadow" style="left:380px;top:1580px;width:330px;height:60px"></div>
+    <img class="ph" id="Bsain" src="../../assets/images/banque/pothos_sain.png" style="left:-105px;top:380px;width:1280px">
+    <img class="ph" id="Bsec" src="../../assets/images/banque/pothos_sec.png" style="left:-105px;top:380px;width:1280px;opacity:0">
+  </div>
+  <!-- C : un seul détail (loupe) -->
+  <div class="scene" id="C"><div class="bg-beige"></div>
+    <div class="floor-shadow" style="left:120px;top:1370px;width:640px;height:70px"></div>
+    <img class="ph" id="Cpot" src="../../assets/images/banque/casserole_pates.png" style="left:50px;top:600px;width:980px">
+    <div id="Cloupe" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+      <div class="lens" id="Clens"><img id="Clensimg" src="../../assets/images/banque/casserole_pates.png" style="position:absolute"></div>
+      <img class="ph" src="../../assets/images/banque/loupe.png" style="left:224px;top:737px;width:700px">
+    </div>
+  </div>
+  <!-- D : le sel -->
+  <div class="scene" id="D"><div class="bg-beige"></div>
+    <div class="floor-shadow" style="left:200px;top:1395px;width:560px;height:60px"></div>
+    <img class="ph" id="Dpot" src="../../assets/images/banque/casserole_pates.png" style="left:160px;top:980px;width:760px">
+    <img class="ph" id="Dsel" src="../../assets/images/banque/sel_boite.png" style="left:166px;top:397px;width:310px">
+  </div>
+  <!-- E : vue en coupe, racines qui sèchent, sel qui s'accumule -->
+  <div class="scene" id="E"><div class="bg-beige"></div>
+    <div id="Ezoom" style="position:absolute;inset:0;transform-origin:540px 960px">
+      <img class="ph" id="Esaines" src="../../assets/images/banque/pothos_coupe_racines_saines.png" style="left:-410px;top:-655px;width:1946px">
+      <img class="ph" id="Epourries" src="../../assets/images/banque/pothos_coupe_racines_pourries.png" style="left:-410px;top:-655px;width:1946px;opacity:0">
+    </div>
+  </div>
+  <!-- F1 : sans sel -->
+  <div class="scene" id="F1"><div class="bg-beige"></div>
+    <div class="floor-shadow" style="left:380px;top:1290px;width:320px;height:50px"></div>
+    <img class="ph" id="F1sel" src="../../assets/images/banque/sel_boite.png" style="left:330px;top:560px;width:420px">
+  </div>
+  <!-- F2 : bien refroidie (casserole à la fenêtre, la vapeur disparaît) -->
+  <div class="scene" id="F2">
+    <img class="bgphoto" src="../../assets/images/source_utilisateur/fond_fenetre.webp" style="filter:blur(2px) brightness(1.02)">
+    <div class="floor-shadow" style="left:300px;top:1390px;width:560px;height:60px"></div>
+    <img class="ph" id="F2pot" src="../../assets/images/banque/casserole_pates_ebullition.png" style="left:200px;top:780px;width:700px">
+    <div id="cold"></div>
+  </div>
+  <!-- G : oui, de temps en temps (arrosoir) -->
+  <div class="scene" id="G"><div class="bg-beige"></div>
+    <div class="floor-shadow" style="left:160px;top:1285px;width:300px;height:50px"></div>
+    <img class="ph" id="Gplant" src="../../assets/images/banque/pothos_sain.png" style="left:-20px;top:700px;width:635px">
+    <img class="ph" id="Gcan" src="../../assets/images/banque/arrosoir_zinc.png" style="left:420px;top:560px;width:640px">
+    <div class="cal" id="Gcal" style="left:860px;top:200px"><div class="head"></div><div class="d"></div><div class="m"></div></div>
+  </div>
+  <!-- H / I : eau de cuisson des légumes, minéraux -->
+  <div class="scene" id="H"><div class="bg-beige"></div>
+    <div class="floor-shadow" style="left:140px;top:1400px;width:640px;height:70px"></div>
+    <img class="ph" id="Hpot" src="../../assets/images/banque/casserole_pates.png" style="left:70px;top:640px;width:940px">
+    <div id="Hveg" style="position:absolute;inset:0"></div>
+    <div id="Hfront" style="position:absolute;inset:0;clip-path:inset(1030px 0 0 0)">
+      <img class="ph" src="../../assets/images/banque/casserole_pates.png" style="left:70px;top:640px;width:940px">
+    </div>
+  </div>
+  <!-- J : abonnez-vous -->
+  <div class="scene" id="J"><div class="bg-beige"></div>
+    <div class="floor-shadow" style="left:300px;top:1120px;width:480px;height:60px"></div>
+    <div class="btn" id="Jbtn"></div>
+  </div>
+
+  <div id="night"></div><div id="nightblue"></div><div id="flash"></div>
+  <canvas id="gl" width="1080" height="1920"></canvas>
+</div>
+
+<script src="../../tools/potager.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { Stage3D, P, loadFont, text3D, Smoke, Instanced, waterMaterial, saltMaterial, rainMaterial, bubble, logoCard, banSign,
+  lerp, prog, clamp, easeOut, easeIn, easeInOut, easeOutBack, pop, hrand, bez, bezD } from '../../tools/potager3d.js';
+
+window.DURATION = 21.13;
+const $ = (id) => document.getElementById(id);
+
+const SCENES = [
+  { id: 'A1', start: 0, end: 1.55, zoom: [1, 1.07] },
+  { id: 'A2', start: 1.55, end: 2.9, zoom: [1.02, 1.07] },
+  { id: 'B', start: 2.9, end: 4.05, zoom: [1, 1.08] },
+  { id: 'C', start: 4.05, end: 6.15 },
+  { id: 'D', start: 6.15, end: 7.3 },
+  { id: 'E', start: 7.3, end: 11.1, zoom: [1, 1] },
+  { id: 'F1', start: 11.1, end: 11.95 },
+  { id: 'F2', start: 11.95, end: 12.85 },
+  { id: 'G', start: 12.85, end: 14.15 },
+  { id: 'H', start: 14.15, end: 18.05, zoom: [1, 1.12] },
+  { id: 'J', start: 18.05, end: 99 },
+];
+
+// Gros titres 3D
+const TITLES = [
+  { text: "L'eau des\npâtes ?", start: 0, end: 2.85, y: 330, size: 118 },
+  { text: '1 détail', start: 4.9, end: 6.15, y: 360, size: 130, rz: 0.05 },
+  { text: 'Le sel', start: 6.2, end: 7.3, y: 300, size: 160 },
+  { text: 'Sans sel', start: 11.15, end: 11.95, y: 360, size: 140 },
+  { text: 'Le meilleur', start: 14.2, end: 16.6, y: 380, size: 120 },
+  { text: 'Minéraux', start: 17.2, end: 18.05, y: 330, size: 125, rz: 0.04 },
+  { text: "Plus\nd'astuces ?", start: 18.1, end: 99, y: 300, size: 112 },
+];
+// Sous-titres 3D (temps calés sur la voix)
+const CAPTIONS = window.Pot.buildCaptions([
+  { start: 0.05, end: 2.69, chunks: ["L'eau de *cuisson*", 'de tes *pâtes*', 'peut *nourrir* tes plantes'] },
+  { start: 2.93, end: 3.8, chunks: ['ou les *tuer*.'] },
+  { start: 4.1, end: 5.95, chunks: ['Tout dépend', "d'un seul *détail*."] },
+  { start: 6.22, end: 7.07, chunks: ['Le *sel*.'] },
+  { start: 7.38, end: 10.96, chunks: ["L'eau *salée*", 'assèche les *racines*', 'et le sel *s’accumule*', 'dans la *terre*.'] },
+  { start: 11.19, end: 12.69, chunks: ['*Sans sel*', 'et bien *refroidie* ?'] },
+  { start: 12.89, end: 13.15, hold: 13.29, chunks: ['*Oui*,'] },
+  { start: 13.29, end: 13.97, chunks: ['de temps en temps.'] },
+  { start: 14.22, end: 16.55, chunks: ['Mais le *meilleur*,', "c'est l'eau de cuisson", 'des *légumes*.'] },
+  { start: 16.7, end: 17.85, chunks: ['Elle est pleine', 'de *minéraux*.'] },
+  { start: 18.13, end: 19.18, chunks: ['Et pour plus', "d'*astuces*,"] },
+  { start: 19.32, end: 20.96, hold: 99, chunks: ['*abonnez-vous*', 'aux *Potagers*\n*de Louis*.'] },
+]);
+
+const VEG = [['oignon', 300, 0.30], ['tomate', 470, 0.26], ['citrouille', 380, 0.34], ['concombre', 540, 0.30], ['oignon', 250, 0.24], ['tomate', 600, 0.22]];
+const DATES = [['3', 'NOV.'], ['17', 'NOV.'], ['1', 'DÉC.']];
+
+let S; // état 3D
+async function init() {
+  const imgs = [...document.images];
+  await Promise.all(imgs.map((im) => (im.complete ? Promise.resolve() : new Promise((r) => { im.onload = r; im.onerror = r; }))));
+  const st = new Stage3D($('gl'));
+  const fTitle = await loadFont('../../assets/fonts/Poppins_900Black.ttf');
+  const fCap = await loadFont('../../assets/fonts/Poppins_800ExtraBold.ttf');
+
+  const titles = TITLES.map((ti) => { const g = text3D(fTitle, ti.text, { size: ti.size, depth: 30, outline: 10, front: 0xfed14a, upper: true, lineHeight: 1.36 }); g.visible = false; st.add(g); return g; });
+  const caps = CAPTIONS.map((c) => { const g = text3D(fCap, c.text, { size: 62, depth: 16, outline: 7 }); g.visible = false; st.add(g); return g; });
+
+  const steam = new Smoke(st, 70);
+  const steam2 = new Smoke(st, 50);
+  const drops = new Instanced(st, new THREE.SphereGeometry(1, 14, 10), waterMaterial(), 160);
+  const rain = new Instanced(st, new THREE.CylinderGeometry(1, 1, 1, 6), rainMaterial(), 260);
+  const salt = new Instanced(st, new THREE.BoxGeometry(1, 1, 1), saltMaterial(), 220);
+  const ban = banSign(240); ban.visible = false; st.add(ban);
+  const bubbles = ['K', 'Ca', 'Mg'].map((l) => { const b = bubble(fTitle, l, 66); b.visible = false; st.add(b); return b; });
+  const logoImg = new Image(); logoImg.src = '../../assets/images/source_utilisateur/logo_potagers_de_louis.webp'; await logoImg.decode();
+  const logo = logoCard(logoImg, 600); logo.visible = false; st.add(logo);
+  // compteur de température : textes 3D pré-calculés
+  const temps = {};
+  for (let v = 20; v <= 95; v++) { const g = text3D(fTitle, `${v} °C`, { size: 120, depth: 30, outline: 9, front: 0xfed14a }); g.visible = false; st.add(g); temps[v] = g; }
+
+  // légumes (DOM)
+  VEG.forEach(([n], i) => { const im = document.createElement('img'); im.className = 'ph'; im.id = 'veg' + i; im.src = `../../assets/images/banque/${n}.png`; im.style.display = 'none'; $('Hveg').appendChild(im); });
+  await Promise.all([...$('Hveg').children].map((im) => im.decode()));
+
+  S = { st, titles, caps, steam, steam2, drops, rain, salt, ban, bubbles, logo, temps };
+}
+
+window.READY = init();
+
+function showTitles(t) {
+  TITLES.forEach((ti, i) => {
+    const g = S.titles[i]; const on = t >= ti.start && t < ti.end; g.visible = on; if (!on) return;
+    const k = pop(t, ti.start, 0.35), out = 1 - prog(t, ti.end - 0.12, ti.end);
+    g.position.copy(P(540, ti.y, 120));
+    g.scale.setScalar(Math.max(0.001, k * out * Math.min(1, 900 / g.userData.width)));
+    g.rotation.set(-0.22 + Math.sin(t * 1.3) * 0.03, Math.sin(t * 1.1 + i) * 0.16, (ti.rz ?? -0.04) + (1 - k) * 0.3);
+  });
+}
+function showCaptions(t) {
+  let cur = -1; CAPTIONS.forEach((c, i) => { if (t >= c.start && t < c.end) cur = i; });
+  S.caps.forEach((g, i) => (g.visible = i === cur));
+  if (cur < 0) return;
+  const g = S.caps[cur], c = CAPTIONS[cur];
+  const k = easeOutBack(prog(t, c.start, c.start + 0.16));
+  g.position.copy(P(540, 1440, 160));
+  g.scale.setScalar(lerp(0.75, 1, k) * Math.min(1, 960 / g.userData.width));
+  g.rotation.set(-0.32, Math.sin(t * 1.4) * 0.05, 0);
+}
+
+window.seek = function (t) {
+  window.Pot.scenes(SCENES, t);
+  const { st, steam, steam2, drops, rain, salt, ban, bubbles, logo, temps } = S;
+  steam.hide(); steam2.hide(); drops.hide(); rain.hide(); salt.hide();
+  ban.visible = false; logo.visible = false; bubbles.forEach((b) => (b.visible = false)); Object.values(temps).forEach((g) => (g.visible = false));
+  $('night').style.opacity = 0; $('nightblue').style.opacity = 0; $('B').style.filter = ''; $('flash').style.opacity = 0;
+
+  if (t < 1.55) { // A1 : ébullition dans la cuisine, vapeur 3D
+    $('A1bg').style.filter = 'blur(3px) brightness(.97)';
+    $('A1pot').style.transform = `translateY(${(1 - easeOut(prog(t, 0, 0.35))) * 70}px)`;
+    steam.update(t, { x: 520, y: 880, spread: 380, rise: 640, life: 2.2, size: 230, opacity: 0.5, t0: -3 });
+  } else if (t < 2.9) { // A2 : on verse
+    const k = easeInOut(prog(t, 1.6, 2.0));
+    $('A2pot').style.transform = `scaleX(-1) rotate(${-k * 35}deg)`;
+    steam.update(t, { x: 240, y: 760, spread: 220, rise: 420, life: 1.8, size: 160, opacity: 0.35, t0: -3 });
+    const flow = prog(t, 1.95, 2.15);
+    if (flow > 0) {
+      const p0 = [580, 919], p1 = [705, 925], p2 = [780, 1195];
+      drops.update((i) => {
+        const u = ((t * 1.6 + i / 160) % 1); if (u > flow) return null;
+        const [x, y] = bez(p0, p1, p2, u), d = bezD(p0, p1, p2, u);
+        const j = (hrand(i, 4) - 0.5) * 16 * (0.4 + u);
+        return { x: x + j, y: y + (hrand(i, 5) - 0.5) * 8, z: 120, sx: 7 + 5 * hrand(i, 6), sy: 14 + 10 * u, dir: d };
+      });
+    }
+  } else if (t < 4.05) { // B : nuit, pluie, la plante sèche
+    const n = easeInOut(prog(t, 2.9, 3.3));
+    $('B').style.filter = `brightness(${1 - 0.1 * n}) saturate(${1 - 0.25 * n}) contrast(${1 + 0.12 * n})`; $('nightblue').style.opacity = n * 0.62;
+    $('Bsec').style.opacity = easeInOut(prog(t, 3.05, 3.75));
+    const fl = t > 3.32 && t < 3.42 ? 0.55 : t > 3.47 && t < 3.52 ? 0.3 : 0;
+    $('flash').style.opacity = fl;
+    rain.update((i) => {
+      const sp = 2600 + 900 * hrand(i, 1), x0 = hrand(i, 2) * 1300 - 110, ph = hrand(i, 3);
+      const y = ((t * sp / 1920 + ph) % 1) * 2200 - 140;
+      return { x: x0 - (y * 0.12), y, z: 200 + hrand(i, 4) * 300, sx: 1.6 + hrand(i, 5) * 1.6, sy: 60 + 50 * hrand(i, 6), dir: [0.12, 1] };
+    });
+  } else if (t < 6.15) { // C : loupe
+    const k = easeOut(prog(t, 4.15, 4.7));
+    $('Cloupe').style.transform = `translate(${(1 - k) * 760}px, ${(1 - k) * -140 + Math.sin(t * 2.4) * 8}px) rotate(${(1 - k) * 25}deg)`;
+    // effet de grossissement dans le verre (centre 420,990 ; rayon 140)
+    const L = $('Clens'); L.style.left = '280px'; L.style.top = '850px'; L.style.width = L.style.height = '280px';
+    const zi = $('Clensimg'), zs = 980 * 2.2; zi.style.width = zs + 'px';
+    zi.style.left = (140 - (420 - 50) * 2.2) + 'px'; zi.style.top = (140 - (990 - 600) * 2.2) + 'px';
+    // cristaux de sel 3D dans le verre
+    if (k > 0.9) salt.update((i) => {
+      if (i >= 16) return null;
+      const a = hrand(i, 1) * 6.28, r = 95 * Math.sqrt(hrand(i, 2));
+      const sc = pop(t, 4.75 + i * 0.04, 0.25) * (12 + 10 * hrand(i, 3));
+      return { x: 420 + Math.cos(a) * r + Math.sin(t * 2 + i) * 4, y: 990 + Math.sin(a) * r + Math.cos(t * 2 + i) * 4, z: 260, sx: sc, rot: [t * 0.8 + i, t * 0.6 + i * 2, i] };
+    });
+  } else if (t < 7.3) { // D : la boîte de sel verse
+    const k = easeInOut(prog(t, 6.15, 6.45));
+    $('Dsel').style.transform = `rotate(${k * 150 + Math.sin(t * 24) * 4 * prog(t, 6.45, 6.55)}deg)`;
+    salt.update((i) => {
+      const t0 = 6.42 + hrand(i, 1) * 0.85, dt = t - t0; if (dt < 0) return null;
+      const y = 1010 + 1200 * dt * dt + 160 * dt; if (y > 1290) return null;
+      return { x: 470 + (hrand(i, 2) - 0.5) * 50 + dt * 40, y, z: 140, sx: 7 + 6 * hrand(i, 3), rot: [dt * 9 + i, dt * 7, i] };
+    });
+  } else if (t < 11.1) { // E : coupe, racines + sel
+    const z = lerp(0.8, 1.0, easeInOut(prog(t, 7.3, 8.4)));
+    $('Ezoom').style.transform = `scale(${z})`;
+    $('Epourries').style.opacity = easeInOut(prog(t, 7.7, 9.2));
+    $('Esaines').style.filter = `saturate(${1 - 0.5 * prog(t, 7.6, 9.2)})`;
+    const s = prog(t, 9.0, 10.9);
+    salt.update((i) => {
+      if (i >= 120 || i / 120 > s) return null;
+      // région du terreau : x 350..730, y 790..1120 (cadre écran, zoom 1)
+      const yy = 800 + hrand(i, 2) * 320, half = 190 - (yy - 800) * 0.12;
+      const x = 540 + (hrand(i, 1) * 2 - 1) * half, y = yy;
+      const sc = easeOutBack(prog(t, 9.0 + (i / 120) * 1.9, 9.2 + (i / 120) * 1.9)) * (8 + 8 * hrand(i, 3));
+      const zz = z; // suit le zoom
+      return { x: 540 + (x - 540) * zz, y: 960 + (y - 960) * zz, z: 60, sx: sc * zz, rot: [i, i * 2, i * 3] };
+    });
+  } else if (t < 11.95) { // F1 : sans sel (panneau 3D)
+    const k = pop(t, 11.3, 0.35);
+    ban.visible = k > 0; ban.position.copy(P(540, 930, 150)); ban.scale.setScalar(Math.max(0.001, k));
+    ban.rotation.set(-0.1, (1 - k) * 2 + Math.sin(t * 2) * 0.12, 0);
+  } else if (t < 12.85) { // F2 : refroidir à la fenêtre
+    const k = easeInOut(prog(t, 12.0, 12.7));
+    $('cold').style.opacity = k;
+    steam.update(t, { x: 508, y: 1054, spread: 300, rise: 560, life: 2.0, size: 200, opacity: 0.55, strength: 1 - k, t0: -3 });
+    const v = Math.round(lerp(95, 20, k)); const g = temps[v]; g.visible = true;
+    g.position.copy(P(540, 520, 120)); g.scale.setScalar(pop(t, 11.97, 0.3) || 0.001); g.rotation.set(-0.2, Math.sin(t * 1.5) * 0.15, -0.03);
+  } else if (t < 14.15) { // G : arrosoir
+    const k = easeInOut(prog(t, 12.85, 13.15));
+    $('Gcan').style.transform = `rotate(${-k * 25}deg)`;
+    const flow = prog(t, 13.05, 13.25);
+    if (flow > 0) drops.update((i) => {
+      const life = 0.45, ph = hrand(i, 1), age = ((t * 1 + ph * life) % life); const u = age / life;
+      if (t - age < 13.05) return null;
+      const vx = -220 - 260 * hrand(i, 2), vy = -60 + 120 * hrand(i, 3);
+      const x = 426 + vx * age, y = 877 + vy * age + 1500 * age * age;
+      if (y > 1195) return null;
+      return { x, y, z: 130, sx: 5 + 4 * hrand(i, 4), sy: 10 + 12 * u, dir: [vx, vy + 3000 * age] };
+    });
+    const i = t < 13.35 ? 0 : t < 13.7 ? 1 : 2;
+    $('Gcal').querySelector('.d').textContent = DATES[i][0]; $('Gcal').querySelector('.m').textContent = DATES[i][1];
+    $('Gcal').style.transform = `scale(${pop(t, [12.85, 13.35, 13.7][i], 0.22)})`;
+  } else if (t < 18.05) { // H / I : légumes, vapeur, minéraux
+    steam.update(t, { x: 414, y: 1010, spread: 420, rise: 600, life: 2.3, size: 220, opacity: 0.4, t0: 13.5 });
+    VEG.forEach(([n, x, sc], i) => {
+      const im = $('veg' + i), t0 = 14.85 + i * 0.14, kk = prog(t, t0, t0 + 0.38);
+      if (kk <= 0) { im.style.display = 'none'; return; }
+      im.style.display = 'block';
+      const w = 1024 * sc, y = lerp(150, 1060, easeIn(kk));
+      im.style.width = w + 'px'; im.style.left = (x - w / 2) + 'px'; im.style.top = (y - w / 2) + 'px';
+      im.style.transform = `rotate(${(1 - kk) * 120 + i * 20}deg)`;
+    });
+    drops.update((i) => { // éclaboussures à chaque légume
+      const v = i % VEG.length, land = 14.85 + v * 0.14 + 0.38, dt = t - land; if (dt < 0 || dt > 0.45) return null;
+      const a = -Math.PI * (0.15 + 0.7 * hrand(i, 1)), sp = 300 + 400 * hrand(i, 2);
+      const x = VEG[v][1] + Math.cos(a) * sp * dt, y = 1030 + Math.sin(a) * sp * dt + 1600 * dt * dt;
+      return { x, y, z: 150, sx: 4 + 4 * hrand(i, 3), sy: 7 + 6 * hrand(i, 3), dir: [Math.cos(a) * sp, Math.sin(a) * sp + 3200 * dt] };
+    });
+    [16.75, 17.0, 17.25].forEach((t0, i) => {
+      const b = bubbles[i]; if (t < t0) return; b.visible = true;
+      const kk = easeOut(prog(t, t0, t0 + 0.7));
+      b.position.copy(P([300, 540, 780][i], lerp(1010, 640 - i * 30, kk) + Math.sin(t * 3 + i) * 8, 220));
+      b.scale.setScalar(Math.max(0.001, easeOutBack(prog(t, t0, t0 + 0.3)) * 1.15));
+      b.rotation.set(Math.sin(t * 2 + i) * 0.2, Math.sin(t * 1.6 + i) * 0.35, 0);
+    });
+  } else { // J : logo 3D + bouton
+    const k = prog(t, 18.1, 18.8);
+    logo.visible = true; logo.position.copy(P(540, 820, 60));
+    logo.rotation.set(-0.12 + Math.sin(t * 1.2) * 0.04, lerp(-Math.PI * 1.5, 0, easeOutBack(k)) + Math.sin(t * 1.5) * 0.12, 0);
+    logo.scale.setScalar(Math.max(0.001, easeOut(prog(t, 18.1, 18.4))));
+    const b = $('Jbtn'); const kb = pop(t, 19.3, 0.3);
+    b.style.display = t >= 19.3 ? 'block' : 'none';
+    b.style.transform = `scale(${kb * (t > 20.0 && t < 20.15 ? 0.92 : 1)})`;
+    b.textContent = t < 20.1 ? "+ S'ABONNER" : '✓ ABONNÉ'; b.className = t < 20.1 ? 'btn' : 'btn ok';
+  }
+  showTitles(t); showCaptions(t);
+  st.render();
+};
+window.READY.then(() => window.seek(0));
+</script>
+</body>
+</html>

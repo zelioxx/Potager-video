@@ -195,7 +195,25 @@ def shimmer(rng, **_):  # loupe / détail
     return norm(x)
 
 
-BANQUE = dict(pop=pop, plop=plop, bubble=bubble, whoosh=whoosh, pour=pour, boil=boil, shaker=shaker,
+def rain(rng, dur=1.2, **_):  # pluie
+    n = int(dur * SR)
+    x = bp(rng.standard_normal(n), 900, 9000) * 0.35
+    for _ in range(int(dur * 140)):
+        p = int(rng.random() * (n - 300)); L = 120 + int(rng.random() * 150)
+        x[p:p + L] += hp(rng.standard_normal(L), 2500) * env_ad(L, 0.0003, 0.002) * rng.random()
+    return norm(fade(x, 0.15, 0.3))
+
+
+def thunder(rng, dur=1.6, **_):  # tonnerre
+    n = int(dur * SR)
+    x = lp(rng.standard_normal(n), 180, 4) * 3 + lp(rng.standard_normal(n), 700) * 0.4
+    crack = hp(rng.standard_normal(int(0.12 * SR)), 1500) * env_ad(int(0.12 * SR), 0.001, 0.03)
+    x[:len(crack)] += crack * 0.6
+    e = np.exp(-t_axis(dur) / 0.6) * (1 + 0.4 * np.sin(2 * np.pi * 3 * t_axis(dur)))
+    return norm(x * e)
+
+
+BANQUE = dict(rain=rain, thunder=thunder, pop=pop, plop=plop, bubble=bubble, whoosh=whoosh, pour=pour, boil=boil, shaker=shaker,
               sprinkle=sprinkle, crackle=crackle, sad=sad, nope=nope, ticks_down=ticks_down, page=page,
               click=click, ding=ding, shimmer=shimmer)
 

@@ -1,5 +1,35 @@
 # 01 — L'eau de cuisson des pâtes
 
+## v2 — vraies photos + éléments 3D (`eau-de-cuisson-pates-photos-3d.mp4`)
+
+Page : `photos.html` · bruitages : `bruitages_photos.json`
+
+| t (s) | Photos | 3D / effets |
+|---|---|---|
+| 0.0 | Casserole en ébullition sur le plan de travail (fond cuisine) | Vapeur 3D, titre 3D « L'EAU DES PÂTES ? » |
+| 1.55 | Casserole qui verse sur le pothos | Filet d'eau en gouttes 3D |
+| 2.9 | Pothos sain → pothos sec | **Nuit** + **pluie 3D** + éclair (tonnerre) |
+| 4.05 | Casserole + loupe (grossissement réel) | Cristaux de sel 3D dans la loupe, « 1 DÉTAIL » |
+| 6.15 | Boîte de sel qui verse dans la casserole | Grains de sel 3D, « LE SEL » |
+| 7.3 | Pot en coupe : racines saines → pourries (zoom) | Cristaux de sel 3D qui s'accumulent dans la terre |
+| 11.1 | Boîte de sel | Panneau « interdit » 3D, « SANS SEL » |
+| 11.95 | Casserole à la fenêtre (fond fenêtre) | La vapeur 3D s'éteint, compteur 3D 95 → 20 °C, teinte froide |
+| 12.85 | Arrosoir zinc + pothos sain | Gouttes 3D, badge calendrier |
+| 14.15 | Casserole + légumes (oignon, tomate, citrouille, concombre) qui tombent | Vapeur, éclaboussures 3D, « LE MEILLEUR » |
+| 16.7 | Idem | Bulles 3D K / Ca / Mg, « MINÉRAUX » |
+| 18.05 | Logo Les Potagers de Louis | Logo en carte 3D qui pivote, bouton S'ABONNER |
+
+Sous-titres : texte 3D (blanc, mot-clé jaune, tranche verte), calés sur la voix.
+
+```bash
+python3 tools/sfx.py projets/01-eau-de-cuisson-pates/bruitages_photos.json
+node tools/render.js projets/01-eau-de-cuisson-pates/photos.html projets/01-eau-de-cuisson-pates/mix_photos.wav projets/01-eau-de-cuisson-pates/eau-de-cuisson-pates-photos-3d.mp4
+```
+
+---
+
+## v1 — illustrations (`eau-de-cuisson-pates.mp4`)
+
 - **Vidéo finale** : `eau-de-cuisson-pates.mp4` (1080×1920, 30 i/s, 21,1 s, voix normalisée à -14 LUFS)
 - **Voix off** : `voix.mp3` (fournie)
 - **Bruitages** : `bruitages.json` (sons synthétisés par `tools/sfx.py`, mixés sous la voix)

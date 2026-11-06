@@ -24,19 +24,32 @@ Tout ce qui sert d'inspiration est rangé dans [`references/`](references/) :
 | 03 | Récolter les graines d'œillet d'Inde | ŒILLET FANÉ ? | 68 s |
 | 04 | Faire fleurir un cactus de Noël le 24 décembre | NOËL EN MARS ? | 70 s |
 
+## Banque de photos
+
+Toutes les photos envoyées par Louis (conversation « ail et échalote ») sont dans [`assets/images/`](assets/images/) :
+
+| Dossier | Contenu |
+|---|---|
+| `assets/images/source_utilisateur/` | Photos originales envoyées (115), dont les **fonds réels** (`*fond*` : cuisine, fenêtre, salon, placard, jardin…) et le **logo** |
+| `assets/images/banque/` | Photos **détourées** (fond transparent) prêtes à l'emploi — index dans [`banque/README.md`](assets/images/banque/README.md) |
+| `assets/images/<sujet>/` | Détourages par sujet (ananas, avocat, citron, compost, gingembre, mangue, poireau, tulipes…) |
+
 ## Vidéos produites
 
 | # | Sujet | Fichier |
 |---|---|---|
-| 01 | L'eau de cuisson des pâtes pour les plantes (21 s) | [`projets/01-eau-de-cuisson-pates/`](projets/01-eau-de-cuisson-pates/) |
+| 01 | L'eau de cuisson des pâtes pour les plantes (21 s) — **v2 vraies photos + 3D** : `eau-de-cuisson-pates-photos-3d.mp4` (v1 illustrée : `eau-de-cuisson-pates.mp4`) | [`projets/01-eau-de-cuisson-pates/`](projets/01-eau-de-cuisson-pates/) |
 
 ## Générer une nouvelle vidéo
 
 À fournir : le **sujet**, le **son** (voix off), et si possible les **images**.
 
-Chaque vidéo est une page HTML animée (`projets/<nom>/index.html`) qui utilise la charte commune
-(`tools/potager.css`, `tools/potager.js` : fond beige, gros titres, sous-titres avec mot-clé jaune),
-rendue image par image puis assemblée avec la voix et les bruitages :
+Chaque vidéo est une page HTML animée (`projets/<nom>/*.html`) :
+- **photos réelles** (DOM) sur fond beige ou fond photo, avec la charte commune (`tools/potager.css`, `tools/potager.js`) ;
+- **couche 3D** par-dessus (`tools/potager3d.js`, three.js) : titres et sous-titres en texte 3D extrudé
+  (Poppins, face jaune/blanche, tranche et contour vert foncé), vapeur/fumée, pluie, gouttes d'eau,
+  cristaux, bulles, panneaux, logo en 3D ; effet de nuit / froid en filtres sur la scène ;
+- rendu image par image (Chromium + WebGL), puis assemblage avec la voix et les bruitages :
 
 ```bash
 python3 tools/sfx.py projets/<nom>/bruitages.json          # voix + bruitages → mix.wav
@@ -46,4 +59,4 @@ node tools/render.js projets/<nom>/index.html projets/<nom>/mix.wav projets/<nom
 Les bruitages (pop, whoosh, eau, salière, bulles, clic, ding…) sont synthétisés par `tools/sfx.py` ;
 `python3 tools/sfx.py --banque assets/sfx` exporte la banque pour l'écouter (`assets/sfx/*.wav`).
 
-Prérequis : Node.js + Playwright (Chromium), ffmpeg, Python 3 + numpy + scipy.
+Prérequis : `npm install` (three.js, opentype.js), Playwright (Chromium), ffmpeg, Python 3 + numpy + scipy.

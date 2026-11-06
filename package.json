@@ -1,0 +1,9 @@
+{
+  "name": "potager-video",
+  "private": true,
+  "description": "Vidéos courtes potager : photos réelles + éléments 3D (three.js), rendu Playwright + ffmpeg",
+  "dependencies": {
+    "opentype.js": "^2.0.0",
+    "three": "^0.187.0"
+  }
+}

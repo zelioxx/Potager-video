@@ -81,3 +81,4 @@ const P = (() => {
 
   return { clamp, lerp, prog, easeOut, easeIn, easeInOut, easeOutBack, mix, rng, pop, scenes, buildCaptions, captions, buildTitles, titles };
 })();
+window.Pot = P;
