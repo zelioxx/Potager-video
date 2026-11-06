@@ -199,6 +199,12 @@ chenille mange feuilles vrai secret regardes soin abonnez-vous astuces"""),
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""plante fenêtre hiver geler nuit vitre glacée feuille touche noircit meurt pire piège rideau
 fermé coincée froid éloigne-la 20 cm côté pièce soir abonnez-vous astuces"""),
+    "fraises": dict(
+        scenes="scenes_fraises", dur=21.75, voice=os.path.join(AUD, "fraises", "voix.mp3"),
+        words=os.path.join(AUD, "fraises", "voix_mots.json"), out="fraises_origine_1080x1920.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""fraise fruit pire partie rouge manges base gonflée fleur vrais fruits petits grains peau
+chaque grain graine seule 200 fruits jamais pareille abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

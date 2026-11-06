@@ -62,3 +62,8 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `fond_salon_coin.webp` / `fond_salon_coin2.jpg` | Coin du salon (table ronde, chaussons, tapis) | sur la table ronde, au sol |
 | `fond_placard.webp` | Étagère de cuisine (bocaux, paniers d'oignons et de pommes) | dans les paniers |
 | `citron_fond_cuisine.png` / `citron_fond_buffet.png` | Cuisine avec planche / buffet du salon | sur la planche / le buffet |
+| `fraisier_bouton` → `fraisier_fruit_vert` (6 étapes) | Hampe de fraisier : bouton, bouton, fleur qui s'ouvre, fleur, sans pétales, fruit vert (tige en bas) |
+| `fraise_grosse` / `fraise_coupee` / `fleur_fraisier` / `fraise_tige` | Fraise entière, coupée, fleur de face |
+| `fraise_peau_macro.jpg` | Gros plan de la peau d'une fraise (akènes) — à mettre dans une loupe |
+| `akene.png` / `panier_fraises.png` | Un akène (graine) ; panier en osier rempli de fraises |
+| `foliole_fraisier.png` | Foliole de fraisier (Open Images) : on en assemble 3 par feuille |
