@@ -72,3 +72,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `pdt.png` / `pdt_germee.png` / `pdt_verte.png` / `pdt_verte_coupee.png` | Pomme de terre (fraîchement récoltée) / germée / verte / coupée en deux (bords verts) |
 | `boite_oeufs_vide.png` / `boite_oeufs.png` | Boîte à œufs en carton ouverte, vide / avec 2 œufs |
 | `pdt_jeune_plant.png` / `pdt_plant_fleuri.png` / `panier_pdt.png` | Jeune pied de pomme de terre sur sa butte / pied fleuri / panier de pommes de terre |
+| `placard_panier_osier_masque.png` | Détourage du panier en osier de `decor_placard_sous_evier.jpg` (recadrage à 180, 680) : sert à faire passer un objet derrière sa paroi avant |

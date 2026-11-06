@@ -10,15 +10,17 @@ rebord de fenêtre, jardin à la terre retournée.
 18.7–fin le panier de pommes de terre sur le plan de travail + S'abonner + logo.
 """
 import math
+import os
+from functools import lru_cache
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
-from gfx import (W, H, YEL, RED, GREEN, DARK, WHITE, put, title, life, fade, ease_out, ease_io, ease_in, clamp,
+from gfx import (IMG, W, H, YEL, RED, GREEN, DARK, WHITE, put, title, life, fade, ease_out, ease_io, ease_in, clamp,
                  lerp, icon, tag, button_img, hl_ellipse, particles, light_rays, text_img, F_TITLE, pills)
 from scenes import sparkles
 from scenes_ananas import logo_img
 from scenes_hortensia import stamp
-from scenes_citron import shade, shadow, swap
+from scenes_citron import shade, shadow, swap, photo, zoomed
 from scenes_banane import ob
 from scenes_eau_pates import Cam
 from scenes_parler_plantes import emoji
@@ -49,18 +51,55 @@ def no(u, ch, x, y, s, size=170):
 
 # ============================================================ A. LE PLACARD (0 → 4.35)
 PL = (445, 1038)                                 # placard sous l'évier : étagère du haut, devant le panier en osier
+IN_BASKET = (395, 905)                           # la pomme de terre au fond du panier (derrière la paroi avant)
+BASKET_BOX = (180, 680)                          # coin du recadrage où le panier a été détouré (photo 1080 x 1920)
+HANDLE = (337, 847, 427, 887)                    # trou de la poignée (on voit l'intérieur à travers)
+JUMP = (0.35, 1.05)                              # elle sort du panier
+
+
+def rim_y(x):
+    """Bord avant (haut de la paroi avant) du panier, en biais léger."""
+    return 816 + (x - 227) * 5 / 305
+
+
+@lru_cache(None)
+def basket_front():
+    """La paroi avant du panier, découpée dans la photo : posée par-dessus, elle cache ce qui est dans le panier."""
+    ph = photo(PLACARD).copy()
+    m = Image.open(os.path.join(IMG, B + "placard_panier_osier_masque.png")).getchannel("A")
+    full = Image.new("L", (W, H), 0)
+    full.paste(m, BASKET_BOX)
+    keep = Image.new("L", (W, H), 0)
+    d = ImageDraw.Draw(keep)
+    d.polygon([(0, rim_y(0)), (W, rim_y(W)), (W, H), (0, H)], fill=255)
+    d.rectangle(HANDLE, fill=0)
+    keep = keep.filter(ImageFilter.GaussianBlur(1.2))
+    ph.putalpha(Image.composite(full, Image.new("L", (W, H), 0), keep))
+    return ph
 
 
 def s_placard(t):
-    zin = ease_io(t / 0.9)
+    zin = ease_io((t - 0.2) / 1.1)
     zout = ease_io((t - 2.6) / 0.8)
-    z = lerp(lerp(1.15, 2.3, zin), 1.35, zout)
-    cam = Cam(z, lerp(lerp(540, PL[0], zin), 540, zout), lerp(lerp(1150, PL[1] - 60, zin), 1180, zout))
+    z = lerp(lerp(1.15, 2.2, zin), 1.35, zout)
+    cam = Cam(z, lerp(lerp(470, PL[0], zin), 540, zout), lerp(lerp(1020, PL[1] - 80, zin), 1180, zout))
     w = cam.bg(PLACARD)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    # elle sort du panier en sautant par-dessus la paroi avant, puis se pose sur l'étagère
+    p = clamp((t - JUMP[0]) / (JUMP[1] - JUMP[0]))
+    q = ease_io(p)
+    wx = lerp(IN_BASKET[0], PL[0], q)
+    wy = lerp(IN_BASKET[1], PL[1], q) - math.sin(math.pi * q) * 230
+    wob = math.sin(t * 40) * 3 * fade(t, 0.05, JUMP[0], 0.05, 0.05) if t < JUMP[0] else 0.0
+    x, y = cam.p(wx + wob, wy)
+    if p >= 1:
+        shadow(w, x, y, 90 * cam.z, 80)
+    ob(w, VERTE, x, y, 100 * cam.z, anchor="bottom", rot=-35 * math.sin(math.pi * q))
+    if q < 0.5:                                  # tant qu'elle n'a pas franchi le bord, la paroi avant la cache
+        w.alpha_composite(zoomed(basket_front(), cam.z, cam.fx, cam.fy))
+    if 0.9 < t < 1.3:
+        particles(w, t, 1.05, x, y, 8, 3, col=(150, 140, 120), size=6, up=120, dur=0.3)
     x, y = cam.p(*PL)
-    shadow(w, x, y, 90 * cam.z, 80)
-    ob(w, VERTE, x, y, 100 * cam.z, anchor="bottom", s=life(t, 0.05, dur=0.35))
     w.alpha_composite(shade())
     if 1.75 < t < 2.65:
         put(u, emoji("🤢", 200), 820, 760, life(t, 1.8, 2.6))
@@ -74,6 +113,8 @@ def s_placard(t):
 
 
 cue(0.05, "whoosh_up", 0.15)
+cue(0.4, "whoosh", 0.16)
+cue(1.05, "thud", 0.25)
 cue(1.78, "alert1", 0.3)
 cue(2.68, "whoosh", 0.16)
 cue(2.88, "pop", 0.2)

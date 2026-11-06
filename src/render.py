@@ -207,7 +207,7 @@ fermé coincée froid éloigne-la 20 cm côté pièce soir abonnez-vous astuces"
 chaque grain graine seule 200 fruits jamais pareille abonnez-vous astuces"""),
     "pommes_de_terre": dict(
         scenes="scenes_pommes_de_terre", dur=21.75, voice=os.path.join(AUD, "pommes_de_terre", "voix.mp3"),
-        words=os.path.join(AUD, "pommes_de_terre", "voix_mots.json"), out="pommes_de_terre_v2.mp4",
+        words=os.path.join(AUD, "pommes_de_terre", "voix_mots.json"), out="pommes_de_terre_v3.mp4",
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""pomme terre malade placard germe verte poison solanine mange jette lumière plante-la printemps
 seule patate récoltes dizaine abonnez-vous astuces"""),
