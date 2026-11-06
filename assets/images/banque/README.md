@@ -45,3 +45,6 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `tomate.png` / `kiwi_entier.png` / `myrtille.png` / `concombre.png` | Tomate, kiwi entier, myrtille, concombre (planche fournie, détourés) — `fraise`, `framboise`, `kiwi_coupe` remplacés par ceux de la même planche |
 | `chenille.png` / `chenille_arquee.png` | Chenille de machaon, à plat / arquée (tête à droite) |
 | `loupe.png` | Loupe laiton et manche bois ; verre transparent (centre ≈ 287,370, rayon ≈ 205 dans le cadre 1024) |
+| `rideau.png` / `tringle.png` | Rideau lin beige, tringle métal (recadrés au plus juste : on les étire en largeur) |
+| `orchidee_saine.png` / `orchidee_fanee.png` | Phalaenopsis blanc en pot rose : en forme / gelé (fleurs fanées, feuilles jaunes) |
+| `lune_croissant.png` / `lune_demi.png` / `lune_pleine.png` | Phases de la lune |

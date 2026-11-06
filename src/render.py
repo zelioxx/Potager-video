@@ -193,6 +193,12 @@ vrais fruits petits grains peau framboise abonnez-vous astuces"""),
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""parles plantes moque science comprennent mots sentent vibrations étude réagissent bruit
 chenille mange feuilles vrai secret regardes soin abonnez-vous astuces"""),
+    "plantes_fenetre": dict(
+        scenes="scenes_plantes_fenetre", dur=23.8, voice=os.path.join(AUD, "plantes_fenetre", "voix.mp3"),
+        words=os.path.join(AUD, "plantes_fenetre", "voix_mots.json"), out="plantes_fenetre_gel_1080x1920.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""plante fenêtre hiver geler nuit vitre glacée feuille touche noircit meurt pire piège rideau
+fermé coincée froid éloigne-la 20 cm côté pièce soir abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
