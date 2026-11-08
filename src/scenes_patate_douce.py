@@ -79,12 +79,21 @@ def potato_glass(c, X, Ybot, Hg, name="patate_douce", picks=(1, 1, 1), lift=0.0,
     sx, sy = G(512, P_BOT - lift)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     place(lay, B + name, FULL, kp, cx, bot, sx, sy)
-    # sous l'eau (dans le verre)
+    # dans le verre : sous le bord, tout reste entre les parois (les racines ne traversent pas le verre) ;
+    # sous l'eau, c'est teinté et un peu flou
     if glass:
         wl = G(0, G_WATER)[1]
-        x0, x1 = G(512 - G_HALF, 0)[0], G(512 + G_HALF, 0)[0]
+        rim = G(0, G_RIM)[1]
+        inner = [G(238, G_RIM), G(792, G_RIM), G(788, G_WATER), G(739, G_FLOOR - 10), G(300, G_FLOOR - 10),
+                 G(246, G_WATER)]
+        keep = Image.new("L", (W, H), 255)
+        dk = ImageDraw.Draw(keep)
+        dk.rectangle([0, rim, W, H], fill=0)
+        dk.polygon(inner, fill=255)
+        keep = keep.filter(ImageFilter.GaussianBlur(1.5))
+        lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), keep))
         m = Image.new("L", (W, H), 0)
-        ImageDraw.Draw(m).rectangle([x0, wl, x1, H], fill=255)
+        ImageDraw.Draw(m).rectangle([0, wl, W, H], fill=255)
         under = lay.filter(ImageFilter.GaussianBlur(1.6 * k + 0.4))
         tint = Image.new("RGBA", (W, H), (200, 222, 228, 0))
         tint.putalpha(under.getchannel("A").point(lambda v: int(v * 0.32)))
