@@ -211,6 +211,12 @@ chaque grain graine seule 200 fruits jamais pareille abonnez-vous astuces"""),
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""pomme terre malade placard germe verte poison solanine mange jette lumière plante-la printemps
 seule patate récoltes dizaine abonnez-vous astuces"""),
+    "patate_douce": dict(
+        scenes="scenes_patate_douce", dur=26.7, voice=os.path.join(AUD, "patate_douce", "voix.mp3"),
+        words=os.path.join(AUD, "patate_douce", "voix_mots.json"), out="patate_douce_1080x1920.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""patate douce verre d'eau regarde cure-dents moitié pointu racines chaud lumière change semaine
+semaines tiges violettes printemps tige nouveau plant abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

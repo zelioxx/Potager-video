@@ -73,3 +73,8 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `boite_oeufs_vide.png` / `boite_oeufs.png` | Boîte à œufs en carton ouverte, vide / avec 2 œufs |
 | `pdt_jeune_plant.png` / `pdt_plant_fleuri.png` / `panier_pdt.png` | Jeune pied de pomme de terre sur sa butte / pied fleuri / panier de pommes de terre |
 | `placard_panier_osier_masque.png` | Détourage du panier en osier de `decor_placard_sous_evier.jpg` (recadrage à 180, 680) : sert à faire passer un objet derrière sa paroi avant |
+| `patate_douce.png` / `_pourrie` / `_racines` / `_tiges` | Patate douce : nature, pourrie, avec racines, avec racines et tiges violettes |
+| `pdouce_tige_coupee.png` / `pdouce_tige_racines.png` / `pdouce_plant.png` | Tige de patate douce seule, avec racines, jeune plant |
+| `verre_eau_droit.png` | Verre droit avec de l'eau, transparence tirée de la photo (bord 125, eau 285, fond 812 dans le cadre 1024) |
+| `bocal_eau.png` | Bocal en verre avec de l'eau |
+| `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |
