@@ -79,6 +79,9 @@ def potato_glass(c, X, Ybot, Hg, name="patate_douce", picks=(1, 1, 1), lift=0.0,
     sx, sy = G(512, P_BOT - lift)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     place(lay, B + name, FULL, kp, cx, bot, sx, sy)
+    a_ = lay.getchannel("A")                       # un peu plus net (racines fines)
+    lay = lay.convert("RGB").filter(ImageFilter.UnsharpMask(radius=1.4, percent=80, threshold=2)).convert("RGBA")
+    lay.putalpha(a_)
     # dans le verre : sous le bord, tout reste entre les parois (les racines ne traversent pas le verre) ;
     # sous l'eau, c'est teinté et un peu flou
     if glass:
@@ -94,7 +97,7 @@ def potato_glass(c, X, Ybot, Hg, name="patate_douce", picks=(1, 1, 1), lift=0.0,
         lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), keep))
         m = Image.new("L", (W, H), 0)
         ImageDraw.Draw(m).rectangle([0, wl, W, H], fill=255)
-        under = lay.filter(ImageFilter.GaussianBlur(1.6 * k + 0.4))
+        under = lay.filter(ImageFilter.GaussianBlur(0.35 * k + 0.25))
         tint = Image.new("RGBA", (W, H), (200, 222, 228, 0))
         tint.putalpha(under.getchannel("A").point(lambda v: int(v * 0.32)))
         under.alpha_composite(tint)
@@ -285,7 +288,8 @@ cue(18.25, "success", 0.24)
 
 
 # ============================================================ C. LE JARDIN : CHAQUE TIGE DEVIENT UN PLANT (20.1 → 23.8)
-ROW = [(-300, 1360, 20.9), (0, 1390, 21.15), (300, 1360, 21.4)]
+# plants espacés en quinconce : ceux du fond plus petits (perspective) ; dessinés du fond vers l'avant
+ROW = [(220, 1140, 0.55, 21.0), (-330, 1190, 0.62, 20.85), (300, 1390, 0.84, 21.3), (-190, 1440, 0.95, 21.15)]
 STAGE_T = (22.25, 22.85)                         # tige coupée → tige racinée → plant
 ROOTS = {B + "pdouce_tige_coupee": 0.04, B + "pdouce_tige_racines": 0.53, B + "pdouce_plant": 0.44}   # part enterrée
 
@@ -295,7 +299,7 @@ def s_garden(t):
     w = cam.bg(JARDIN)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     z = cam.z
-    for i, (dx, y, t0) in enumerate(ROW):
+    for i, (dx, y, ps, t0) in enumerate(ROW):
         d = ease_out((t - t0) / 0.4)
         if d <= 0:
             continue
@@ -306,6 +310,7 @@ def s_garden(t):
             name, wd = B + "pdouce_tige_racines", 300
         else:
             name, wd = B + "pdouce_plant", 440
+        wd *= ps
         sc = 1.0
         for ts in STAGE_T:
             if ts - 0.15 < t < ts + 0.15:
@@ -335,7 +340,7 @@ def s_garden(t):
 
 cue(20.17, "whoosh", 0.16)
 for _d in ROW:
-    cue(_d[2] + 0.35, "thud", 0.16)
+    cue(_d[3] + 0.35, "thud", 0.14)
 cue(STAGE_T[0], "pop_hi", 0.2)
 cue(STAGE_T[1], "pop", 0.22)
 cue(STAGE_T[1] + 0.1, "sparkle", 0.2)
