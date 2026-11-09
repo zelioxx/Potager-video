@@ -94,7 +94,8 @@ def _moonlit():
     return (1.0 + 0.85 * np.exp(-d2))[..., None]
 
 
-EVE = np.array([1.0, 0.84, 0.62], np.float32) * 0.86      # lumière orangée du soir
+EVE = np.array([0.6, 0.65, 0.82], np.float32)             # soir d'hiver : lumière froide, grise et bleutée
+EVE_OUT = np.array([0.3, 0.4, 0.74], np.float32)          # dehors : l'heure bleue
 NIGHT_IN = np.array([0.26, 0.33, 0.55], np.float32)        # pièce dans la nuit (bleu)
 NIGHT_OUT = np.array([0.10, 0.14, 0.34], np.float32)       # dehors, plus sombre
 MORNING = np.array([1.06, 1.0, 0.88], np.float32)          # matin doré
@@ -115,16 +116,19 @@ def graded_bg(qe, qn, qm, qc):
     a = _base()
     m, _ = light_mul(eve, night, morn, cold)
     a = a * m
+    lum = a.mean(2, keepdims=True)
+    des = 0.4 * eve + 0.3 * night                          # couleurs éteintes du soir d'hiver
+    a = a * (1 - des) + lum * des
     inside = a * (1 + night * (NIGHT_IN[None, None] * _moonlit() - 1))
-    out = a * (1 + night * (NIGHT_OUT - 1))
+    out = a * (1 + eve * (EVE_OUT / EVE - 1)) * (1 + night * (NIGHT_OUT - 1))
     wm = _win()
     a = inside * (1 - wm) + out * wm
     im = Image.fromarray((np.clip(a, 0, 1) * 255).astype(np.uint8)).convert("RGBA")
-    if night > 0.02:   # en face, des fenêtres s'allument ; la lune dans le ciel
+    if night + eve > 0.02:   # en face, des fenêtres s'allument ; la lune dans le ciel
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         d = ImageDraw.Draw(ov)
         for i, (x0, y0, x1, y1) in enumerate(LIT):
-            a_ = clamp(night * 1.6 - i * 0.12)
+            a_ = clamp(max(night * 1.6, eve * 1.1) - i * 0.12)
             (X0, Y0), (X1, Y1) = P(x0, y0), P(x1, y1)
             d.rectangle([X0, Y0, X1, Y1], fill=(255, 196, 110, int(150 * a_)))
         glow = ov.filter(ImageFilter.GaussianBlur(10))
@@ -150,7 +154,10 @@ def tint_layer(lay, eve, night, morn=0.0, cold=0.0, lit=1.75):
         return lay
     m, n = light_mul(eve, night, morn, cold, lit)
     a = np.asarray(lay, np.float32)
-    a[..., :3] = np.clip(a[..., :3] * (m * n), 0, 255)
+    rgb = a[..., :3] * (m * n)
+    des = 0.4 * eve + 0.3 * night
+    rgb = rgb * (1 - des) + rgb.mean(2, keepdims=True) * des
+    a[..., :3] = np.clip(rgb, 0, 255)
     return Image.fromarray(a.astype(np.uint8), "RGBA")
 
 
@@ -349,17 +356,18 @@ def clock(c, x, y, r, hours, a=1.0):
 
 
 # ============================================================ A. LE SALON : LE SOIR, LA NUIT, LE CHAUFFAGE (0 → 7.95)
-CAM_DAY = (1.12, 600, 1000)
-CAM_NIGHT = (1.3, 700, 900)
-CAM_RAD = (1.55, 330, 1110)
+CAM_DAY = (1.12, 640, 1000)
+CAM_NIGHT = (1.22, 680, 960)
+CAM_RAD = (1.45, 330, 1110)
+CAM_RAD2 = (1.52, 330, 1110)
+T_RAD = 6.35                                     # coupe franche sur le radiateur
 
 
 def s_salon(t):
-    k1 = ease_io((t - 4.05) / 0.8)
-    k2 = ease_io((t - 6.3) / 0.6)
-    za = [lerp(a, b, k1) for a, b in zip(CAM_DAY, CAM_NIGHT)]
-    zb = [lerp(a, b, k2) for a, b in zip(za, CAM_RAD)]
-    cam = Cam(*zb)
+    if t < T_RAD:   # une seule lente avancée vers la plante
+        cam = Cam(*[lerp(a, b, clamp(t / T_RAD)) for a, b in zip(CAM_DAY, CAM_NIGHT)])
+    else:
+        cam = Cam(*[lerp(a, b, clamp((t - T_RAD) / 1.6)) for a, b in zip(CAM_RAD, CAM_RAD2)])
     eve = fade(t, 1.25, None, 0.8) * (1 - fade(t, 4.1, None, 0.6))
     night = fade(t, 4.1, None, 0.7)
     cold = fade(t, 7.0, None, 0.8)
@@ -461,14 +469,14 @@ def place_im(c, im, k, X, Y):
     c.alpha_composite(s, (int(X - POT_BASE[0] * k), int(Y - POT_BASE[1] * k)))
 
 
-CAM_CUT = (3.0, 722, 1000)
+CAM_CUT = (2.6, 722, 1010)
+CAM_CUT2 = (2.8, 722, 1010)
 
 
 def s_cut(t):
-    zk = ease_io((t - 7.95) / 0.55)
-    cam = Cam(*[lerp(a, b, zk) for a, b in zip(CAM_RAD, CAM_CUT)])
+    cam = Cam(*[lerp(a, b, clamp((t - 7.95) / 6.5)) for a, b in zip(CAM_CUT, CAM_CUT2)])
     z = cam.z
-    w = cam.bg(0.0, 1.0, 0.0, 1.0).filter(ImageFilter.GaussianBlur(5 * zk))
+    w = cam.bg(0.0, 1.0, 0.0, 1.0).filter(ImageFilter.GaussianBlur(4))
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     px, py = cam.p(*PLANT)
     k = PK * z
@@ -569,8 +577,8 @@ cue(13.62, "pop", 0.12)
 
 
 # ============================================================ C. LE MATIN : EAU À 20 °C, ELLE BOIT À LA LUMIÈRE (14.45 → 19.6)
-CAM_MORN = (1.12, 600, 1000)
-CAM_DRINK = (1.45, 720, 920)
+CAM_MORN = (1.12, 640, 1000)
+CAM_DRINK = (1.22, 680, 960)
 
 
 def sun_rays(c, cam, t, a):
@@ -606,8 +614,7 @@ def drink_drops(c, cam, t, t0, a):
 
 
 def s_morning(t):
-    k = ease_io((t - 17.2) / 0.7)
-    cam = Cam(*[lerp(a, b, k) for a, b in zip(CAM_MORN, CAM_DRINK)])
+    cam = Cam(*[lerp(a, b, clamp((t - 14.45) / 5.15)) for a, b in zip(CAM_MORN, CAM_DRINK)])
     dawn = 1 - fade(t, 14.45, None, 0.55)          # la nuit se lève
     morn = fade(t, 14.45, None, 0.6)
     w = cam.bg(0.0, dawn, morn, 0.0)
@@ -679,7 +686,8 @@ def _sh(fn):
 
 
 SCENES = [
-    (0.0, 7.95 - SHIFT, _sh(s_salon)),
+    (0.0, T_RAD - SHIFT, _sh(s_salon)),
+    (T_RAD - SHIFT, 7.95 - SHIFT, _sh(s_salon)),
     (7.95 - SHIFT, 14.45 - SHIFT, _sh(s_cut)),
     (14.45 - SHIFT, 19.6 - SHIFT, _sh(s_morning)),
     (19.6 - SHIFT, 99.0, _sh(s_end)),
