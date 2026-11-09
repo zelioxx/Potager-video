@@ -33,9 +33,9 @@ NO_CAPTION_UNTIL = 0.0
 CAP_STYLE = dict(max_words=4, max_chars=24, size=90)     # blocs de 3-4 mots, gros et lisibles
 
 # bruitages discrets : nettement sous la voix (TikTok baisse le son quand les effets sont trop présents)
-SFX_GAIN = 0.34
-DUCK = 0.5
-TRANS_GAIN = 0.22
+SFX_GAIN = 0.43
+DUCK = 0.45
+TRANS_GAIN = 0.26
 
 
 SHIFT = 0.25                                     # les temps ci-dessous suivent la reconnaissance vocale, ~0,25 s en retard
