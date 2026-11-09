@@ -217,6 +217,12 @@ seule patate récoltes dizaine abonnez-vous astuces"""),
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""patate douce verre d'eau regarde cure-dents moitié pointu racines chaud lumière change semaine
 semaines tiges violettes printemps tige nouveau plant abonnez-vous astuces"""),
+    "arrosage_soir": dict(
+        scenes="scenes_arrosage_soir", dur=24.6, voice=os.path.join(AUD, "arrosage_soir", "voix.mp3"),
+        words=os.path.join(AUD, "arrosage_soir", "voix_mots.json"), out="arrosage_soir.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""soir hiver pire idée nuit boit chauffage froide racines matin pourrissent moucherons adorent
+arrose température ambiante journée lumière abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
@@ -429,7 +435,7 @@ def build_audio(path):
     active = np.clip(env / (np.percentile(env[env > 1e-4], 50) + 1e-6), 0, 1)
     sm = int(0.25 * sfx.SR)
     active = np.convolve(active, np.ones(sm) / sm, mode="same")
-    mix += fx * getattr(scenes, "SFX_GAIN", 0.34) * (1 - 0.45 * active)
+    mix += fx * getattr(scenes, "SFX_GAIN", 0.34) * (1 - getattr(scenes, "DUCK", 0.45) * active)
     st = np.stack([mix, mix], 1)
     peak = np.abs(st).max()
     if peak > 0.98:
