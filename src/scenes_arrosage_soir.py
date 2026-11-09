@@ -420,16 +420,13 @@ def s_salon(t):
     w.alpha_composite(shade())
     title(u, "TU ARROSES LE SOIR…", t, 0.05, 2.02, y=330, color=YEL, size=125)
     title(u, "EN HIVER ?", t, 2.06, 2.86, y=330, color=WHITE, size=170)
-    stamp(u, "LA PIRE IDÉE !", 540, 340, t, 2.9, 4.15, RED, 140, -7)
+    stamp(u, "LA PIRE IDÉE !", 540, 340, t, 2.9, 4.0, RED, 140, -7)
     title(u, "LA NUIT…", t, 4.2, 5.0, y=330, color=YEL, size=180)
     title(u, "ELLE NE BOIT PAS !", t, 5.05, 6.4, y=330, color=WHITE, size=125)
     title(u, "TU BAISSES LE CHAUFFAGE", t, 6.45, None, y=330, color=YEL, size=105)
     return w, u
 
 
-cue(0.45, "whoosh", 0.12)
-cue(0.95, "pour", 0.2)
-cue(2.07, "tick", 0.14)
 cue(2.92, "alert1", 0.22)
 cue(4.15, "whoosh_up", 0.12)
 cue(4.75, "sparkle", 0.12)
@@ -437,6 +434,113 @@ cue(5.36, "pop_lo", 0.16)
 cue(6.6, "click", 0.25)
 cue(7.05, "tick", 0.14)
 cue(7.35, "tick", 0.14)
+
+
+# ============================================================ A0. TA VIDÉO : TU ARROSES LE SOIR EN HIVER ? (0 → 4.1)
+VIDEO = "assets/video/intro_arrosage_soir.mp4"   # vidéo fournie (iPhone HDR → SDR), arrosoir vert qui verse
+T_CLIP = 4.1
+
+
+@lru_cache(None)
+def clip_frames():
+    import os
+    import subprocess
+    from gfx import IMG
+    root = os.path.dirname(os.path.dirname(IMG))
+    d = os.path.join(root, "output", "tmp_arrosage_soir_intro")
+    if not os.path.isdir(d) or not os.listdir(d):
+        os.makedirs(d, exist_ok=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", os.path.join(root, VIDEO), "-an", "-vf",
+                        f"fps=30,scale={W}:{H}:flags=lanczos", os.path.join(d, "%04d.png")], check=True)
+    return sorted(os.path.join(d, f) for f in os.listdir(d))
+
+
+@lru_cache(None)
+def _vignette():
+    yy, xx = np.ogrid[:H, :W]
+    v = np.clip((np.hypot((xx - W / 2) / (W * 0.62), (yy - H / 2) / (H * 0.62)) - 0.45) / 0.6, 0, 1)
+    return (1 - 0.55 * v)[..., None].astype(np.float32)
+
+
+def evening(im, eve):
+    """Le soir d'hiver tombe sur la vidéo : lumière froide, couleurs éteintes, coins assombris."""
+    if eve < 0.01:
+        return im
+    a = np.asarray(im.convert("RGB"), np.float32)
+    m, _ = light_mul(eve, 0.0, 0.0, 0.0)
+    a = a * m
+    des = 0.4 * eve
+    a = a * (1 - des) + a.mean(2, keepdims=True) * des
+    a = a * (1 - eve * (1 - _vignette()))
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).convert("RGBA")
+
+
+@lru_cache(None)
+def moon_badge(r=95):
+    S = r * 2 + 40
+    im = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    o = S / 2
+    d.ellipse([o - r + 6, o - r + 12, o + r + 6, o + r + 12], fill=(0, 0, 0, 70))
+    d.ellipse([o - r, o - r, o + r, o + r], fill=DARK)
+    d.ellipse([o - r + 9, o - r + 9, o + r - 9, o + r - 9], fill=(28, 40, 92))
+    for sx, sy, ss in [(0.42, -0.45, 9), (0.55, 0.2, 6), (-0.5, 0.5, 5), (0.2, 0.55, 7)]:
+        x, y = o + sx * r, o + sy * r
+        d.polygon([(x, y - ss * 1.8), (x + ss * 0.5, y - ss * 0.5), (x + ss * 1.8, y), (x + ss * 0.5, y + ss * 0.5),
+                   (x, y + ss * 1.8), (x - ss * 0.5, y + ss * 0.5), (x - ss * 1.8, y), (x - ss * 0.5, y - ss * 0.5)],
+                  fill=(255, 236, 170))
+    ob(im, "banque/lune_croissant", o - r * 0.12, o, r * 1.2)
+    return im
+
+
+@lru_cache(None)
+def snow_badge(r=95):
+    """Pastille « hiver » : flocon blanc sur fond bleu glacier."""
+    S = r * 2 + 40
+    k = 3
+    big = Image.new("RGBA", (S * k, S * k), (0, 0, 0, 0))
+    d = ImageDraw.Draw(big)
+    o, R = S * k / 2, r * k
+    d.ellipse([o - R + 18, o - R + 36, o + R + 18, o + R + 36], fill=(0, 0, 0, 70))
+    d.ellipse([o - R, o - R, o + R, o + R], fill=DARK)
+    d.ellipse([o - R + 27, o - R + 27, o + R - 27, o + R - 27], fill=BLUE)
+    L, wd = R * 0.62, int(R * 0.09)
+    for i in range(6):
+        a = math.radians(i * 60 + 90)
+        ex, ey = o + math.cos(a) * L, o - math.sin(a) * L
+        d.line([(o, o), (ex, ey)], fill=WHITE, width=wd)
+        for f in (0.55, 0.8):   # petites branches
+            bx, by = o + math.cos(a) * L * f, o - math.sin(a) * L * f
+            for sg in (-1, 1):
+                b = a + sg * math.radians(40)
+                d.line([(bx, by), (bx + math.cos(b) * L * 0.25, by - math.sin(b) * L * 0.25)], fill=WHITE, width=wd)
+    d.ellipse([o - wd, o - wd, o + wd, o + wd], fill=WHITE)
+    return big.resize((S, S), Image.LANCZOS)
+
+
+def s_clip(t):
+    fr = clip_frames()
+    i = min(len(fr) - 1, max(0, int(round((t - SHIFT) * 30))))
+    eve = fade(t, 1.25, None, 0.8)
+    w = evening(Image.open(fr[i]).convert("RGBA"), eve)
+    u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    if 2.9 < t < 3.3:   # « la pire idée » : petit flash rouge
+        w.alpha_composite(Image.new("RGBA", (W, H), (224, 76, 62, int(70 * (1 - (t - 2.9) / 0.4)))))
+    w.alpha_composite(shade())
+    # « le soir » : la lune ; « en hiver » : le flocon
+    if t > 1.5:
+        put(u, moon_badge(), 880, 600, life(t, 1.52, 2.88) if t < 2.9 else life(t, 1.52, 4.0))
+    if t > 2.06:
+        put(u, snow_badge(), 200, 600, life(t, 2.08, 4.0))
+    title(u, "TU ARROSES LE SOIR…", t, 0.05, 2.02, y=330, color=YEL, size=125)
+    title(u, "EN HIVER ?", t, 2.06, 2.86, y=330, color=WHITE, size=170)
+    stamp(u, "LA PIRE IDÉE !", 540, 340, t, 2.9, 3.98, RED, 140, -7)
+    return w, u
+
+
+cue(0.3, "pour", 0.18)
+cue(1.54, "pop", 0.14)
+cue(2.1, "pop_hi", 0.12)
 
 
 # ============================================================ B. EN COUPE : L'EAU FROIDE, LES RACINES POURRISSENT (7.95 → 14.45)
@@ -685,8 +789,12 @@ def _sh(fn):
     return lambda t: fn(t + SHIFT)
 
 
+_clip = _sh(s_clip)
+_clip.raw = True                                 # la vidéo fournie n'est pas zoomée par le moteur
+
 SCENES = [
-    (0.0, T_RAD - SHIFT, _sh(s_salon)),
+    (0.0, T_CLIP - SHIFT, _clip),
+    (T_CLIP - SHIFT, T_RAD - SHIFT, _sh(s_salon)),
     (T_RAD - SHIFT, 7.95 - SHIFT, _sh(s_salon)),
     (7.95 - SHIFT, 14.45 - SHIFT, _sh(s_cut)),
     (14.45 - SHIFT, 19.6 - SHIFT, _sh(s_morning)),
