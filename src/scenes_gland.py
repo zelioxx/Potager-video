@@ -2,13 +2,13 @@
 
 Le volume de la voix est gardé tel qu'envoyé (aucun mastering, cf. render.py « af ») ; bruitages sous la voix
 (niveau validé sur la vidéo « arroser le soir »).
-0–4.65   le chemin dans la forêt (photo fournie) : un gland tombe, la caméra le suit, « toc » ; zoom, une main
-         le ramasse, dézoom sur la promenade ; « un chêne de 300 ans » : un grand chêne pousse derrière.
-4.65–8.15 la cuisine : les glands tombent sur la planche ; « trie tes glands » (des « ? »).
+0–4.65   le chemin dans la forêt (photo fournie) : un gland tombe lentement, la caméra le suit, « toc » ; zoom doux,
+         une main le ramasse, dézoom lent sur la promenade ; « un chêne de 300 ans » : un grand chêne pousse derrière.
+4.65–8.15 la table du salon, vue à la 1re personne : les glands tombent sur la table ; « trie tes glands » (« ? »).
 8.15–14.45 le bol en verre (photo fournie) : on les plonge ; ceux qui flottent sont vides → poubelle ; ceux qui
          coulent, on les garde.
 14.45–17.55 le pot profond coupé en deux : le gland est planté à 2 cm (règle) ; « pot profond » (flèche).
-17.55–24.95 le jardin : dehors tout l'hiver (neige) ; on arrose, jamais sec ; au printemps la neige fond,
+17.55–24.95 dehors, dans le coin contre le vieux mur aux outils : tout l'hiver (neige) ; on arrose, jamais sec ; au printemps la neige fond,
          le soleil revient et le premier chêne sort de terre.
 24.95–fin le salon : le petit chêne sur la table, bouton S'abonner et logo.
 """
@@ -49,8 +49,9 @@ HAND, BOWL = B + "main_ouverte", B + "bol_verre_eau"
 OAK, POT, POT_OAK, POT_CUT = B + "chene_arbre", B + "pot_haut", B + "pot_chene", B + "pot_coupe_terre"
 CAN = B + "arrosoir_zinc"
 FULL = (0, 0, 1024, 1024)
-FOREST, KITCHEN, GARDEN, SALON = ("decor_foret_chemin.webp", "decor_cuisine_planche_fenetre.jpg",
+FOREST, KITCHEN, GARDEN, SALON = ("decor_foret_chemin.webp", "decor_salon_table_bois.webp",
                                   "tulipes_fond_sol_nu.png", "decor_salon_table_fenetre.jpg")
+WALL = "decor_mur_outils_jardin.jpg"             # dehors : contre le vieux mur, avec les outils
 
 
 class Cam:
@@ -91,73 +92,88 @@ def hand_at(c, px, py, hw, alpha=1.0):
     ob(c, HAND, px - (PINCH[0] - HB_C[0]) * k, py - (PINCH[1] - HB_C[1]) * k, hw, alpha=alpha)
 
 
+T_LAND = 1.4                                     # le gland touche le sol (chute lente, qu'on a le temps de suivre)
+Z_FALL, Z_CLOSE = 1.6, 2.1                       # zooms modérés (pas trop rapides, pas trop forts)
+T_GRAB, T_LIFT = 2.35, (2.45, 3.45)
+T_OAK = 3.4
+
+
 def s_forest(t):
-    # le gland : chute (accélère, tourne), puis deux petits rebonds sur le chemin
-    if t < FALL[1]:
-        p = clamp((t - FALL[0]) / (FALL[1] - FALL[0]))
-        ax, ay = lerp(620, GROUND[0], p), lerp(-160, GROUND[1], ease_in(p))
-        arot = 540 * p
+    # le gland : chute lente (il se balance et tourne), puis deux petits rebonds sur le chemin
+    if t < T_LAND:
+        p = clamp((t - FALL[0]) / (T_LAND - FALL[0]))
+        f = 0.35 * p + 0.65 * p * p
+        ax = lerp(640, GROUND[0], p) + 26 * math.sin(p * 7.0) * (1 - p)
+        ay = lerp(-160, GROUND[1], f)
+        arot = 420 * p + 18 * math.sin(p * 9)
     else:
-        q1, q2 = clamp((t - 0.95) / 0.24), clamp((t - 1.19) / 0.14)
-        ax = GROUND[0] + 18 * ease_out(clamp((t - 0.95) / 0.4))
+        q1, q2 = clamp((t - T_LAND) / 0.26), clamp((t - T_LAND - 0.26) / 0.16)
+        ax = GROUND[0] + 18 * ease_out(clamp((t - T_LAND) / 0.45))
         ay = GROUND[1] - 70 * math.sin(math.pi * q1) - 22 * math.sin(math.pi * q2)
-        arot = 540 + 70 * ease_out(clamp((t - 0.95) / 0.4))
-    # caméra : suit la chute, zoome sur le gland posé, puis dézoome pendant que la main le remonte
-    if t < 0.95:
-        cam = Cam(1.7, 580, ay + 120)
-    elif t < 1.45:
-        k = ease_io((t - 0.95) / 0.4)
-        cam = Cam(lerp(1.7, 2.3, k), lerp(580, ax, k), lerp(GROUND[1] + 120, GROUND[1] - 120, k))
+        arot = 420 + 70 * ease_out(clamp((t - T_LAND) / 0.45))
+    # caméra : suit la chute, s'approche doucement du gland posé, puis dézoome lentement quand la main le remonte
+    if t < T_LAND:
+        cam = Cam(Z_FALL, 580, ay + 120)
+    elif t < T_LIFT[0]:
+        k = ease_io((t - T_LAND) / 0.9)
+        cam = Cam(lerp(Z_FALL, Z_CLOSE, k), lerp(580, GROUND[0] + 18, k), lerp(GROUND[1] + 120, GROUND[1] - 120, k))
     else:
-        k = ease_io((t - 1.45) / 0.8)
-        cam = Cam(lerp(2.3, 1.0, k), lerp(GROUND[0] + 18, 540, k), lerp(GROUND[1] - 120, 960, k))
+        k = ease_io((t - T_LIFT[0]) / (T_LIFT[1] - T_LIFT[0]))
+        cam = Cam(lerp(Z_CLOSE, 1.0, k), lerp(GROUND[0] + 18, 540, k), lerp(GROUND[1] - 120, 960, k))
     w = cam.bg(FOREST)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     z = cam.z
     # le grand chêne de 300 ans pousse au loin sur le chemin
-    if t > 3.15:
-        g = ease_out_back(clamp((t - 3.15) / 0.6), 1.3)
-        ow = 1700 * g
+    if t > T_OAK:
+        # il « pousse » du sol vers le ciel (révélé de bas en haut) : le haut de la photo reste hors du cadre
+        g = ease_out(clamp((t - T_OAK) / 0.75))
         bx, by = 600, 1300
-        if ow > 4:
-            place(w, OAK, FULL, ow / 960, *OAK_BASE, bx, by)
-        if t < 3.6:
-            particles(w, t, 3.16, bx, by, 16, 5, col=(120, 90, 60), size=10, up=260, dur=0.6)
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        place(lay, OAK, FULL, 1800 * lerp(0.97, 1.0, g) / 960, *OAK_BASE, bx, by)
+        if g < 1:
+            line = lerp(by + 40, -250, g)
+            m = Image.new("L", (W, H), 0)
+            ImageDraw.Draw(m).rectangle([0, line, W, H], fill=255)
+            m = m.filter(ImageFilter.GaussianBlur(60))
+            lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (W, H), 0), m))
+        w.alpha_composite(lay)
+        if t < T_OAK + 0.5:
+            particles(w, t, T_OAK + 0.01, bx, by, 16, 5, col=(120, 90, 60), size=10, up=260, dur=0.6)
     sx, sy = cam.p(ax, ay)
-    if t < 1.42:
-        shadow(w, sx, cam.p(ax, GROUND[1])[1] + AC_W * z * 0.35, AC_W * z * 0.9 * clamp((t - 0.5) / 0.45), 90)
+    if t < T_LIFT[0]:
+        shadow(w, sx, cam.p(ax, GROUND[1])[1] + AC_W * z * 0.35, AC_W * z * 0.9 * clamp((t - 0.7) / 0.7), 90)
         acorn(w, sx, sy, AC_W * z, arot)
-        if 0.95 < t < 1.4:   # petites feuilles et poussière soulevées
-            particles(w, t, 0.96, sx, sy + 25 * z, 10, 3, col=(150, 120, 80), size=4 * z, up=150, spread=200,
-                      dur=0.45)
-        if t > 1.0:      # la main arrive et pince le gland
-            k = ease_out((t - 1.0) / 0.38)
+        if T_LAND < t < T_LAND + 0.5:   # petites feuilles et poussière soulevées
+            particles(w, t, T_LAND + 0.01, sx, sy + 25 * z, 10, 3, col=(150, 120, 80), size=4 * z, up=150, spread=200,
+                      dur=0.5)
+        if t > T_GRAB - 0.6:      # la main arrive doucement et pince le gland
+            k = ease_out((t - (T_GRAB - 0.6)) / 0.6)
             px, py = lerp(sx - 700, sx, k), lerp(sy - 800, sy, k)
             hand_at(w, px, py, HAND_W * z)
     else:            # la main remonte le gland au premier plan
-        k = ease_io((t - 1.45) / 0.8)
+        k = ease_io((t - T_LIFT[0]) / (T_LIFT[1] - T_LIFT[0]))
         gx, gy = cam.p(GROUND[0] + 18, GROUND[1])
         px, py = lerp(gx, FG[0], k), lerp(gy, FG[1], k)
-        hw = lerp(HAND_W * 2.3, 760, k)
-        py += math.sin(t * 2.2) * 6 * clamp((t - 2.25) / 0.4)
+        hw = lerp(HAND_W * Z_CLOSE, 760, k)
+        py += math.sin(t * 2.2) * 6 * clamp((t - T_LIFT[1]) / 0.4)
         acorn(w, px, py, hw * AC_W / HAND_W, arot)
         hand_at(w, px, py, hw)
     w.alpha_composite(shade())
     title(u, "CE PETIT GLAND…", t, 0.05, 2.4, y=330, color=YEL, size=150)
-    title(u, "PEUT DEVENIR…", t, 2.44, 3.18, y=330, color=WHITE, size=160)
-    title(u, "UN CHÊNE…", t, 3.22, 3.8, y=330, color=GREEN, size=180)
-    stamp(u, "DE 300 ANS !", 540, 340, t, 3.84, None, RED, 150, -7)
+    title(u, "PEUT DEVENIR…", t, 2.44, 3.36, y=330, color=WHITE, size=160)
+    title(u, "UN CHÊNE…", t, 3.4, 3.85, y=330, color=GREEN, size=180)
+    stamp(u, "DE 300 ANS !", 540, 340, t, 3.88, None, RED, 150, -7)
     return w, u
 
 
-cue(0.1, "whoosh", 0.12)
-cue(0.95, "toc", 0.5)
-cue(0.97, "rustle", 0.16)
-cue(1.37, "pop_lo", 0.18)
-cue(1.5, "whoosh_up", 0.14)
-cue(3.17, "rise", 0.2)
-cue(3.6, "sparkle", 0.14)
-cue(3.86, "alert1", 0.2)
+cue(0.1, "whoosh", 0.1)
+cue(T_LAND, "toc", 0.5)
+cue(T_LAND + 0.02, "rustle", 0.16)
+cue(T_GRAB, "pop_lo", 0.18)
+cue(T_LIFT[0] + 0.05, "whoosh_up", 0.12)
+cue(T_OAK + 0.02, "rise", 0.2)
+cue(T_OAK + 0.5, "sparkle", 0.14)
+cue(3.9, "alert1", 0.2)
 
 
 # ============================================================ B. LA CUISINE : TRIE TES GLANDS (4.65 → 8.15)
@@ -389,7 +405,9 @@ cue(16.9, "whoosh", 0.1)
 
 
 # ============================================================ E. LE JARDIN : L'HIVER, L'ARROSAGE, LE PRINTEMPS (17.55 → 24.95)
-G_POT, G_POT_W = (540, 1470), 250                # pot posé sur la terre du jardin (zoom 1)
+G_POT, G_POT_W = (445, 1585), 150                # pot posé dans le coin, contre le mur, devant le râteau (zoom 1)
+WALL_CAM = (1.25, 520, 1380)
+GROUND_Y = 1640                                  # le sol commence ici (photo plein écran) : la neige tient dessous
 PH_BB_W, PO_W = 507, 344                         # largeur du pot dans pot_haut / pot_chene (cadre 1024)
 OPEN = (512, 62, 226, 19)                        # ouverture du pot (pot_haut) : centre, demi-axes
 
@@ -402,7 +420,7 @@ def _noise():
     return ((n - n.min()) / (n.max() - n.min())).astype(np.float32)
 
 
-def season(im, winter, spring):
+def season(im, winter, spring, ground=None):
     """Hiver : froid, terne, neige au sol ; printemps : doré et lumineux."""
     if winter < 0.01 and spring < 0.01:
         return im
@@ -411,12 +429,27 @@ def season(im, winter, spring):
         lum = a.mean(2, keepdims=True)
         a = a * (1 - 0.45 * winter) + lum * 0.45 * winter
         a = a * (1 + winter * (np.array([0.82, 0.9, 1.08], np.float32) - 1))
-        cov = np.clip((_noise() + 0.05) * 2.6, 0, 0.94)[..., None] * winter     # la neige se pose / fond en douceur
-        cov *= np.clip((np.arange(H)[:, None, None] - 420) / 300, 0, 1)     # la neige tient au sol
+        cov = np.clip((_noise() + 0.05) * 2.6, 0, 0.85)[..., None] * winter     # la neige se pose / fond en douceur
+        g0 = 420 if ground is None else ground
+        cov *= np.clip((np.arange(H)[:, None, None] - g0) / 80, 0, 1)      # la neige tient au sol, pas sur le mur
         a = a * (1 - cov) + np.array([238, 242, 250], np.float32) * cov
     if spring > 0.01:
         a = a * (1 + spring * (np.array([1.08, 1.03, 0.9], np.float32) - 1))
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).convert("RGBA")
+
+
+def tint_obj(lay, winter, spring):
+    """Même lumière d'hiver / de printemps sur le pot que sur le décor (sans la neige au sol)."""
+    if winter < 0.01 and spring < 0.01:
+        return lay
+    a = np.asarray(lay, np.float32).copy()
+    rgb = a[..., :3]
+    lum = rgb.mean(2, keepdims=True)
+    rgb = rgb * (1 - 0.45 * winter) + lum * 0.45 * winter
+    rgb = rgb * (1 + winter * (np.array([0.82, 0.9, 1.08], np.float32) - 1))
+    rgb = rgb * (1 + spring * (np.array([1.08, 1.03, 0.9], np.float32) - 1))
+    a[..., :3] = np.clip(rgb, 0, 255)
+    return Image.fromarray(a.astype(np.uint8), "RGBA")
 
 
 def snowfall(c, t, a):
@@ -443,22 +476,24 @@ def soil_disc(rx, ry):
 
 
 def s_garden(t):
-    cam = Cam(1.15, 540, 1240)
+    cam = Cam(*WALL_CAM)
     z = cam.z
     winter = fade(t, 17.6, None, 0.6) * (1 - fade(t, 21.85, None, 0.7))
     spring = fade(t, 21.85, None, 0.7)
-    w = season(cam.bg(GARDEN), winter, spring)
+    w = season(cam.bg(WALL), winter, spring, cam.p(0, GROUND_Y)[1])
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     px, py = cam.p(*G_POT)
     pw = G_POT_W * z
     shadow(w, px, py - 4, pw * 1.15, 90)
+    pl = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     which, sc = swap((t - 24.02) / 0.3)
     if which == 0:
         k = pw / PH_BB_W
-        place(w, POT, FULL, k * sc, 511, 992, px, py)
+        place(pl, POT, FULL, k * sc, 511, 992, px, py)
         ox, oy = px + (OPEN[0] - 511) * k * sc, py + (OPEN[1] - 992) * k * sc + 8 * k
         disc = soil_disc(int(OPEN[2] * k * sc * 0.96), int(OPEN[3] * k * sc))
-        w.alpha_composite(disc, (int(ox - disc.width / 2), int(oy - disc.height / 2)))
+        pl.alpha_composite(disc, (int(ox - disc.width / 2), int(oy - disc.height / 2)))
+        w.alpha_composite(tint_obj(pl, winter, spring))
         cap = winter * clamp((t - 18.0) / 0.6)
         if cap > 0.01:   # un petit chapeau de neige sur la terre du pot
             ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -467,7 +502,8 @@ def s_garden(t):
             w.alpha_composite(ov.filter(ImageFilter.GaussianBlur(2)))
     else:
         k = pw / PO_W
-        place(w, POT_OAK, FULL, k * sc, 508, 992, px, py)
+        place(pl, POT_OAK, FULL, k * sc, 508, 992, px, py)
+        w.alpha_composite(tint_obj(pl, winter, spring))
     snowfall(w, t, winter * (1 - fade(t, 19.3, None, 0.6)) if t < 21.85 else 0.0)
     # « ne les laisse jamais sécher » : on arrose
     if 19.35 < t < 21.9:
