@@ -53,6 +53,11 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 
 | Fichier | Décor | Où poser les objets |
 |---|---|---|
+| `decor_mur_outils_jardin.jpg` | Vieux mur en silex : bêche, râteau, transplantoir, arrosoir zinc, pots en terre cuite (un avec du terreau), caisse de gants | au sol, devant les pots (≈ 540, 1250 sur 768 × 1376) |
+| `decor_salon_table_fenetre2.jpg` | Salon : table en bois clair devant une grande fenêtre (immeuble en face, ciel gris), bibliothèque, radiateurs, canapé, tapis | sur la table (≈ 535, 715 sur 768 × 1376) |
+| `decor_potager_bacs_vides.webp` | Potager en carrés surélevés en bois, terreau nu, allées de gravier, cabane et pommier au fond | dans le grand bac du premier plan |
+| `decor_potager_bacs_plantes.webp` | Le même potager (même cadrage) avec les bacs plantés (salades, oignons, choux…) ; bac du premier plan toujours vide | avant / après avec `decor_potager_bacs_vides` |
+| `decor_salon_table_bois.webp` | Grande table en chêne au premier plan (bol de noix, pot de plante, bougeoir), salon chaleureux au fond (canapé, lampes) | sur la table, au premier plan |
 | `decor_foret_chemin.webp` | Chemin dans une forêt de chênes, en été (sol de feuilles) | sur le chemin (560, 1480) |
 | `decor_cuisine_planche_fenetre.jpg` | Cuisine lumineuse : planche à découper, basilic, huile d'olive, torchon, fenêtre sur Paris, évier à droite | sur la planche |
 | `decor_salon_table_fenetre.jpg` | Salon : petite table en bois devant une porte-fenêtre, bibliothèque, radiateur, canapé, tapis | sur la table |
