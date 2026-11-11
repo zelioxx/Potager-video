@@ -223,6 +223,12 @@ semaines tiges violettes printemps tige nouveau plant abonnez-vous astuces"""),
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""soir hiver pire idée nuit boit chauffage froide racines matin pourrissent moucherons adorent
 arrose température ambiante journée lumière abonnez-vous astuces"""),
+    "gland": dict(
+        scenes="scenes_gland", dur=29.8, voice=os.path.join(AUD, "gland", "voix.mp3"),
+        words=os.path.join(AUD, "gland", "voix_mots.json"), out="gland_chene.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""gland glands chêne 300 ans montrer trier plonge-les bol d'eau flottent vides jette-les coulent
+garde-les plante-les 2 cm pot profond dehors l'hiver jamais sécher printemps premier terre abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
@@ -435,12 +441,23 @@ def build_audio(path):
     active = np.clip(env / (np.percentile(env[env > 1e-4], 50) + 1e-6), 0, 1)
     sm = int(0.25 * sfx.SR)
     active = np.convolve(active, np.ones(sm) / sm, mode="same")
-    mix += fx * getattr(scenes, "SFX_GAIN", 0.34) * (1 - getattr(scenes, "DUCK", 0.45) * active)
+    fx = fx * getattr(scenes, "SFX_GAIN", 0.34) * (1 - getattr(scenes, "DUCK", 0.45) * active)
+    # pas de baisse globale si voix + bruitage dépassent : on ne réduit QUE le bruitage, là où ça déborde
+    # (avant, tout le mix était baissé et la voix sortait moins fort qu'envoyée)
+    over = np.abs(mix + fx)
+    room = np.maximum(0.98 - np.abs(mix), 0.0)
+    g = np.where(over > 0.98, np.clip(room / (np.abs(fx) + 1e-6), 0, 1), 1.0)
+    from scipy.ndimage import minimum_filter1d, uniform_filter1d
+    g = uniform_filter1d(minimum_filter1d(g, int(0.03 * sfx.SR)), int(0.01 * sfx.SR))
+    mix += fx * g
     st = np.stack([mix, mix], 1)
-    peak = np.abs(st).max()
-    if peak > 0.98:
-        st *= 0.98 / peak
-    sf.write(path, st, sfx.SR)
+    # pas de baisse globale : certaines voix envoyées dépassent 0 dBFS une fois décodées (pics à 1,4) ;
+    # on garde le niveau tel quel (WAV en flottant) et le limiteur final (« af ») rabote ces quelques pics
+    if "af" not in CFG:
+        peak = np.abs(st).max()
+        if peak > 0.98:
+            st *= 0.98 / peak
+    sf.write(path, st, sfx.SR, subtype="FLOAT")
 
 
 # volume « TikTok » : fort (≈ -8,7 LUFS, pic -1 dB) et pensé pour les haut-parleurs de téléphone : basses inutiles

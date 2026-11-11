@@ -263,6 +263,19 @@ def chop():
     return norm(snap * 0.8 + knock, 0.95)
 
 
+def toc():
+    """Gland qui tombe par terre : petit « toc » sec de coque dure, puis deux rebonds plus faibles."""
+    out = np.zeros(int(0.5 * SR), np.float32)
+    for o, g in [(0.0, 1.0), (0.15, 0.45), (0.25, 0.2)]:
+        t = _t(0.09)
+        click = _bp(rng.standard_normal(len(t)), 1500, 7000) * np.exp(-t * 160)
+        body = (np.sin(2 * np.pi * 1150 * t) * 0.6 + np.sin(2 * np.pi * 620 * t) * 0.5) * np.exp(-t * 55)
+        x = (click * 0.7 + body) * g
+        i = int(o * SR)
+        out[i: i + len(x)] += x
+    return norm(out, 0.9)
+
+
 def pour(d=1.1):
     n = int(d * SR)
     t = np.arange(n) / SR
@@ -383,6 +396,7 @@ BANK = {
     "bell": bell_notif,
     "rise": rise,
     "chop": chop,
+    "toc": toc,
     "pour": pour,
     "splash": splash,
     "alert1": lambda: alert(392.0),

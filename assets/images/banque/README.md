@@ -53,6 +53,7 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 
 | Fichier | Décor | Où poser les objets |
 |---|---|---|
+| `decor_foret_chemin.webp` | Chemin dans une forêt de chênes, en été (sol de feuilles) | sur le chemin (560, 1480) |
 | `decor_cuisine_planche_fenetre.jpg` | Cuisine lumineuse : planche à découper, basilic, huile d'olive, torchon, fenêtre sur Paris, évier à droite | sur la planche |
 | `decor_salon_table_fenetre.jpg` | Salon : petite table en bois devant une porte-fenêtre, bibliothèque, radiateur, canapé, tapis | sur la table |
 | `decor_rebord_fenetre_radiateur.jpg` | Gros plan d'un large rebord de fenêtre blanc, radiateur en fonte dessous | sur le rebord |
@@ -77,4 +78,14 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `pdouce_tige_coupee.png` / `pdouce_tige_racines.png` / `pdouce_plant.png` | Tige de patate douce seule, avec racines, jeune plant |
 | `verre_eau_droit.png` | Verre droit avec de l'eau, transparence tirée de la photo (bord 125, eau 285, fond 812 dans le cadre 1024) |
 | `bocal_eau.png` | Bocal en verre avec de l'eau |
+| `gland.png` / `gland2.png` | Gland de chêne avec sa cupule (deux photos) |
+| `main_ouverte.png` | Main qui arrive de la gauche et pince (pince pouce-index ≈ 815, 655 dans le cadre 1024) |
+| `main_gland.png` | Main qui tient un gland posé sur des feuilles de chêne vertes |
+| `chene_arbre.png` | Grand chêne (photo) — houppier coupé net en haut et à droite : à faire déborder du cadre ; pied du tronc ≈ 566, 890 |
+| `pot_haut.png` | Pot haut en terre cuite, vide (ouverture ≈ 512, 62 ; bas 992 ; largeur 507) |
+| `pot_chene.png` | Le même pot avec un jeune chêne (largeur du pot 344, bas 508, 992) |
+| `pot_coupe_chene.png` / `pot_coupe_terre.png` | Pot coupé en deux : racines du jeune chêne / rempli de terre seule (surface ≈ 92) |
+| `pot_coupe_pousse.png` | Pot conique coupé, jeune pousse et racines |
+| `feuilles_chene_seches.png` / `feuilles_chene_seches2.png` | Tas de feuilles de chêne sèches |
+| `bol_verre_eau.png` | Bol en verre avec de l'eau, transparence tirée de la photo (eau 487, fond 716 dans le cadre 1024) |
 | `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |
