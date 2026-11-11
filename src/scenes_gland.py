@@ -77,9 +77,9 @@ def acorn(c, x, y, w_, rot=0.0, which=0, alpha=1.0):
 
 # ============================================================ A. LA FORÊT : LE GLAND TOMBE, LA MAIN LE RAMASSE (0 → 4.65)
 GROUND = (560, 1480)                             # là où le gland atterrit, sur le chemin (photo plein écran)
-AC_W = 88                                        # largeur du gland (zoom 1)
+AC_W = 68                                        # largeur du gland (zoom 1)
 HAND_W = 520                                     # largeur de la main (zoom 1)
-PINCH = (815, 655)                               # entre le pouce et l'index (cadre 1024 de la main)
+PINCH = (768, 770)                               # centre du gland tenu : sa cupule entre le bout du pouce et de l'index
 HB_C = (512, 511.5)                              # centre de la boîte de la main
 FG = (430, 1200)                                 # la main présente le gland au premier plan
 FALL = (0.05, 0.95)
@@ -111,6 +111,8 @@ def s_forest(t):
         ax = GROUND[0] + 18 * ease_out(clamp((t - T_LAND) / 0.45))
         ay = GROUND[1] - 70 * math.sin(math.pi * q1) - 22 * math.sin(math.pi * q2)
         arot = 420 + 70 * ease_out(clamp((t - T_LAND) / 0.45))
+        # saisi par la cupule : les doigts le redressent (cupule en haut, entre le pouce et l'index)
+        arot = lerp(arot, 405, ease_io(clamp((t - T_GRAB + 0.05) / 0.3)))
     # caméra : suit la chute, s'approche doucement du gland posé, puis dézoome lentement quand la main le remonte
     if t < T_LAND:
         cam = Cam(Z_FALL, 580, ay + 120)
