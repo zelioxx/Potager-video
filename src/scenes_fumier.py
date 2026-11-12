@@ -31,8 +31,8 @@ CUES = []
 NO_CAPTION_UNTIL = 0.0
 CAP_STYLE = dict(max_words=4, max_chars=24, size=90)
 
-SFX_GAIN = 0.27                                  # voix envoyée à -17,7 LUFS : bruitages réduits d'autant
-DUCK = 0.45
+SFX_GAIN = 0.19                                  # bruitages baissés (≈ -3 dB) : la voix reste bien devant
+DUCK = 0.6
 TRANS_GAIN = 0.26
 SHIFT = 0.25                                     # les temps ci-dessous suivent la reconnaissance vocale (~0,25 s en retard)
 
