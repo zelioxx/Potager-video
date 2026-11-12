@@ -56,6 +56,7 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `decor_mur_outils_jardin.jpg` | Vieux mur en silex : bêche, râteau, transplantoir, arrosoir zinc, pots en terre cuite (un avec du terreau), caisse de gants | au sol, devant les pots (≈ 540, 1250 sur 768 × 1376) |
 | `decor_salon_table_fenetre2.jpg` | Salon : table en bois clair devant une grande fenêtre (immeuble en face, ciel gris), bibliothèque, radiateurs, canapé, tapis | sur la table (≈ 535, 715 sur 768 × 1376) |
 | `decor_potager_bacs_vides.webp` | Potager en carrés surélevés en bois, terreau nu, allées de gravier, cabane et pommier au fond | dans le grand bac du premier plan |
+| `decor_potager_bacs_neige.png` | Le même potager (même cadrage) en hiver : bacs, allées et clôture sous une fine neige, arbre nu, ciel gris | hiver ; fondu avec `decor_potager_bacs_vides` (été) |
 | `decor_potager_bacs_plantes.webp` | Le même potager (même cadrage) avec les bacs plantés (salades, oignons, choux…) ; bac du premier plan toujours vide | avant / après avec `decor_potager_bacs_vides` |
 | `decor_salon_table_bois.webp` | Grande table en chêne au premier plan (bol de noix, pot de plante, bougeoir), salon chaleureux au fond (canapé, lampes) | sur la table, au premier plan |
 | `decor_foret_chemin.webp` | Chemin dans une forêt de chênes, en été (sol de feuilles) | sur le chemin (560, 1480) |
@@ -93,4 +94,8 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `pot_coupe_pousse.png` | Pot conique coupé, jeune pousse et racines |
 | `feuilles_chene_seches.png` / `feuilles_chene_seches2.png` | Tas de feuilles de chêne sèches |
 | `bol_verre_eau.png` | Bol en verre avec de l'eau, transparence tirée de la photo (eau 487, fond 716 dans le cadre 1024) |
+| `fumier_tas.png` / `fumier_gros_tas.png` | Tas de fumier (paille et crottin décomposés), petit / grand |
+| `fumier_bloc.png` | Bloc de fumier pailleux (cube) |
+| `fourche_droite.png` / `fourche_biais.png` / `fourche_biais2.png` | Fourche-bêche à 4 dents : debout (dents en bas) / en biais vers la gauche / en biais vers la droite |
+| `feuille_morte_a.png` / `feuille_morte_b.png` | Feuilles mortes (érable / platane), brun-orangé |
 | `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |
