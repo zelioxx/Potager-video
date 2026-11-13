@@ -25,6 +25,12 @@ VOICE = ("highpass=f=90:p=2,agate=threshold=0.012:ratio=2.5:range=0.12:attack=3:
          "equalizer=f=250:t=q:w=1:g=-2,equalizer=f=3200:t=q:w=1.2:g=3,treble=g=2:f=8000,deesser=i=0.4,"
          "acompressor=threshold=-22dB:ratio=3:attack=6:release=90:knee=6:makeup=4,"
          "acompressor=threshold=-10dB:ratio=4:attack=1.5:release=40:knee=4")      # attrape les attaques avant le limiteur
+# variante « voix pleine » (essai) : timbre et dynamique calqués sur les comptes de référence (Hortenia, Léo) :
+# plus de corps (200–600 Hz), moins d'aigus, compression légère (voix naturelle), niveau ≈ -11 LUFS
+VOICE_PLEINE = ("highpass=f=75:p=2,agate=threshold=0.012:ratio=2.5:range=0.12:attack=3:release=200,"
+                "equalizer=f=220:t=q:w=1:g=2,equalizer=f=550:t=q:w=1:g=1,equalizer=f=3000:t=q:w=1.2:g=-1,"
+                "treble=g=-4:f=6000,deesser=i=0.3,acompressor=threshold=-24dB:ratio=2:attack=10:release=150:knee=8")
+PLEINE_LUFS = -14.0                              # mesuré en mono : ≈ -11 LUFS une fois en stéréo
 LIM = "alimiter=limit=0.84:attack=4:release=60:level=false"
 FX_UNDER, FX_PEAK_UNDER = 14.0, 12.0          # bruitages : sous le niveau médian de la voix / sous les syllabes
 MUS_UNDER, MUS_DUCK = 19.0, 6.0               # musique : sous la voix dans les blancs, et encore -6 dB sous la parole
@@ -49,6 +55,16 @@ def win(x, w, fn):
     k = int(w * SR)
     n = len(x) // k
     return fn(x[: n * k].reshape(n, k))
+
+
+def voice_pleine(src, tmp):
+    pre = os.path.join(tmp, "v_pre.wav")
+    ff("-i", src, "-af", f"aresample={SR}:resampler=soxr,{VOICE_PLEINE}", "-c:a", "pcm_f32le", "-ac", "1", pre)
+    g = PLEINE_LUFS - lufs(pre)[0]
+    out = os.path.join(tmp, "v_master.wav")
+    ff("-i", pre, "-af", f"volume={g:.2f}dB,{LIM}", "-c:a", "pcm_f32le", out)
+    print(f"voix pleine : gain {g:+.1f} dB → {lufs(out)[0]:.1f} LUFS")
+    return out
 
 
 def voice_master(src, tmp):
@@ -79,7 +95,7 @@ def voice_master(src, tmp):
     return out
 
 
-def main(project, music=False):
+def main(project, music=False, pleine=False):
     sys.argv = ["render.py", project]
     sys.path.insert(0, os.path.join(ROOT, "src"))
     import render
@@ -87,7 +103,7 @@ def main(project, music=False):
     os.makedirs(tmp, exist_ok=True)
     sv, sfx_ = os.path.join(tmp, "voix.wav"), os.path.join(tmp, "bruitages.wav")
     render.build_audio(os.path.join(tmp, "mix.wav"), stems=(sv, sfx_))
-    v, _ = sf.read(voice_master(sv, tmp))
+    v, _ = sf.read(voice_pleine(sv, tmp) if pleine else voice_master(sv, tmp))
     fx, sr0 = sf.read(sfx_)
     fx = np.interp(np.linspace(0, len(fx) - 1, int(len(fx) * SR / sr0)), np.arange(len(fx)), fx)
     n = min(len(v), len(fx))
@@ -117,7 +133,7 @@ def main(project, music=False):
         e = uniform_filter1d(e, int(0.35 * SR))
         m *= 10 ** (-MUS_DUCK * e / 20)
         mix = mix + m
-    tag = "_voix_max_musique" if music else "_voix_max"
+    tag = "_voix_pleine" if pleine else ("_voix_max_musique" if music else "_voix_max")
     wav = os.path.join(tmp, "mix_final.wav")
     sf.write(wav, np.stack([mix, mix], 1), SR, subtype="FLOAT")
     video = os.path.join(ROOT, "output", render.CFG["out"])
@@ -140,4 +156,4 @@ def main(project, music=False):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], "--musique" in sys.argv)
+    main(sys.argv[1], "--musique" in sys.argv, "--pleine" in sys.argv)
