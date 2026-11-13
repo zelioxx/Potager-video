@@ -126,7 +126,13 @@ def voice_master(src, tmp):
     return out
 
 
-def main(project, music=False, pleine=False, broadcast=False):
+def main(project, music=False, pleine=False, broadcast=False, gemini=False):
+    """gemini=True : la consigne de Gemini à la lettre (voix broadcast, bruitages à -20 dB sous la voix, mixage
+    normalisé à -14 LUFS, limiteur de crête à -1 dB)."""
+    global FX_UNDER, FX_PEAK_UNDER
+    if gemini:
+        broadcast = True
+        FX_UNDER, FX_PEAK_UNDER = 20.0, 18.0
     sys.argv = ["render.py", project]
     sys.path.insert(0, os.path.join(ROOT, "src"))
     import render
@@ -165,12 +171,12 @@ def main(project, music=False, pleine=False, broadcast=False):
         e = uniform_filter1d(e, int(0.35 * SR))
         m *= 10 ** (-MUS_DUCK * e / 20)
         mix = mix + m
-    tag = "_broadcast" if broadcast else ("_voix_pleine" if pleine else ("_voix_max_musique" if music else "_voix_max"))
+    tag = "_gemini" if gemini else "_broadcast" if broadcast else ("_voix_pleine" if pleine else ("_voix_max_musique" if music else "_voix_max"))
     wav = os.path.join(tmp, "mix_final.wav")
     sf.write(wav, np.stack([mix, mix], 1), SR, subtype="FLOAT")
     if broadcast:   # tout le mixage calé à -14 LUFS, pics vrais ≤ -1,5 dB
         norm = os.path.join(tmp, "mix_norm.wav")
-        loudnorm2(wav, norm, BROADCAST_LUFS, BROADCAST_TP)
+        loudnorm2(wav, norm, BROADCAST_LUFS, -1.0 if gemini else BROADCAST_TP)
         wav = norm
     video = os.path.join(ROOT, "output", render.CFG["out"])
     base, ext = os.path.splitext(video)
@@ -192,4 +198,5 @@ def main(project, music=False, pleine=False, broadcast=False):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], "--musique" in sys.argv, "--pleine" in sys.argv, "--broadcast" in sys.argv)
+    main(sys.argv[1], "--musique" in sys.argv, "--pleine" in sys.argv, "--broadcast" in sys.argv,
+         "--gemini" in sys.argv)

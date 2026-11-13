@@ -230,8 +230,8 @@ arrose température ambiante journée lumière abonnez-vous astuces"""),
         highlight="""gland glands chêne 300 ans montrer trier plonge-les bol d'eau flottent vides jette-les coulent
 garde-les plante-les 2 cm pot profond dehors l'hiver jamais sécher printemps premier terre abonnez-vous astuces"""),
     "fumier": dict(
-        scenes="scenes_fumier", dur=29.2, voice=os.path.join(AUD, "fumier", "voix.mp3"),
-        words=os.path.join(AUD, "fumier", "voix_mots.json"), out="fumier_hiver.mp4",
+        scenes="scenes_fumier", dur=29.4, voice=os.path.join(AUD, "fumier", "voix.wav"),      # nouvelle prise WAV
+        words=os.path.join(AUD, "fumier", "voix_mots_wav.json"), out="fumier_hiver.mp4",
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""hiver potager payer printemps étaler fumier enterrer surface centimètres pluie gel vers terre
 travail attention évite carottes détestent riche souple prête planter abonnez-vous astuces"""),

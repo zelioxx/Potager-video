@@ -37,8 +37,26 @@ TRANS_GAIN = 0.26
 SHIFT = 0.25                                     # les temps ci-dessous suivent la reconnaissance vocale (~0,25 s en retard)
 
 
+# nouvelle prise de voix (WAV, 13 nov.) : même texte, débit légèrement différent (jusqu'à +0,28 s en fin de
+# vidéo). Tous les temps de ce fichier restent ceux de la 1re prise ; on les recale mot à mot sur la nouvelle.
+import json as _json
+_A = _json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "audio",
+                                  "fumier", "recalage_voix_wav.json")))
+_OLD = np.array([a for a, b in _A])
+_NEW = np.array([b for a, b in _A])
+
+
+def old2new(t):
+    """Temps de la 1re prise → temps de la nouvelle prise."""
+    return float(np.interp(t, _OLD, _NEW, left=t + (_NEW[0] - _OLD[0]), right=t + (_NEW[-1] - _OLD[-1])))
+
+
+def new2old(t):
+    return float(np.interp(t, _NEW, _OLD, left=t - (_NEW[0] - _OLD[0]), right=t - (_NEW[-1] - _OLD[-1])))
+
+
 def cue(t, name, gain=0.5):
-    CUES.append((t - SHIFT, name, gain))
+    CUES.append((old2new(t) - SHIFT, name, gain))
 
 
 B = "banque/"
@@ -421,16 +439,20 @@ cue(26.95, "sparkle", 0.16)
 
 
 def _sh(fn):
-    return lambda t: fn(t + SHIFT)
+    return lambda t: fn(new2old(t + SHIFT))
+
+
+def _b(t):
+    return old2new(t) - SHIFT
 
 
 SCENES = [
-    (0.0, 4.5 - SHIFT, _sh(s_snow)),
-    (4.5 - SHIFT, 11.85 - SHIFT, _sh(s_spread)),
-    (11.85 - SHIFT, 16.25 - SHIFT, _sh(s_nature)),
-    (16.25 - SHIFT, 20.35 - SHIFT, _sh(s_carrots)),
-    (20.35 - SHIFT, 24.3 - SHIFT, _sh(s_spring)),
-    (24.3 - SHIFT, 99.0, _sh(s_end)),
+    (0.0, _b(4.5), _sh(s_snow)),
+    (_b(4.5), _b(11.85), _sh(s_spread)),
+    (_b(11.85), _b(16.25), _sh(s_nature)),
+    (_b(16.25), _b(20.35), _sh(s_carrots)),
+    (_b(20.35), _b(24.3), _sh(s_spring)),
+    (_b(24.3), 99.0, _sh(s_end)),
 ]
 
 TRAPS = []
