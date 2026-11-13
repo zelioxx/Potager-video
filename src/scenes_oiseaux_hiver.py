@@ -47,12 +47,31 @@ VOL, PROFIL, BLEUE, FACE = B + "mesange_vol", B + "mesange_profil", B + "mesange
 PICORE, GRAINE_B, MARCHE, PLONGE = B + "mesange_picore", B + "mesange_graine", B + "mesange_marche", B + "mesange_plonge"
 MERLE = B + "merle_sol"
 TOURNESOL_SEC, POMME, POMME2 = B + "tournesol_sec", B + "pomme_rouge", B + "pomme_rouge2"
-MANGEOIRE, GRAINES, PAIN = B + "mangeoire_toit", B + "graines_tournesol", B + "pain"
+MANGEOIRE, GRAINES, PAIN = B + "mangeoire_grille", B + "graines_tournesol", B + "pain"
 CHENILLE = B + "chenille"
 COLD = np.array([0.9, 0.96, 1.07], np.float32)
 BUSH = (235, 1380)                               # sommet du massif enneigé (photo plein écran)
 TREE = (340, 1335)                               # pied du grand arbre
-BRANCH = (560, 760)                              # branche où l'on accroche la mangeoire
+BRANCH = (470, 690)                              # branche enneigée du grand arbre où pend la mangeoire
+HOOK = (488, 34)                                 # sommet du fil dans mangeoire_grille (cadre 1024)
+FB_C = (511.5, 510.5)                            # centre de sa boîte
+FB_W = 829                                       # largeur de sa boîte
+PERCH_Y = 915                                    # perchoirs (cadre 1024)
+
+
+def feeder(c, cam, w_world, s=1.0, rot=0.0):
+    """Mangeoire pendue par son fil au point BRANCH ; renvoie (y des perchoirs, échelle k)."""
+    hx, hy = cam.p(*BRANCH)
+    k = w_world * cam.z / FB_W * s
+    ob(c, MANGEOIRE, hx + (FB_C[0] - HOOK[0]) * k + math.sin(math.radians(rot)) * 400 * k,
+       hy + (FB_C[1] - HOOK[1]) * k, FB_W * k, rot=rot)
+    # la ficelle : réunit les deux bouts du fil et passe par-dessus la branche
+    d = ImageDraw.Draw(c)
+    lw = max(2, int(5 * k))
+    l_, r_ = (hx + (420 - HOOK[0]) * k, hy + 6 * k), (hx + (556 - HOOK[0]) * k, hy + 6 * k)
+    top = (hx, hy - 34 * k)
+    d.line([l_, top, r_], fill=(70, 62, 52, 255), width=lw, joint="curve")
+    return hx, hy + (PERCH_Y - HOOK[1]) * k, k
 
 
 def cold(lay, k=1.0):
@@ -192,16 +211,17 @@ def s_frost(t):
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     X, Y = cam.p(*SPOT)
     shadow_on_snow(lay, X, Y + 4, 70 * z)
-    if t < 11.6:   # ébouriffée, elle grelotte
-        shiver = math.sin(t * 60) * 3 * fade(t, 10.65, None, 0.2)
-        puff = 1 + 0.08 * fade(t, 10.65, None, 0.4)
-        bird(lay, FACE, X + shiver, Y, 70 * z * puff, t=t)
-    else:          # elle picore la neige… rien
-        peck = abs(math.sin((t - 11.6) * 6))
+    if t < 11.6:   # elle picore la neige… rien
+        peck = abs(math.sin((t - 9.3) * 6))
         bird(lay, PICORE, X, Y + 4 * z * peck, 110 * z, flip=False, t=t, rot=-6 * peck)
         if peck > 0.85:
             particles(lay, t, t - 0.02, X - 45 * z, Y, 6, int(t * 10), col=(245, 248, 255), size=4 * z, up=80,
                       spread=90, dur=0.2)
+    else:          # rien trouvé : elle se tourne vers nous, ébouriffée, et grelotte
+        sq = 1 - 0.1 * math.sin(math.pi * clamp((t - 11.6) / 0.2))
+        shiver = math.sin(t * 60) * 3 * fade(t, 11.8, None, 0.2)
+        puff = 1 + 0.08 * fade(t, 11.8, None, 0.4)
+        bird(lay, FACE, X + shiver, Y, 70 * z * puff * sq, t=t)
     w.alpha_composite(cold(lay, 1.2))
     snowfall(w, t, 1.0)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -221,7 +241,7 @@ cue(9.37, "whoosh", 0.1)
 cue(10.7, "sparkle", 0.12)
 cue(11.75, "fail", 0.16)
 for _i in range(4):
-    cue(11.7 + _i * 0.52, "peck", 0.08)
+    cue(9.5 + _i * 0.52, "peck", 0.08)
 
 
 # ============================================================ D. COMME LES ANCIENS : TOURNESOLS ET POMMES (12.8 → 18.4)
@@ -285,31 +305,30 @@ cue(17.35, "bird", 0.14)
 
 
 # ============================================================ E. PAR GRAND FROID : LA MANGEOIRE (18.4 → 22.35)
-FEED_W = 230
+FEED_W = 135                                     # largeur de la mangeoire (photo plein écran)
 
 
 def s_feeder(t):
     k = ease_io(clamp((t - 19.8) / 1.0))
-    cam = Cam(lerp(1.2, 1.9, k), lerp(520, BRANCH[0], k), lerp(1000, BRANCH[1] + 120, k))
+    cam = Cam(lerp(1.2, 2.3, k), lerp(520, BRANCH[0], k), lerp(1000, BRANCH[1] + 140, k))
     z = cam.z
     w = decor(cam, NEIGE)
     w.alpha_composite(Image.new("RGBA", (W, H), (170, 200, 255, int(45 * fade(t, 18.45, None, 0.5)))))
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    fx, fy = cam.p(*BRANCH)
-    drop = ease_out_back(clamp((t - 19.75) / 0.45), 1.3)
-    swing = math.sin((t - 19.75) * 5) * 6 * math.exp(-max(0, t - 19.75) * 1.5) if t > 19.75 else 0
-    if drop > 0.01:   # accrochée à la branche (le haut de la photo de la mangeoire = sa branche)
-        top = lerp(-400, fy, drop)
-        ob(lay, MANGEOIRE, fx, top + FEED_W * z * 0.5, FEED_W * z, rot=swing)
-    birds = [(21.0, -70, PROFIL, False), (21.4, 75, GRAINE_B, True), (21.8, 0, MARCHE, False)]
-    perch_y = fy + FEED_W * z * 0.86
-    for i, (t0, dx, nm, fl) in enumerate(birds):
-        if t0 < t < t0 + 0.5:
-            q = (t - t0) / 0.5
-            flight(lay, W + 150 if i % 2 == 0 else -150, 200, fx + dx * z, perch_y, q, lerp(140, 70 * z, q), t,
-                   flip=i % 2 == 0)
-        elif t >= t0 + 0.5:
-            bird(lay, nm, fx + dx * z, perch_y, 85 * z, flip=fl, t=t + i, hop=0.2)
+    app = ease_out_back(clamp((t - 19.75) / 0.4), 1.4)
+    swing = math.sin((t - 19.75) * 5) * 5 * math.exp(-max(0, t - 19.75) * 1.5) if t > 19.75 else 0
+    fx = None
+    if app > 0.01:   # pendue par son fil à la branche, elle se balance un peu
+        fx, perch_y, kk = feeder(lay, cam, FEED_W, app, swing)
+        # perchoirs : bouts gauche et droit
+        perches = [(fx + (200 - HOOK[0]) * kk, PROFIL, True), (fx + (840 - HOOK[0]) * kk, GRAINE_B, True)]
+        for i, (t0, (px, nm, fl)) in enumerate(zip((21.0, 21.45), perches)):
+            if t0 < t < t0 + 0.5:
+                q = (t - t0) / 0.5
+                flight(lay, W + 150 if i == 0 else -150, 250, px, perch_y, q, lerp(140, 60 * z, q), t,
+                       flip=i == 0)
+            elif t >= t0 + 0.5:
+                bird(lay, nm, px, perch_y, 62 * z, flip=(i == 0), t=t + i, hop=0.2)
     w.alpha_composite(cold(lay, 0.8))
     snowfall(w, t, 1.0, 160)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -333,20 +352,43 @@ cue(21.15, "pop", 0.14)
 
 
 # ============================================================ F. JAMAIS DE PAIN (22.35 → 26.1)
+BREAD = (560, 1600)                              # le pain jeté sur la neige
+
+
 def s_bread(t):
-    w = background("table")
+    cam = Cam(lerp(2.2, 2.35, clamp((t - 22.35) / 3.8)), 600, BREAD[1] - 150)
+    z = cam.z
+    w = decor(cam, NEIGE)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    X, Y = cam.p(*BREAD)
+    q = clamp((t - 22.45) / 0.35)                  # le pain tombe sur la neige
+    if q > 0:
+        y = lerp(Y - 1100, Y, ease_in(q))
+        shadow_on_snow(lay, X, Y + 2, 150 * z * q, 70)
+        ob(lay, PAIN, X, y, 150 * z, rot=(1 - q) * 90 - 6, anchor="bottom")
+        if 22.8 < t < 23.2:
+            particles(lay, t, 22.81, X, Y, 12, 4, col=(245, 248, 255), size=5 * z, up=140, spread=200, dur=0.35)
+    # la mésange arrive à côté du pain… puis gonfle
+    bx = X - 105 * z
+    if 23.0 < t < 23.45:
+        qq = (t - 23.0) / 0.45
+        flight(lay, -200, Y - 900, bx, Y, qq, lerp(150, 70 * z, qq), t)
+    elif t >= 23.45:
+        shadow_on_snow(lay, bx, Y + 4, 70 * z)
+        if t < 24.5:
+            peck = abs(math.sin((t - 23.45) * 6))
+            bird(lay, MARCHE, bx, Y, 110 * z, flip=False, t=t, rot=-5 * peck)
+        else:
+            puff = 1 + 0.35 * ease_out_back(clamp((t - 24.5) / 0.5), 2.0)
+            bird(lay, FACE, bx - 10 * z, Y, 62 * z * puff, t=t)
+    w.alpha_composite(cold(lay))
+    snowfall(w, t, 0.8)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    s_in = ease_out_back(clamp((t - 22.45) / 0.4), 1.5)
-    shadow(w, 360, 1300, 460 * s_in, 80)
-    ob(w, PAIN, 360, 1300, 480, s=max(0.01, s_in), anchor="bottom")
-    # la mésange : elle grossit (gonflée) sans être nourrie
-    puff = 1 + 0.35 * ease_out_back(clamp((t - 24.5) / 0.5), 2.0)
-    shadow(w, 790, 1305, 200 * puff, 80)
-    bird(w, FACE, 790, 1300, 190 * puff, t=t)
+    w.alpha_composite(shade())
     if t > 23.45:
-        put(u, icon("nosign", 360), 360, 1120, life(t, 23.5))
+        put(u, icon("nosign", 260), X, Y - 70 * z, life(t, 23.5))
     if t > 25.3:
-        put(u, icon("cross", 140), 960, 900, life(t, 25.35))
+        put(u, icon("cross", 140), 900, 720, life(t, 25.35))
     title(u, "MAIS SURTOUT…", t, 22.4, 23.4, y=330, color=WHITE, size=170)
     stamp(u, "JAMAIS DE PAIN !", 540, 340, t, 23.45, 24.45, RED, 130, -6)
     title(u, "ÇA LES GONFLE…", t, 24.5, 25.3, y=330, color=YEL, size=150)
@@ -354,7 +396,8 @@ def s_bread(t):
     return w, u
 
 
-cue(22.47, "pop", 0.16)
+cue(22.8, "thud", 0.14)
+cue(23.05, "bird", 0.14)
 cue(23.5, "alert1", 0.2)
 cue(24.55, "squeak", 0.14)
 cue(25.37, "fail", 0.16)
@@ -366,11 +409,9 @@ def s_end(t):
     z = cam.z
     w = decor(cam, NEIGE)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    fx, fy = cam.p(*BRANCH)
-    ob(lay, MANGEOIRE, fx, fy + FEED_W * z * 0.5, FEED_W * z)
-    perch_y = fy + FEED_W * z * 0.86
-    for i, (dx, nm, fl) in enumerate([(-70, PROFIL, False), (75, GRAINE_B, True)]):
-        bird(lay, nm, fx + dx * z, perch_y, 72 * z, flip=fl, t=t + i, hop=0.2)
+    fx, perch_y, kk = feeder(lay, cam, FEED_W)
+    for i, (px, nm) in enumerate([(fx + (200 - HOOK[0]) * kk, PROFIL), (fx + (840 - HOOK[0]) * kk, GRAINE_B)]):
+        bird(lay, nm, px, perch_y, 62 * z, flip=(i == 0), t=t + i, hop=0.2)
     bx, by = cam.p(*BUSH)
     bird(lay, BLEUE, bx, by + 6 * z, 80 * z, flip=True, t=t, hop=0.3)
     w.alpha_composite(cold(lay, 0.8))
