@@ -59,6 +59,10 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `decor_potager_bacs_neige.png` | Le même potager (même cadrage) en hiver : bacs, allées et clôture sous une fine neige, arbre nu, ciel gris | hiver ; fondu avec `decor_potager_bacs_vides` (été) |
 | `decor_potager_bacs_plantes.webp` | Le même potager (même cadrage) avec les bacs plantés (salades, oignons, choux…) ; bac du premier plan toujours vide | avant / après avec `decor_potager_bacs_vides` |
 | `decor_salon_table_bois.webp` | Grande table en chêne au premier plan (bol de noix, pot de plante, bougeoir), salon chaleureux au fond (canapé, lampes) | sur la table, au premier plan |
+| `decor_potager_maison_carre_vide.jpg` | Potager en carrés devant une maison en pierre (volets bleus, glycine) ; au centre, un carré de terre nue | dans le carré vide (≈ 540, 1060 sur 768 × 1376) |
+| `decor_potager_allees_tomates.webp` | Potager en bacs bois, allées de terre : salades rouges/vertes, carottes, fraisiers, courgettes, tomates tuteurées, cabane, maison | dans les allées, au premier plan |
+| `decor_potager_ensoleille_salades.webp` | Potager en plein soleil : bac de salades et carottes au premier plan (une carotte qui dépasse), courgettes, tomates, maison en pierre | au premier plan, sur la terre du bac |
+| `decor_jardin_pelouse_arbres.webp` | Jardin : pelouse, deux jeunes arbres, massif fleuri, arrosoir en zinc, portail et maisons de village au fond | sur la pelouse |
 | `decor_foret_chemin.webp` | Chemin dans une forêt de chênes, en été (sol de feuilles) | sur le chemin (560, 1480) |
 | `decor_cuisine_planche_fenetre.jpg` | Cuisine lumineuse : planche à découper, basilic, huile d'olive, torchon, fenêtre sur Paris, évier à droite | sur la planche |
 | `decor_salon_table_fenetre.jpg` | Salon : petite table en bois devant une porte-fenêtre, bibliothèque, radiateur, canapé, tapis | sur la table |
