@@ -103,4 +103,5 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `fourche_droite.png` / `fourche_biais.png` / `fourche_biais2.png` | Fourche-bêche à 4 dents : debout (dents en bas) / en biais vers la gauche / en biais vers la droite |
 | `feuille_morte_a.png` / `feuille_morte_b.png` | Feuilles mortes (érable / platane), brun-orangé |
 | `carottes_botte.png` | Trois carottes avec leurs fanes (Open Images) |
+| `tas_feuilles_noir.png` | Silhouette noire du tas de feuilles (`feuilles/tas_feuilles`) : pour le suspense |
 | `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |

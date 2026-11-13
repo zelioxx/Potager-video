@@ -276,6 +276,20 @@ def toc():
     return norm(out, 0.9)
 
 
+def feu(d=1.8):
+    """Feu de feuilles : souffle grave (combustion) et petits crépitements secs."""
+    n = int(d * SR)
+    t = np.arange(n) / SR
+    roar = _lp(rng.standard_normal(n), 500) * 0.6
+    x = roar * np.minimum(1, t / 0.3)
+    for _ in range(int(d * 28)):
+        o = rng.integers(0, n - 2000)
+        tt = _t(0.012)
+        x[o: o + len(tt)] += _bp(rng.standard_normal(len(tt)), 1500, 8000) * np.exp(-tt * 400) * rng.uniform(0.4, 1.0)
+    env = np.minimum(1, t / 0.2) * np.minimum(1, (d - t) / 0.4)
+    return norm(x * env, 0.8)
+
+
 def pour(d=1.1):
     n = int(d * SR)
     t = np.arange(n) / SR
@@ -397,6 +411,7 @@ BANK = {
     "rise": rise,
     "chop": chop,
     "toc": toc,
+    "feu": feu,
     "pour": pour,
     "splash": splash,
     "alert1": lambda: alert(392.0),

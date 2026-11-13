@@ -235,6 +235,13 @@ garde-les plante-les 2 cm pot profond dehors l'hiver jamais sécher printemps pr
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""hiver potager payer printemps étaler fumier enterrer surface centimètres pluie gel vers terre
 travail attention évite carottes détestent riche souple prête planter abonnez-vous astuces"""),
+    "feuilles_feu": dict(
+        scenes="scenes_feuilles_feu", dur=27.6, voice=os.path.join(AUD, "feuilles_feu", "voix.wav"),
+        words=os.path.join(AUD, "feuilles_feu", "voix_mots.json"), out="feuilles_feu.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""année jardin interdit 450 euros amende brûler feuilles mortes interdit France pourquoi fumée
+particules toxiques polluent quartier bonne nouvelle l'or paillage potager compost printemps terreau gratuit
+abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
