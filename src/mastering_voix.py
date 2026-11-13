@@ -1,6 +1,8 @@
-"""RÉGLAGE PAR DÉFAUT de toutes les vidéos (validé par Louis le 13 nov. 2026).
+"""Mastering de la voix. RÉGLAGE PAR DÉFAUT de toutes les vidéos : --broadcast (voir VOICE_BROADCAST).
 
-Version « voix au maximum » : la voix seule est rendue la plus forte possible SANS grésiller, puis on ajoute
+    python3 src/mastering_voix.py fumier --broadcast → output/<vidéo>_broadcast.mp4 (+ _leger)   ← par défaut
+
+Ancienne version « voix au maximum » : la voix seule est rendue la plus forte possible SANS grésiller, puis on ajoute
 les bruitages (et, en option, une petite musique de fond) nettement en dessous, sans pics.
 
     python3 src/mastering_voix.py fumier            → output/<vidéo>_voix_max.mp4 (+ _leger)
@@ -30,6 +32,17 @@ VOICE = ("highpass=f=90:p=2,agate=threshold=0.012:ratio=2.5:range=0.12:attack=3:
 VOICE_PLEINE = ("highpass=f=75:p=2,agate=threshold=0.012:ratio=2.5:range=0.12:attack=3:release=200,"
                 "equalizer=f=220:t=q:w=1:g=2,equalizer=f=550:t=q:w=1:g=1,equalizer=f=3000:t=q:w=1.2:g=-1,"
                 "treble=g=-4:f=6000,deesser=i=0.3,acompressor=threshold=-24dB:ratio=2:attack=10:release=150:knee=8")
+# RÉGLAGE « BROADCAST » (demandé par Louis, 13 nov. 2026) : traitement studio type podcast / radio.
+# Voix dense (deux compresseurs : un lent pour resserrer la dynamique, un rapide pour les attaques), médiums
+# boostés (1,8 et 3,5 kHz : ce que les haut-parleurs de téléphone restituent le mieux), haut-bas et boue (200 Hz)
+# nettoyés, dé-esseur ; puis tout le mixage normalisé à -14 LUFS, pics vrais ≤ -1,5 dB (aucune saturation).
+VOICE_BROADCAST = ("highpass=f=80:p=2,agate=threshold=0.012:ratio=2.5:range=0.15:attack=3:release=200,"
+                   "deesser=i=0.4,equalizer=f=200:t=q:w=1:g=-1.5,equalizer=f=1800:t=q:w=1:g=2.5,"
+                   "equalizer=f=3500:t=q:w=1:g=2,"
+                   "acompressor=threshold=-26dB:ratio=3:attack=8:release=120:knee=6:makeup=6,"
+                   "acompressor=threshold=-14dB:ratio=4:attack=2:release=60:knee=4,"
+                   "alimiter=limit=0.84:attack=3:release=50:level=false")
+BROADCAST_LUFS, BROADCAST_TP = -14.0, -1.5
 PLEINE_LUFS = -14.0                              # mesuré en mono : ≈ -11 LUFS une fois en stéréo
 LIM = "alimiter=limit=0.84:attack=4:release=60:level=false"
 FX_UNDER, FX_PEAK_UNDER = 14.0, 12.0          # bruitages : sous le niveau médian de la voix / sous les syllabes
@@ -67,6 +80,24 @@ def voice_pleine(src, tmp):
     return out
 
 
+def voice_broadcast(src, tmp):
+    out = os.path.join(tmp, "v_master.wav")
+    ff("-i", src, "-af", f"aresample={SR}:resampler=soxr,{VOICE_BROADCAST}", "-c:a", "pcm_f32le", "-ac", "1", out)
+    return out
+
+
+def loudnorm2(src, dst, i=-14.0, tp=-1.5, lra=6.0):
+    """Normalisation EBU R128 en deux passes (mode linéaire : un simple gain, aucune déformation)."""
+    import json
+    out = subprocess.run(["ffmpeg", "-nostats", "-i", src, "-af",
+                          f"loudnorm=I={i}:TP={tp}:LRA={lra}:print_format=json", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    m = json.loads(out[out.rindex("{"):out.rindex("}") + 1])
+    ff("-i", src, "-af", f"loudnorm=I={i}:TP={tp}:LRA={lra}:measured_I={m['input_i']}:measured_TP={m['input_tp']}:"
+       f"measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true,"
+       f"aresample={SR}:resampler=soxr", "-c:a", "pcm_f32le", dst)
+
+
 def voice_master(src, tmp):
     """Gain le plus fort possible avant que le limiteur ne travaille trop."""
     pre = os.path.join(tmp, "v_pre.wav")
@@ -95,7 +126,7 @@ def voice_master(src, tmp):
     return out
 
 
-def main(project, music=False, pleine=False):
+def main(project, music=False, pleine=False, broadcast=False):
     sys.argv = ["render.py", project]
     sys.path.insert(0, os.path.join(ROOT, "src"))
     import render
@@ -103,7 +134,8 @@ def main(project, music=False, pleine=False):
     os.makedirs(tmp, exist_ok=True)
     sv, sfx_ = os.path.join(tmp, "voix.wav"), os.path.join(tmp, "bruitages.wav")
     render.build_audio(os.path.join(tmp, "mix.wav"), stems=(sv, sfx_))
-    v, _ = sf.read(voice_pleine(sv, tmp) if pleine else voice_master(sv, tmp))
+    v, _ = sf.read(voice_broadcast(sv, tmp) if broadcast else (voice_pleine(sv, tmp) if pleine else
+                                                                voice_master(sv, tmp)))
     fx, sr0 = sf.read(sfx_)
     fx = np.interp(np.linspace(0, len(fx) - 1, int(len(fx) * SR / sr0)), np.arange(len(fx)), fx)
     n = min(len(v), len(fx))
@@ -133,14 +165,18 @@ def main(project, music=False, pleine=False):
         e = uniform_filter1d(e, int(0.35 * SR))
         m *= 10 ** (-MUS_DUCK * e / 20)
         mix = mix + m
-    tag = "_voix_pleine" if pleine else ("_voix_max_musique" if music else "_voix_max")
+    tag = "_broadcast" if broadcast else ("_voix_pleine" if pleine else ("_voix_max_musique" if music else "_voix_max"))
     wav = os.path.join(tmp, "mix_final.wav")
     sf.write(wav, np.stack([mix, mix], 1), SR, subtype="FLOAT")
+    if broadcast:   # tout le mixage calé à -14 LUFS, pics vrais ≤ -1,5 dB
+        norm = os.path.join(tmp, "mix_norm.wav")
+        loudnorm2(wav, norm, BROADCAST_LUFS, BROADCAST_TP)
+        wav = norm
     video = os.path.join(ROOT, "output", render.CFG["out"])
     base, ext = os.path.splitext(video)
     out = base + tag + ext
     # pics après encodage AAC sous -1 dB (sinon le réencodage de TikTok sature) : on resserre si besoin
-    for lim in (0.82, 0.8, 0.75, 0.71):
+    for lim in ((0.9, 0.86, 0.82) if broadcast else (0.82, 0.8, 0.75, 0.71)):
         ff("-i", video, "-i", wav, "-map", "0:v", "-map", "1:a", "-c:v", "copy",
            "-af", f"aresample=176400:resampler=soxr,alimiter=limit={lim}:attack=1:release=20:level=false,"
                   f"aresample={SR}:resampler=soxr", "-c:a", "aac", "-b:a", "256k",      # limiteur suréchantillonné
@@ -156,4 +192,4 @@ def main(project, music=False, pleine=False):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], "--musique" in sys.argv, "--pleine" in sys.argv)
+    main(sys.argv[1], "--musique" in sys.argv, "--pleine" in sys.argv, "--broadcast" in sys.argv)
