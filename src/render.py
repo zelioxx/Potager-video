@@ -242,6 +242,13 @@ travail attention évite carottes détestent riche souple prête planter abonnez
         highlight="""année jardin interdit 450 euros amende brûler feuilles mortes interdit France pourquoi fumée
 particules toxiques polluent quartier bonne nouvelle l'or paillage potager compost printemps terreau gratuit
 abonnez-vous astuces"""),
+    "oiseaux_hiver": dict(
+        scenes="scenes_oiseaux_hiver", dur=30.8, voice=os.path.join(AUD, "oiseaux_hiver", "voix.mp3"),
+        words=os.path.join(AUD, "oiseaux_hiver", "voix_mots.json"), out="oiseaux_hiver.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""jardin oiseaux hiver toi printemps famille mésanges milliers chenilles potager gèle manger
+anciens têtes tournesol sécher pommes abîmées arbres grands froids mangeoire bois graines jamais pain gonfle nourrir
+abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

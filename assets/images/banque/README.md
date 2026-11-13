@@ -63,6 +63,7 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `decor_potager_allees_tomates.webp` | Potager en bacs bois, allées de terre : salades rouges/vertes, carottes, fraisiers, courgettes, tomates tuteurées, cabane, maison | dans les allées, au premier plan |
 | `decor_potager_ensoleille_salades.webp` | Potager en plein soleil : bac de salades et carottes au premier plan (une carotte qui dépasse), courgettes, tomates, maison en pierre | au premier plan, sur la terre du bac |
 | `decor_jardin_pelouse_arbres.webp` | Jardin : pelouse, deux jeunes arbres, massif fleuri, arrosoir en zinc, portail et maisons de village au fond | sur la pelouse |
+| `decor_jardin_neige.jpg` | Le petit jardin (pelouse, deux arbres, massif, portail, maisons du village) sous la neige | massif (235, 1380), pied du grand arbre (340, 1335), branche (560, 760) |
 | `decor_foret_chemin.webp` | Chemin dans une forêt de chênes, en été (sol de feuilles) | sur le chemin (560, 1480) |
 | `decor_cuisine_planche_fenetre.jpg` | Cuisine lumineuse : planche à découper, basilic, huile d'olive, torchon, fenêtre sur Paris, évier à droite | sur la planche |
 | `decor_salon_table_fenetre.jpg` | Salon : petite table en bois devant une porte-fenêtre, bibliothèque, radiateur, canapé, tapis | sur la table |
@@ -104,4 +105,10 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `feuille_morte_a.png` / `feuille_morte_b.png` | Feuilles mortes (érable / platane), brun-orangé |
 | `carottes_botte.png` | Trois carottes avec leurs fanes (Open Images) |
 | `tas_feuilles_noir.png` | Silhouette noire du tas de feuilles (`feuilles/tas_feuilles`) : pour le suspense |
+| `mesange_vol` / `_profil` / `_face` / `_picore` / `_graine` / `_marche` / `_plonge` / `_basse` / `_3q` | Mésange charbonnière : en vol, de profil (tête à droite), de face ébouriffée, qui picore (tête à gauche), graine au bec, qui marche, qui plonge, accroupie, de trois quarts |
+| `mesange_bleue.png` / `merle.png` / `merle_sol.png` | Mésange bleue sur une branche ; merle debout ; merle au sol (tête à gauche) |
+| `tournesol_plant.png` / `tournesol_sec.png` / `tete_tournesol_seche.png` | Tournesol en fleur ; tournesol séché sur pied ; tête de tournesol séchée pleine de graines |
+| `graines_tournesol.png` / `graine_tournesol.png` | Tas de graines de tournesol ; une graine |
+| `mangeoire_toit.png` / `mangeoire_grille.png` | Mangeoire en bois suspendue à sa branche (plateau) ; mangeoire à grille avec fil |
+| `pomme_rouge.png` / `pomme_rouge2.png` / `pain.png` | Pommes rouges ; morceau de pain de campagne |
 | `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |
