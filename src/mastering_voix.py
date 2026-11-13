@@ -81,8 +81,12 @@ def voice_pleine(src, tmp):
 
 
 def voice_broadcast(src, tmp):
+    """La voix est d'abord ramenée à -18 LUFS : les compresseurs travaillent pareil quel que soit le niveau de la
+    prise envoyée (une voix plus forte au départ ne doit pas être plus écrasée)."""
     out = os.path.join(tmp, "v_master.wav")
-    ff("-i", src, "-af", f"aresample={SR}:resampler=soxr,{VOICE_BROADCAST}", "-c:a", "pcm_f32le", "-ac", "1", out)
+    g = -18.0 - lufs(src)[0]
+    ff("-i", src, "-af", f"aresample={SR}:resampler=soxr,volume={g:.2f}dB,{VOICE_BROADCAST}", "-c:a", "pcm_f32le",
+       "-ac", "1", out)
     return out
 
 

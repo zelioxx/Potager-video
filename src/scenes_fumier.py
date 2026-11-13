@@ -37,7 +37,7 @@ TRANS_GAIN = 0.26
 SHIFT = 0.25                                     # les temps ci-dessous suivent la reconnaissance vocale (~0,25 s en retard)
 
 
-# nouvelle prise de voix (WAV, 13 nov.) : même texte, débit légèrement différent (jusqu'à +0,28 s en fin de
+# prise de voix WAV (13 nov., voix plus forte) : même texte, débit un peu plus lent (jusqu’à +0,64 s en fin de
 # vidéo). Tous les temps de ce fichier restent ceux de la 1re prise ; on les recale mot à mot sur la nouvelle.
 import json as _json
 _A = _json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "audio",
