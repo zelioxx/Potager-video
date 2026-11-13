@@ -50,7 +50,7 @@ def frames(x, w, sr, fn):
     return fn(x[: n * k].reshape(n, k)), k
 
 
-def main(project):
+def main(project, plus=4.0, suffix="_plus4db", ceiling=0.84, ar=48000):
     sys.argv = ["render.py", project]
     sys.path.insert(0, os.path.join(ROOT, "src"))
     import render
@@ -60,7 +60,7 @@ def main(project):
     render.build_audio(os.path.join(tmp, "mix.wav"), stems=(sv, sfx_))
     # 1) la voix seule dans la chaîne validée (+4 dB au-dessus de la version douce à -10 LUFS)
     # même gain que la version +4 dB validée (calé sur le mixage complet) : la voix sort exactement pareil
-    g = gain_for(os.path.join(tmp, "mix.wav")) + 4.0
+    g = gain_for(os.path.join(tmp, "mix.wav")) + plus
     mv = os.path.join(tmp, "voix_master.wav")
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", sv, "-af", f"{PRE},{CMP},volume={g:.2f}dB,{LIM}",
                     "-c:a", "pcm_f32le", "-ar", "48000", "-ac", "1", mv], check=True)
@@ -95,13 +95,14 @@ def main(project):
     # 3) sur la vidéo (rendue au volume d'origine)
     video = os.path.join(ROOT, "output", render.CFG["out"])
     base, ext = os.path.splitext(video)
-    out = base + "_plus4db" + ext
+    out = base + suffix + ext
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", video, "-i", out_wav, "-map", "0:v", "-map", "1:a",
-                    "-c:v", "copy", "-af", SAFE, "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-shortest",
+                    "-c:v", "copy", "-af", f"aresample={ar}:resampler=soxr,alimiter=limit={ceiling}:attack=1:release=20:level=false",
+                    "-c:a", "aac", "-b:a", "256k", "-ar", str(ar), "-shortest",
                     "-movflags", "+faststart", out], check=True)
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", out, "-c:v", "libx264", "-crf", "28", "-preset", "slow",
                     "-maxrate", "1500k", "-bufsize", "3000k", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags",
-                    "+faststart", base + "_plus4db_leger" + ext], check=True)
+                    "+faststart", base + suffix + "_leger" + ext], check=True)
     lfx, _ = frames(fx, 0.1, sr, lambda m: db(np.sqrt((m ** 2).mean(1))))
     pfx, _ = frames(fx, 0.01, sr, lambda m: db(np.abs(m).max(1)))
     print(f"{out}  {lufs(out):.1f} LUFS")
@@ -113,4 +114,9 @@ def main(project):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    if "--tiktok" in sys.argv:
+        # version « TikTok » : moins poussée (-11 LUFS), pics sous -2 dB, 44,1 kHz comme la sortie de TikTok :
+        # de la marge pour que leur réencodage ne sature pas
+        main(sys.argv[1], plus=-1.0, suffix="_tiktok", ceiling=0.79, ar=44100)
+    else:
+        main(sys.argv[1])
