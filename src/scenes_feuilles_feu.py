@@ -1,8 +1,8 @@
 """Storyboard « Brûler ses feuilles mortes : interdit » (voix : assets/audio/feuilles_feu/voix.wav).
 
 Décors fournis : le petit jardin avec les maisons du village au fond, le potager en carrés vides / plantés.
-0–6       le jardin : un tas de feuilles tout noir (suspense) ; « interdit » ; l'avis de contravention de 450 €.
-6–9.1     le tas se révèle… et prend feu : « brûler tes feuilles mortes, c'est interdit en France ».
+0–6       le jardin : une masse noire d'où s'échappe une fumée noire (suspense) ; « interdit » ; amende de 450 €.
+6–9.1     on découvre un tas de feuilles à moitié carbonisé qui couve (braises) et fume beaucoup.
 9.1–14.15 la fumée monte, la caméra file vers les maisons du village, enfumées : particules toxiques.
 14.15–17.2 bonne nouvelle : tes feuilles valent de l'or (fond beige, feuilles dorées).
 17.2–20.1 le potager : on étale les feuilles en paillage, ou on les met au compost.
@@ -93,46 +93,96 @@ def fire(c, x, y, w, t, a=1.0):
         d.ellipse([xx - s_, yy - s_, xx + s_, yy + s_], fill=(255, 200, 80, int(230 * a * (1 - p))))
 
 
-def smoke(c, x, y, t, t0, a=1.0, drift=420, height=1300, n=46, dark=0.0):
-    """Fumée : volutes grises qui montent, grossissent et dérivent vers la droite (vers les maisons)."""
-    if a <= 0.01 or t < t0:
+def embers(c, x, y, w, t, a=1.0):
+    """Le tas couve : des braises orangées qui rougeoient et vacillent entre les feuilles, petites fumerolles."""
+    if a <= 0.01:
         return
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(glow).ellipse([x - w * 0.42, y - w * 0.42, x + w * 0.42, y - w * 0.05],
+                                 fill=(255, 90, 20, int(60 * a * (0.8 + 0.2 * math.sin(t * 5)))))
+    c.alpha_composite(glow.filter(ImageFilter.GaussianBlur(w * 0.12)))
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(lay)
+    r = np.random.default_rng(14)
+    for i in range(18):
+        ang = r.uniform(0, math.pi)
+        rr = r.uniform(0.1, 0.95)
+        xx = x + math.cos(ang) * w * 0.4 * rr
+        yy = y - w * 0.05 - math.sin(ang) * w * 0.48 * rr
+        fl = 0.5 + 0.5 * math.sin(t * r.uniform(4, 9) + i)
+        rad = w * r.uniform(0.005, 0.012)
+        d.ellipse([xx - rad * 1.6, yy - rad, xx + rad * 1.6, yy + rad],
+                  fill=(255, int(lerp(60, 150, fl)), 20, int(200 * a * (0.25 + 0.75 * fl))))
+    c.alpha_composite(lay.filter(ImageFilter.GaussianBlur(2.5)))
+    c.alpha_composite(lay.filter(ImageFilter.GaussianBlur(9)))
+
+
+def _puffs(puffs, col):
+    """Volutes douces accumulées (opérateur « over ») : (x, y, rx, ry, alpha 0–1) → calque RGBA.
+    Profil radial doux (pas de bord net), grain léger pour un aspect de vraie fumée."""
+    A = np.zeros((H, W), np.float32)
+    for x, y, rx, ry, al in puffs:
+        x0, x1 = int(max(0, x - rx)), int(min(W, x + rx + 1))
+        y0, y1 = int(max(0, y - ry)), int(min(H, y + ry + 1))
+        if x1 <= x0 or y1 <= y0 or al <= 0.003:
+            continue
+        yy, xx = np.ogrid[y0:y1, x0:x1]
+        d2 = ((xx - x) / rx) ** 2 + ((yy - y) / ry) ** 2
+        m = np.clip(1 - d2, 0, 1) ** 1.6 * al
+        sub = A[y0:y1, x0:x1]
+        A[y0:y1, x0:x1] = sub + m * (1 - sub)
+    A *= 0.85 + 0.3 * _grain()
+    out = np.zeros((H, W, 4), np.uint8)
+    out[..., 0], out[..., 1], out[..., 2] = col
+    out[..., 3] = np.clip(A * 255, 0, 255).astype(np.uint8)
+    return Image.fromarray(out, "RGBA")
+
+
+@lru_cache(None)
+def _grain():
+    from scipy.ndimage import gaussian_filter
+    g = gaussian_filter(np.random.default_rng(2).standard_normal((H, W)).astype(np.float32), 22)
+    return (g - g.min()) / (g.max() - g.min())
+
+
+def smoke(c, x, y, t, t0, a=1.0, drift=420, height=1300, n=46, dark=0.0):
+    """Fumée : volutes qui montent, grossissent, s'éclaircissent et dérivent vers la droite (vers les maisons).
+    dark : 0 gris clair, 1 gris sombre, 2 noire."""
+    if a <= 0.01 or t < t0:
+        return
     r = np.random.default_rng(8)
     age = t - t0
+    pf = []
     for i in range(n):
         sp = r.uniform(0.16, 0.24)
+        jx = r.uniform(-1, 1)
         p = (age * sp + i / n) % 1.0
         if p > min(1.0, age * 0.45 + 0.05):   # au début, la colonne de fumée monte peu à peu
             continue
-        xx = x + drift * p ** 1.3 + math.sin(t * 0.8 + i) * 40 * p
+        xx = x + drift * p ** 1.2 + math.sin(t * 0.9 + i * 1.7) * 90 * p + jx * 110 * p
         yy = y - height * p
-        rad = 50 + 330 * p
-        g = int(lerp(150, 90, dark))
-        al = int(235 * a * (1 - p) ** 0.6 * min(1, p * 6))
-        d.ellipse([xx - rad, yy - rad, xx + rad, yy + rad], fill=(g + 25, g + 25, g + 28, al // 2))
-        d.ellipse([xx - rad * 0.7, yy - rad * 0.7, xx + rad * 0.7, yy + rad * 0.7], fill=(g, g, g + 3, al))
-    c.alpha_composite(lay.filter(ImageFilter.GaussianBlur(16)))
+        rad = 65 + 400 * p ** 0.7
+        al = 0.42 * a * (1 - p) ** 1.5 * min(1, p * 10 + 0.3) * r.uniform(0.6, 1.2)
+        pf.append((xx, yy, rad, rad * 0.85, al))
+    g = int(max(26, lerp(150, 90, dark)))
+    c.alpha_composite(_puffs(pf, (g, g, g + 3)))
 
 
 def smoke_band(c, t, t0, y, a=1.0, dark=0.0):
     """Nappe de fumée qui traverse le quartier de gauche à droite, à hauteur des toits."""
     if a <= 0.01 or t < t0:
         return
-    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(lay)
     r = np.random.default_rng(9)
+    pf = []
     for i in range(40):
         sp = r.uniform(110, 190)
         xx = (r.uniform(-300, W + 300) + (t - t0) * sp) % (W + 700) - 350
         yy = y + r.uniform(-260, 260) + math.sin(t * 0.6 + i) * 30
-        rad = r.uniform(140, 280)
-        g = int(lerp(155, 95, dark))
-        al = int(200 * a * clamp((t - t0) * 1.2 - r.uniform(0, 0.6)))
-        if al > 0:
-            d.ellipse([xx - rad, yy - rad * 0.7, xx + rad, yy + rad * 0.7], fill=(g, g, g + 3, al))
-    c.alpha_composite(lay.filter(ImageFilter.GaussianBlur(30)))
+        rad = r.uniform(160, 300)
+        al = 0.45 * a * clamp((t - t0) * 1.2 - r.uniform(0, 0.6))
+        pf.append((xx, yy, rad, rad * 0.7, al))
+    g = int(lerp(150, 95, dark))
+    c.alpha_composite(_puffs(pf, (g, g, g + 3)))
 
 
 def toxic(c, cam, t, t0, a=1.0):
@@ -180,17 +230,16 @@ def s_garden(t):
     reveal = ease_io(clamp((t - 6.1) / 0.35))
     s_in = ease_out_back(clamp((t - 0.1) / 0.45), 1.5)
     shadow(w, px, py + 20 * z, PILE_W * z * 0.95 * s_in, 90)
-    burnt = clamp((t - 7.4) / 1.6)                       # il noircit en brûlant
-    if reveal < 1:
+    burnt = 0.6 + 0.2 * clamp((t - 6.5) / 2.5)            # tas à moitié carbonisé, qui noircit encore
+    if reveal < 1:     # suspense : une masse noire d'où sort une fumée noire
         ob(w, TAS_NOIR, px, py, PILE_W * z, s=max(0.01, s_in), anchor="bottom")
+        smoke(w, px, py - 200 * z, t, -4.0, life(t, 0.3, None, dur=0.8) * (1 - reveal), drift=420, height=1150,
+              n=90, dark=2.0)
     if reveal > 0:
-        ob(w, TAS, px, py, PILE_W * z, alpha=reveal * (1 - 0.55 * burnt), anchor="bottom")
-        if burnt > 0:
-            ob(w, TAS_NOIR, px, py, PILE_W * z, alpha=0.55 * burnt, anchor="bottom")
-    if t > 6.55:   # le feu
-        fa = fade(t, 6.55, None, 0.35)
-        smoke(w, px, py - 220 * z, t, 6.8, fade(t, 6.8, None, 0.8), drift=380, height=1400)
-        fire(w, px, py - 40 * z, PILE_W * z * lerp(0.4, 0.75, ease_out((t - 6.55) / 0.6)), t, fa)
+        ob(w, TAS, px, py, PILE_W * z, alpha=reveal, anchor="bottom")
+        ob(w, TAS_NOIR, px, py, PILE_W * z, alpha=reveal * burnt, anchor="bottom")
+        embers(w, px, py, PILE_W * z, t, reveal)
+        smoke(w, px, py - 200 * z, t, -4.0, reveal, drift=480, height=1200, n=90, dark=1.4)
     if 6.1 < t < 6.35:   # flash de la révélation
         w.alpha_composite(Image.new("RGBA", (W, H), (255, 255, 255, int(170 * (1 - (t - 6.1) / 0.25)))))
     w.alpha_composite(shade())
@@ -219,7 +268,8 @@ cue(2.32, "alert1", 0.22)
 cue(4.24, "whoosh_up", 0.14)
 cue(4.5, "fail", 0.18)
 cue(6.12, "pop", 0.2)
-cue(6.55, "feu", 0.35)
+cue(0.4, "feu", 0.12)
+cue(6.4, "feu", 0.18)
 cue(7.82, "alert2", 0.2)
 
 
@@ -236,9 +286,10 @@ def s_smoke(t):
     if py < H + 200:
         ob(w, TAS_NOIR, px, py, PILE_W * z, alpha=0.6, anchor="bottom")
         ob(w, TAS, px, py, PILE_W * z, alpha=0.4, anchor="bottom")
-        fire(w, px, py - 40 * z, PILE_W * z * 0.7, t, 1.0)
+        ob(w, TAS_NOIR, px, py, PILE_W * z, alpha=0.3, anchor="bottom")
+        embers(w, px, py, PILE_W * z, t, 1.0)
     sx, sy = cam.p(PILE[0], PILE[1] - 220)
-    smoke(w, sx, sy, t, 6.8, 1.0, drift=420 * z, height=1400 * z, dark=clamp((t - 11.3) / 1.0))
+    smoke(w, sx, sy, t, -4.0, 1.0, drift=380 * z, height=1300 * z, n=90, dark=1.4 + 0.4 * clamp((t - 11.3) / 1.0))
     # la fumée qui passe devant les maisons
     hx, hy = cam.p(*HOUSES)
     smoke_band(w, t, 10.3, hy - 60, fade(t, 10.3, None, 1.0), dark=clamp((t - 11.3) / 1.0))
@@ -340,20 +391,30 @@ def mulch(c, cam, t, t0=17.35, dur=1.2, decomp=0.0):
     c.alpha_composite(lay)
 
 
+BED_P = [(364, 826), (752, 826), (1040, 1592), (40, 1592)]      # le même carré dans la photo du potager planté
+
+
+def terreau(c, cam, k, q2=0.0):
+    """Le grand carré recouvert d'un terreau sombre ; suit le carré d'une photo à l'autre pendant le fondu."""
+    if k <= 0.01:
+        return
+    poly = [cam.p(lerp(a[0], b[0], q2), lerp(a[1], b[1], q2)) for a, b in zip(BED, BED_P)]
+    m = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(m).polygon(poly, fill=int(110 * k))
+    dark = Image.new("RGBA", (W, H), (32, 20, 11, 255))
+    dark.putalpha(m.filter(ImageFilter.GaussianBlur(4)))
+    c.alpha_composite(dark)
+
+
 def s_garden2(t):
     cam = Cam(1.05, 540, 1000)
     q2 = ease_io(clamp((t - 21.6) / 0.8))            # au printemps : le potager planté
     w = decor(cam, VIDES, PLANTES, q2) if q2 > 0 else decor(cam, VIDES)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     decomp = ease_io(clamp((t - 20.3) / 1.2))
+    terreau(w, cam, decomp, q2)           # la terre fonce (terreau riche) et le reste pendant le fondu
     if q2 < 1:
         mulch(w, cam, t, decomp=decomp)
-        if decomp > 0:    # la terre fonce : un terreau riche
-            m = Image.new("L", (W, H), 0)
-            ImageDraw.Draw(m).polygon([cam.p(*p) for p in BED], fill=int(90 * decomp * (1 - q2)))
-            dark = Image.new("RGBA", (W, H), (35, 22, 12, 255))
-            dark.putalpha(m.filter(ImageFilter.GaussianBlur(4)))
-            w.alpha_composite(dark)
     # « ou mets-les au compost » : le composteur arrive, les feuilles s'envolent dedans
     if 18.95 < t < 20.4:
         k = ease_out_back(clamp((t - 19.0) / 0.35), 1.5)
@@ -394,6 +455,7 @@ cue(21.9, "success", 0.2)
 def s_end(t):
     cam = Cam(1.0, 540, 1000)
     w = decor(cam, PLANTES)
+    terreau(w, cam, 1.0, 1.0)
     light_rays(w, 860, 0, t, 1.0)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
