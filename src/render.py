@@ -471,8 +471,9 @@ def build_audio(path, stems=None):
     sf.write(path, st, sfx.SR, subtype="FLOAT")
 
 
-# Réglage validé par Louis (nov. 2026) pour la livraison : version « +4 dB » (≈ -8,3 LUFS) → src/mastering.py,
-# à lancer sur la vidéo rendue au volume d'origine (« af »).
+# RÉGLAGE PAR DÉFAUT validé par Louis (13 nov. 2026) pour toutes les vidéos : « voix au maximum, sans grésillement »
+# → python3 src/mastering_voix.py <projet>  (≈ -8,0 LUFS, pics < -1 dB, bruitages ≥ 14 dB sous la voix, sans musique),
+# à lancer sur la vidéo rendue au volume d'origine (« af »). Livrer <vidéo>_voix_max.mp4 (+ _leger).
 # volume « TikTok » : fort (≈ -8,7 LUFS, pic -1 dB) et pensé pour les haut-parleurs de téléphone : basses inutiles
 # coupées (< 130 Hz), voix mise en avant (2,6 kHz), compression en deux étapes douces, puis +4,5 dB dans un limiteur
 # à relâche lente (réduction médiane < 1 dB) : plus fort sans l'effet « saturé ».

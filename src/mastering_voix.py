@@ -1,4 +1,6 @@
-"""Version « voix au maximum » : la voix seule est rendue la plus forte possible SANS grésiller, puis on ajoute
+"""RÉGLAGE PAR DÉFAUT de toutes les vidéos (validé par Louis le 13 nov. 2026).
+
+Version « voix au maximum » : la voix seule est rendue la plus forte possible SANS grésiller, puis on ajoute
 les bruitages (et, en option, une petite musique de fond) nettement en dessous, sans pics.
 
     python3 src/mastering_voix.py fumier            → output/<vidéo>_voix_max.mp4 (+ _leger)
