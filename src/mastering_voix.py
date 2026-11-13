@@ -121,9 +121,14 @@ def main(project, music=False):
     video = os.path.join(ROOT, "output", render.CFG["out"])
     base, ext = os.path.splitext(video)
     out = base + tag + ext
-    ff("-i", video, "-i", wav, "-map", "0:v", "-map", "1:a", "-c:v", "copy",
-       "-af", "alimiter=limit=0.8:attack=1:release=20:level=false", "-c:a", "aac", "-b:a", "256k", "-ar", str(SR),
-       "-shortest", "-movflags", "+faststart", out)
+    # pics après encodage AAC sous -1 dB (sinon le réencodage de TikTok sature) : on resserre si besoin
+    for lim in (0.82, 0.8, 0.75, 0.71):
+        ff("-i", video, "-i", wav, "-map", "0:v", "-map", "1:a", "-c:v", "copy",
+           "-af", f"aresample=176400:resampler=soxr,alimiter=limit={lim}:attack=1:release=20:level=false,"
+                  f"aresample={SR}:resampler=soxr", "-c:a", "aac", "-b:a", "256k",      # limiteur suréchantillonné
+           "-ar", str(SR), "-shortest", "-movflags", "+faststart", out)
+        if lufs(out)[1] <= -1.0:
+            break
     ff("-i", out, "-c:v", "libx264", "-crf", "28", "-preset", "slow", "-maxrate", "1500k", "-bufsize", "3000k",
        "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", base + tag + "_leger" + ext)
     i, tp = lufs(out)
