@@ -427,7 +427,9 @@ def render_range(args):
     return path
 
 
-def build_audio(path):
+def build_audio(path, stems=None):
+    """Mixage voix + bruitages. Si `stems` = (voix.wav, bruitages.wav), écrit aussi les deux pistes séparées
+    (bruitages déjà dosés et « duckés ») pour le mastering voix seule de src/mastering.py."""
     voice, sr = sf.read(VOICE, dtype="float32", always_2d=True)
     voice = voice.mean(1)
     if sr != sfx.SR:
@@ -455,6 +457,9 @@ def build_audio(path):
     g = np.where(over > 0.98, np.clip(room / (np.abs(fx) + 1e-6), 0, 1), 1.0)
     from scipy.ndimage import minimum_filter1d, uniform_filter1d
     g = uniform_filter1d(minimum_filter1d(g, int(0.03 * sfx.SR)), int(0.01 * sfx.SR))
+    if stems:
+        sf.write(stems[0], mix.copy(), sfx.SR, subtype="FLOAT")
+        sf.write(stems[1], fx * g, sfx.SR, subtype="FLOAT")
     mix += fx * g
     st = np.stack([mix, mix], 1)
     # pas de baisse globale : certaines voix envoyées dépassent 0 dBFS une fois décodées (pics à 1,4) ;
