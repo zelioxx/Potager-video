@@ -111,6 +111,6 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `graines_tournesol.png` / `graine_tournesol.png` | Tas de graines de tournesol ; une graine |
 | `mangeoire_toit.png` / `mangeoire_grille.png` | Mangeoire en bois suspendue à sa branche (plateau) ; mangeoire à grille avec fil |
 | `pomme_rouge.png` / `pomme_rouge2.png` / `pain.png` | Pommes rouges ; morceau de pain de campagne |
-| `cactus_noel` / `_boutons1` / `_boutons` / `_fleuri` | Cactus de Noël en pot terre cuite : sans fleurs, premiers boutons, boutons, en fleurs (repères : `cactus_noel_meta.json`) |
+| `cactus_noel` / `_boutons` / `_debut_fleurs` / `_fleuri` | Cactus de Noël en pot terre cuite (planche ChatGPT, agrandie ×4, cadre 2048) : sans fleurs, boutons, premières fleurs, couvert de fleurs (repères : `cactus_noel_meta.json`) ; `_boutons1` = ancienne version |
 | `sapin_noel.png` | Petit sapin décoré (boules, guirlande), pied en toile de jute |
 | `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |

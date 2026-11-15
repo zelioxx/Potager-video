@@ -1,13 +1,15 @@
 {
  "cactus_noel": {
-  "bottom": 945,
-  "saucer_w": 348,
-  "cx": 514.0
+  "bottom": 1935,
+  "saucer_w": 735,
+  "cx": 1045.5,
+  "frame": 2048
  },
  "cactus_noel_boutons": {
-  "bottom": 987,
-  "saucer_w": 372,
-  "cx": 509.0
+  "bottom": 1931,
+  "saucer_w": 721,
+  "cx": 1008.5,
+  "frame": 2048
  },
  "cactus_noel_boutons1": {
   "bottom": 988,
@@ -15,13 +17,20 @@
   "cx": 511.5
  },
  "cactus_noel_fleuri": {
-  "bottom": 931,
-  "saucer_w": 333,
-  "cx": 501.5
+  "bottom": 1895,
+  "saucer_w": 711,
+  "cx": 1007.5,
+  "frame": 2048
  },
  "sapin_noel": {
   "bottom": 990,
   "saucer_w": 218,
   "cx": 491.0
+ },
+ "cactus_noel_debut_fleurs": {
+  "bottom": 1892,
+  "saucer_w": 713,
+  "cx": 1027.5,
+  "frame": 2048
  }
 }

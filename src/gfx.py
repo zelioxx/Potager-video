@@ -245,7 +245,8 @@ def spr(c, name, x, base_y, h, s=1.0, rot=0.0, alpha=1.0, rotten=0.0, shadow=Tru
     tw = a.width * h / a.height * s * sx
     if th < 2 or tw < 2:
         return None
-    im = a.resize((max(1, int(tw)), max(1, int(th))), Image.BICUBIC)
+    # réduction : LANCZOS (pas de crénelage sur les photos haute définition) ; agrandissement : BICUBIC
+    im = a.resize((max(1, int(tw)), max(1, int(th))), Image.LANCZOS if th < a.height * 0.8 else Image.BICUBIC)
     if flip:
         im = im.transpose(Image.FLIP_LEFT_RIGHT)
     if rotten > 0.01:

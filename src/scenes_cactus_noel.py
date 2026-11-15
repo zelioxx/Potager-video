@@ -43,13 +43,15 @@ def cue(t, name, gain=0.5):
 
 B = "banque/"
 SALON, GRANGE = "decor_salon_table_bois.webp", "chrys_fond_etabli.png"
-VERT, BOUT1, BOUT, FLEURI, SAPIN = (B + "cactus_noel", B + "cactus_noel_boutons1", B + "cactus_noel_boutons",
+# cactus : planche générée avec ChatGPT (4 stades, même pot), agrandis ×4 (EDSR) puis détourés, cadre 2048
+DEBUT = B + "cactus_noel_debut_fleurs"
+VERT, BOUT1, BOUT, FLEURI, SAPIN = (B + "cactus_noel", B + "cactus_noel_boutons", B + "cactus_noel_boutons",
                                     B + "cactus_noel_fleuri", B + "sapin_noel")
 META = json.load(open(os.path.join(IMG, "banque", "cactus_noel_meta.json")))
 FULL = (0, 0, 1024, 1024)
 LAMP = (955, 560)                                # abat-jour de la lampe (salon, plein écran)
 CACTUS = (640, 1520)                             # bas de la soucoupe, sur la table du salon
-POT_W = 300                                      # largeur de la soucoupe (zoom 1)
+POT_W = 235                                      # largeur de la soucoupe (zoom 1)
 TREE = (215, 1060)                               # pied du sapin, au sol derrière la table
 TREE_H = 560
 BENCH = (520, 1330)                              # sur l'établi de la grange
@@ -59,7 +61,8 @@ LIGHTS = [(0.42, 0.25), (0.6, 0.33), (0.35, 0.42), (0.55, 0.47), (0.68, 0.55), (
 
 def cactus(c, name, x, y, pot_w, s=1.0, rot=0.0):
     m = META[name.split("/")[-1]]
-    place(c, name, FULL, pot_w / m["saucer_w"], m["cx"], m["bottom"], x, y, s, rot)
+    f = m.get("frame", 1024)
+    place(c, name, (0, 0, f, f), pot_w / m["saucer_w"], m["cx"], m["bottom"], x, y, s, rot)
 
 
 def sapin(c, cam, t, glow=1.0):
@@ -280,8 +283,13 @@ def s_bloom_grange(t):
     w = decor(cam, GRANGE)
     x, y = cam.p(*BENCH)
     shadow(w, x, y - 4, POT_W * z * 1.0, 100)
-    which, sc = swap((t - 19.95) / 0.3)
-    cactus(w, BOUT if which == 0 else FLEURI, x, y, POT_W * z * sc)
+    if t < 19.95:    # boutons → premières fleurs → couvert de fleurs
+        which, sc = swap((t - 19.45) / 0.3)
+        nm = BOUT if which == 0 else DEBUT
+    else:
+        which, sc = swap((t - 19.95) / 0.3)
+        nm = DEBUT if which == 0 else FLEURI
+    cactus(w, nm, x, y, POT_W * z * sc)
     w = lighting(w, lerp(0.55, 0.3, fade(t, 19.95, None, 0.4)), 0.0, tint=(0.75, 0.82, 1.0))
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
