@@ -80,8 +80,25 @@ def shade():
     return im
 
 
+_HDREF = {}            # id(image plein écran) → nom du décor qui a une version HD (assets/.../source_utilisateur/hd)
+
+
+def _hd_path(name):
+    return os.path.join(SRC, "hd", os.path.splitext(name)[0] + ".jpg")
+
+
+@lru_cache(8)
+def photo_hd(name):
+    """Version agrandie ×4 (EDSR, outils/upscale.py) ramenée à 2 × l'écran : les zooms y restent nets."""
+    return Image.open(_hd_path(name)).convert("RGB").resize((2 * W, 2 * H), Image.LANCZOS).convert("RGBA")
+
+
 @lru_cache(None)
 def photo(name):
+    if os.path.exists(_hd_path(name)):
+        im = photo_hd(name).resize((W, H), Image.LANCZOS)
+        _HDREF[id(im)] = name
+        return im
     p = os.path.join(SRC, name)
     return Image.open(p).convert("RGB").resize((W, H), Image.LANCZOS).convert("RGBA")
 
@@ -115,7 +132,10 @@ def zoomed(img, z, fx, fy):
     cw, ch = W / z, H / z
     x0 = min(max(fx - cw / 2, 0), W - cw)
     y0 = min(max(fy - ch / 2, 0), H - ch)
-    return img.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BICUBIC)
+    if id(img) in _HDREF:   # décor HD : on recadre dans la grande image (une seule mise à l'échelle, nette)
+        hd = photo_hd(_HDREF[id(img)])
+        return hd.resize((W, H), Image.LANCZOS, box=(2 * x0, 2 * y0, 2 * (x0 + cw), 2 * (y0 + ch)))
+    return img.resize((W, H), Image.LANCZOS, box=(x0, y0, x0 + cw, y0 + ch))
 
 
 def obj(c, name, bbox, X, Y, width, s=1.0, rot=0.0, alpha=1.0):

@@ -13,7 +13,7 @@ from multiprocessing import Pool
 
 import numpy as np
 import soundfile as sf
-from PIL import Image
+from PIL import Image, ImageFilter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gfx import (W, H, YEL, WHITE, DARK, F_CAP, text_img, put, ring_badge, clamp, ease_out_back, ease_io,  # noqa: E402
@@ -380,7 +380,9 @@ def render_scene(fn, a, b, t):
     if z > 1.001 and not getattr(fn, "raw", False):
         cw, ch = W / z, H / z
         x0, y0 = (W - cw) / 2, (H - ch) * 0.45
-        w = w.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BILINEAR)
+        w = w.resize((W, H), Image.BICUBIC, box=(x0, y0, x0 + cw, y0 + ch))
+    # léger renforcement de netteté du décor et des objets (pas des titres) : compense les mises à l'échelle
+    w = w.filter(ImageFilter.UnsharpMask(radius=1.1, percent=45, threshold=2))
     w.alpha_composite(u)
     return w
 
@@ -432,7 +434,7 @@ def frame(t):
 def render_range(args):
     i0, i1, path = args
     p = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
-                          "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "16",
+                          "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "slow", "-crf", "14",
                           "-pix_fmt", "yuv420p", path], stdin=subprocess.PIPE)
     for i in range(i0, i1):
         p.stdin.write(frame(i / FPS).tobytes())
