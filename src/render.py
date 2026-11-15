@@ -249,6 +249,12 @@ abonnez-vous astuces"""),
         highlight="""jardin oiseaux hiver toi printemps famille mésanges milliers chenilles potager gèle manger
 anciens têtes tournesol sécher pommes abîmées arbres grands froids mangeoire bois graines jamais pain gonfle nourrir
 abonnez-vous astuces"""),
+    "cactus_noel": dict(
+        scenes="scenes_cactus_noel", dur=26.9, voice=os.path.join(AUD, "cactus_noel", "voix.mp3"),
+        words=os.path.join(AUD, "cactus_noel", "voix_mots.json"), out="cactus_noel.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""cactus Noël fleurit jamais lampe salon empêche fleurir longues nuits noir complet pièce fraîche
+lumière soir 6 semaines arrose-le très peu attention boutons bouge tombent fleurs abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
