@@ -8,7 +8,7 @@ def norm(c):
 zc = []; zt = []
 for tok, t in zip(z["tokens"], z["ts"]):
     for ch in norm(tok.replace('▁', '')): zc.append(ch); zt.append(t)
-NUM = {"1": "un", "2": "deux", "3": "trois", "4": "quatre", "5": "cinq", "10": "dix", "20": "vingt", "200": "deuxcents", "300": "troiscents", "450": "quatrecentcinquante", "cm": "centimètres", "cm,": "centimètres", "2/3": "deuxtiers"}
+NUM = {"1": "un", "2": "deux", "3": "trois", "4": "quatre", "5": "cinq", "6": "six", "10": "dix", "20": "vingt", "200": "deuxcents", "300": "troiscents", "450": "quatrecentcinquante", "cm": "centimètres", "cm,": "centimètres", "2/3": "deuxtiers"}
 words = open(S + "/script.txt").read().split()
 sc = []; owner = []
 for i, w in enumerate(words):
