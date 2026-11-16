@@ -11,6 +11,7 @@ puis détourées ; le pied de tomate détouré sans son pot.
 22.5–fin  la cagette de tomates rouges ; bouton S'abonner et logo.
 """
 import math
+from functools import lru_cache
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
@@ -22,7 +23,7 @@ from scenes_ananas import logo_img
 from scenes_hortensia import stamp
 from scenes_citron import shade, shadow, swap
 from scenes_banane import ob
-from scenes_fumier import Cam, decor
+from scenes_fumier import Cam, decor, snowfall
 from scenes_gland import hand_at
 from scenes_feuilles_feu import _puffs
 from scenes_arrosage_soir import thermo_cold
@@ -41,19 +42,21 @@ def cue(t, name, gain=0.5):
 
 
 B = "banque/"
-POTAGER, SALON = "decor_potager_maison_carre_vide.jpg", "decor_salon_table_bois.webp"
+POTAGER, SALON = "decor_potager_bacs_neige.png", "decor_salon_table_bois.webp"     # le potager déjà en hiver
 PIED, PIED_C = B + "pied_tomate", B + "pied_tomate_cueillie"
+PIED_PLUS = B + "pied_tomate_plus"               # le pied + une tomate verte accrochée sous la grappe (celle qu'on cueille)
+GRAPPE = B + "tomate_verte_grappe"
 VERTE, ROUGE, BOULE = B + "tomate_verte", B + "tomate_rouge", B + "tomate_journal_boule"
 VERTE_J, ROUGE_J, BANANE, CAGETTE = (B + "tomate_verte_journal", B + "tomate_rouge_journal", B + "banane_mure",
                                      B + "cagette")
 
 # --- le pied de tomate (cadre 2048 : bbox x 564–1483, y 64–1984 ; bas de la motte 1984)
-P_BASE = (765, 1100)                             # planté dans le carré vide (photo plein écran)
-P_H = 700                                        # hauteur à l'écran (zoom 1)
+P_BASE = (560, 1270)                             # planté dans le grand carré enneigé (photo plein écran)
+P_H = 760                                        # hauteur à l'écran (zoom 1)
 PK = P_H / 1920
 P_BB_W = 1483 - 564
-TOM = (967, 1302)                                # la tomate cueillie (cadre 2048), rayon 62
-TOM_R = 62
+TOM = (1018, 1410)                               # la tomate ajoutée, cueillie (cadre 2048), rayon 64
+TOM_R = 64
 
 
 def pied_xy(fx, fy):
@@ -97,18 +100,35 @@ def _frost_grain():
 CAM_A0, CAM_A1 = (1.08, 600, 1000), (2.1, TOM_W[0] + 20, TOM_W[1] + 40)
 
 
-def draw_pied(c, cam, picked=False):
-    x, y = cam.p(*P_BASE)
-    shadow(c, x, y, 260 * PK * cam.z * 2.2, 70)
-    ob(c, PIED_C if picked else PIED, x, y, P_BB_W * PK * cam.z, anchor="bottom")
+@lru_cache(2)
+def garden_hd(picked):
+    """Le potager enneigé avec le pied planté, composé une fois en haute définition (2 × l'écran) : la caméra
+    recadre ensuite cette image d'un seul tenant, le pied ne « tremble » plus pendant les zooms."""
+    import os
+    from scenes_citron import photo_hd, _hd_path, photo
+    base = (photo_hd(POTAGER) if os.path.exists(_hd_path(POTAGER)) else
+            photo(POTAGER).resize((2 * W, 2 * H), Image.LANCZOS)).copy()
+    x, y = 2 * P_BASE[0], 2 * P_BASE[1]
+    sh = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    r = P_BB_W * PK * 2 * 0.55
+    ImageDraw.Draw(sh).ellipse([x - r, y - r * 0.16, x + r, y + r * 0.16], fill=(40, 30, 25, 110))
+    base.alpha_composite(sh.filter(ImageFilter.GaussianBlur(14)))
+    ob(base, PIED if picked else PIED_PLUS, x, y, P_BB_W * PK * 2, anchor="bottom")
+    return base
+
+
+def garden(cam, picked=False):
+    cw, ch = W / cam.z, H / cam.z
+    return garden_hd(picked).resize((W, H), Image.LANCZOS,
+                                    box=(2 * cam.x0, 2 * cam.y0, 2 * (cam.x0 + cw), 2 * (cam.y0 + ch)))
 
 
 def s_potager(t):
-    k = ease_io(clamp((t - 0.6) / 5.0))
+    k = ease_io(clamp((t - 0.5) / 2.3))             # zoom plus franc (≈ 2,3 s), puis on reste sur la grappe
     cam = Cam(*[lerp(a, b, k) for a, b in zip(CAM_A0, CAM_A1)])
-    w = decor(cam, POTAGER)
-    draw_pied(w, cam)
-    w = november(w)
+    w = garden(cam)
+    snowfall(w, t, 0.7, 70)
+    w = november(w, 0.6, 0.45)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
     if t > 3.6:   # la feuille de journal
@@ -134,11 +154,10 @@ PICK = (6.55, 7.25, 8.0)                         # arrivée de la main, pincemen
 def s_pick(t):
     cam = Cam(lerp(2.9, 3.1, clamp((t - 5.85) / 3.6)), TOM_W[0] + 30, TOM_W[1] - 20)
     z = cam.z
-    w = decor(cam, POTAGER)
     picked = t >= PICK[1]
-    draw_pied(w, cam, picked)
+    w = garden(cam, picked)
     tx, ty = cam.p(*TOM_W)
-    tw = 2 * TOM_R * PK * z * 1.1
+    tw = 2 * TOM_R * PK * z
     hw = tw * 3.4
     if t > PICK[0]:
         if t < PICK[1]:          # la main arrive et saisit la tomate par le haut
@@ -147,10 +166,11 @@ def s_pick(t):
         else:                    # elle l'emporte
             q = ease_in(clamp((t - PICK[1] - 0.15) / (PICK[2] - PICK[1])))
             px, py = lerp(tx, tx - 300, q), lerp(ty, ty - 1200, q)
-            ob(w, VERTE, px, py, tw)
+            ob(w, GRAPPE, px, py, tw)
             hand_at(w, px, py - tw * 0.38, hw)
-    frost_k = ease_io(clamp((t - 6.0) / 1.6))
-    w = november(w, 1.0, frost_k)
+    snowfall(w, t, 0.7, 70)
+    frost_k = 0.45 + 0.55 * ease_io(clamp((t - 6.0) / 1.2))
+    w = november(w, 0.6, frost_k)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
     if t > 6.9:
