@@ -113,4 +113,8 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `pomme_rouge.png` / `pomme_rouge2.png` / `pain.png` | Pommes rouges ; morceau de pain de campagne |
 | `cactus_noel` / `_boutons` / `_debut_fleurs` / `_fleuri` | Cactus de Noël en pot terre cuite (planche ChatGPT, agrandie ×4, cadre 2048) : sans fleurs, boutons, premières fleurs, couvert de fleurs (repères : `cactus_noel_meta.json`) ; `_boutons1` = ancienne version |
 | `sapin_noel.png` | Petit sapin décoré (boules, guirlande), pied en toile de jute |
+| `pied_tomate.png` / `pied_tomate_cueillie.png` | Pied de tomate tuteuré chargé de tomates vertes, sans pot (motte de terre) ; même pied sans la tomate cueillie (cadre 2048, tomate en 967, 1302) |
+| `tomate_verte` / `tomate_rouge` / `tomate_verte_journal` / `tomate_journal_boule` / `tomate_rouge_journal` | Tomate verte, rouge, à moitié emballée, emballée dans le journal, déballée rouge (cadre 2048) |
+| `banane_mure.png` | Banane bien mûre, tachée (cadre 2048) |
+| `cagette` / `cagette_dessus` / `carton_ouvert` / `carton_dessus` | Cagette en bois de 3/4 et vue de dessus ; carton ouvert de 3/4 et vu de dessus (cadre 2048) |
 | `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |

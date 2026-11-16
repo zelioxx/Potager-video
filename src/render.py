@@ -255,6 +255,12 @@ abonnez-vous astuces"""),
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""cactus Noël fleurit jamais lampe salon empêche fleurir longues nuits noir complet pièce fraîche
 lumière soir 6 semaines arrose-le très peu attention boutons bouge tombent fleurs abonnez-vous astuces"""),
+    "tomates_vertes": dict(
+        scenes="scenes_tomates_vertes", dur=27.2, voice=os.path.join(AUD, "tomates_vertes", "voix.wav"),
+        words=os.path.join(AUD, "tomates_vertes", "voix_mots.json"), out="tomates_vertes.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""tomates vertes novembre jette feuille journal mûrir cueille-les gel belles enveloppe papier boîte
+chaud secret banane mûre gaz accélère semaines rouges abonnez-vous astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
