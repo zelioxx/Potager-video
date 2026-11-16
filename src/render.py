@@ -261,6 +261,12 @@ lumière soir 6 semaines arrose-le très peu attention boutons bouge tombent fle
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""tomates vertes novembre jette feuille journal mûrir cueille-les gel belles enveloppe papier boîte
 chaud secret banane mûre gaz accélère semaines rouges abonnez-vous astuces"""),
+    "orchidee_racines": dict(
+        scenes="scenes_orchidee_racines", dur=25.2, voice=os.path.join(AUD, "orchidee_racines", "voix.wav"),
+        words=os.path.join(AUD, "orchidee_racines", "voix_mots.json"), out="orchidee_racines.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""coupes racines grises orchidée arrête mortes soif grise argentée sèche arroses verte test pince-la
+doucement ferme garde-la molle creuse noire coupe-la ciseaux propres abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

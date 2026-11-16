@@ -64,6 +64,7 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `decor_potager_ensoleille_salades.webp` | Potager en plein soleil : bac de salades et carottes au premier plan (une carotte qui dépasse), courgettes, tomates, maison en pierre | au premier plan, sur la terre du bac |
 | `decor_jardin_pelouse_arbres.webp` | Jardin : pelouse, deux jeunes arbres, massif fleuri, arrosoir en zinc, portail et maisons de village au fond | sur la pelouse |
 | `decor_jardin_neige.jpg` | Le petit jardin (pelouse, deux arbres, massif, portail, maisons du village) sous la neige | massif (235, 1380), pied du grand arbre (340, 1335), branche (560, 760) |
+| `decor_salon_meuble_lampe.jpg` | Meuble en chêne du salon, lampe allumée, vase, pendule, oiseau en bois (ambiance chaude) | sur le meuble (≈ 600, 1340) |
 | `decor_foret_chemin.webp` | Chemin dans une forêt de chênes, en été (sol de feuilles) | sur le chemin (560, 1480) |
 | `decor_cuisine_planche_fenetre.jpg` | Cuisine lumineuse : planche à découper, basilic, huile d'olive, torchon, fenêtre sur Paris, évier à droite | sur la planche |
 | `decor_salon_table_fenetre.jpg` | Salon : petite table en bois devant une porte-fenêtre, bibliothèque, radiateur, canapé, tapis | sur la table |
@@ -117,4 +118,7 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `tomate_verte` / `tomate_rouge` / `tomate_verte_journal` / `tomate_journal_boule` / `tomate_rouge_journal` | Tomate verte, rouge, à moitié emballée, emballée dans le journal, déballée rouge (cadre 2048) |
 | `banane_mure.png` | Banane bien mûre, tachée (cadre 2048) |
 | `cagette` / `cagette_dessus` / `carton_ouvert` / `carton_dessus` | Cagette en bois de 3/4 et vue de dessus ; carton ouvert de 3/4 et vu de dessus (cadre 2048) |
+| `orchidee_rose.png` | Orchidée rose à deux tiges en pot transparent (cadre du recadrage : bas du pot ≈ 0,49 ; 0,95 en fractions) |
+| `racine_orchidee_grise` / `_verte` / `_noire` | Racine aérienne d'orchidée : sèche (grise), saine (verte), pourrie (noire) ; le haut = côté plante |
+| `ciseaux_ouverts.png` / `ciseaux_fermes.png` | Ciseaux inox : ouverts (lames vers la droite), fermés (lames vers la gauche) |
 | `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |
