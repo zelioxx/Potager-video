@@ -47,12 +47,12 @@ R_GRISE, R_VERTE, R_NOIRE = B + "racine_orchidee_grise", B + "racine_orchidee_ve
 CIS_O, CIS_F = B + "ciseaux_ouverts", B + "ciseaux_fermes"
 # repères en fractions du cadre de chaque photo (le cadre complet du recadrage, pas la boîte englobante)
 O_BOT = (0.49, 0.95)                           # bas du pot
-O_RIM_L = (0.325, 0.685)                           # bord gauche du pot : la racine en sort
-O_H = 760                                        # hauteur de la photo de l'orchidée à l'écran (zoom 1)
-ORCH_AT = (600, 1340)                            # bas du pot, sur le meuble (photo plein écran)
+O_RIM_L = (0.36, 0.665)                           # bord gauche du pot : la racine en sort
+O_H = 980                                        # hauteur de la photo de l'orchidée à l'écran (zoom 1)
+ORCH_AT = (610, 1380)                            # bas du pot, sur le meuble (photo plein écran)
 CIS_CUT_O = (0.717, 0.50)                        # entre les lames, ciseaux ouverts (lames vers la droite)
 CIS_CUT_F = (0.33, 0.48)                         # au même endroit, ciseaux fermés
-ROOT_L = 230                                     # longueur de la racine qui dépasse (zoom 1)
+ROOT_L = 300                                     # longueur de la racine qui dépasse (zoom 1)
 ROOT_SX = 0.62                                   # les racines de la planche sont trapues : on les affine
 ROOT_ROT = -38                                   # elle pend vers la gauche, par-dessus le bord du pot
 
@@ -143,14 +143,15 @@ def _paste_img(c, im, fx, fy, X, Y, hgt, rot, alpha=1.0):
 
 
 def orchid(c, cam, root=R_GRISE, root_cut=None, fall=0.0, squeeze=0.0, show_root=True):
-    """L'orchidée sur le meuble, avec la racine aérienne qui dépasse du pot (dessinée devant le pot)."""
+    """L'orchidée sur le meuble ; la racine aérienne part de l'arrière du pot (dessinée derrière lui) et pend
+    par-dessus le bord, sur le côté : elle fait partie de la plante."""
     x, y = cam.p(*ORCH_AT)
     h = O_H * cam.z
-    shadow(c, x, y - 4, 230 * cam.z, 95)
-    paste_frac(c, ORCH, *O_BOT, x, y, height=h)
+    shadow(c, x, y - 4, 300 * cam.z, 95)
     if show_root:
         rx, ry = root_attach(cam)
         draw_root(c, root, rx, ry, ROOT_L * cam.z, ROOT_ROT, root_cut, fall, squeeze)
+    paste_frac(c, ORCH, *O_BOT, x, y, height=h)
 
 
 def root_attach(cam):
@@ -179,7 +180,7 @@ CAM_WIDE = (1.05, 540, 1060)
 
 
 def cam_on_root(z, f=0.5, dy=0):
-    x, y = (ORCH_AT[0] - 120, ORCH_AT[1] - 160 + dy)
+    x, y = (ORCH_AT[0] - 150, ORCH_AT[1] - 220 + dy)
     return (z, x, y)
 
 
@@ -199,7 +200,7 @@ def s_intro(t):
         sy = ty + 10 * math.sin(t * 3)
         snip = 1.6 < t < 2.6 and int((t - 1.6) / 0.25) % 2 == 1
         shake = math.sin(t * 60) * 8 if 2.6 < t < 2.85 else 0
-        scissors(w, sx + shake, sy, 330 * cam.z, closed=snip, rot=-10)
+        scissors(w, sx + shake, sy, 400 * cam.z, closed=snip, rot=-10)
     w.alpha_composite(shade())
     title(u, "TU COUPES LES RACINES", t, 0.05, 1.3, y=330, color=WHITE, size=110)
     title(u, "GRISES DE TON ORCHIDÉE ?", t, 1.35, 2.6, y=330, color=YEL, size=108)
@@ -325,7 +326,7 @@ def s_test(t):
     if t > 12.9:
         q = ease_out(clamp((t - 12.9) / 0.45))
         out = ease_in(clamp((t - 14.6) / 0.4))
-        hand_at(w, lerp(px - 700, px, q) - 700 * out, lerp(py - 700, py, q) - 600 * out, 520 * cam.z * 0.55)
+        hand_at(w, lerp(px - 700, px, q) - 700 * out, lerp(py - 700, py, q) - 600 * out, 520 * cam.z * 0.68)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
     if t > 14.6:
@@ -359,7 +360,7 @@ def s_coupe(t):
         cin = ease_out(clamp((t - 18.4) / 0.45))
         out = ease_in(clamp((t - 19.75) / 0.45))
         sx = lerp(W + 400, cx, cin) + 900 * out
-        scissors(w, sx, cy, 300 * cam.z, closed=t >= CUT_T, rot=-12)
+        scissors(w, sx, cy, 370 * cam.z, closed=t >= CUT_T, rot=-12)
         if 18.9 < t < 19.6:
             sparkles(w, t, 18.92, sx + 160, cy, 160, 8, 7, dur=0.6)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
