@@ -169,6 +169,78 @@ def root_pt(cam, f):
     return rx + L * math.sin(a), ry + L * math.cos(a)
 
 
+# ---- ciseaux articulés : la photo des ciseaux ouverts découpée en deux branches qui pivotent autour de la vis
+PIVOT = (714, 510)                               # la vis (cadre de ciseaux_ouverts, lames vers la droite)
+ANG_FRONT, ANG_BACK = -20.7, 19.4                # lame du dessus / lame du dessous (degrés, y vers le bas)
+ANG_MID = (ANG_FRONT + ANG_BACK) / 2
+CUT_D = 360                                      # le point de coupe sur les lames, à 360 px de la vis
+
+
+@lru_cache(None)
+def _branches():
+    """Branche « avant » (anneau du bas + lame du dessus, avec la vis) et branche « arrière » (anneau du haut +
+    lame du dessous), séparées selon l'angle autour de la vis."""
+    a = np.asarray(_img(CIS_O)).copy()
+    hh, ww = a.shape[:2]
+    yy, xx = np.mgrid[:hh, :ww]
+    ang = np.degrees(np.arctan2(yy - PIVOT[1], xx - PIVOT[0]))
+    r = np.hypot(xx - PIVOT[0], yy - PIVOT[1])
+
+    def near(target):
+        return np.abs((ang - target + 180) % 360 - 180)
+    front = np.minimum(near(ANG_FRONT), near(145.4)) < np.minimum(near(ANG_BACK), near(-147.4))
+    hub = r < 78
+    fa, ba = a.copy(), a.copy()
+    fa[..., 3] = np.where(front | hub, a[..., 3], 0)
+    ba[..., 3] = np.where(~front | hub, a[..., 3], 0)
+    return Image.fromarray(fa, "RGBA"), Image.fromarray(ba, "RGBA")
+
+
+@lru_cache(64)
+def scissors_pose(q24):
+    """Les deux branches pour une fermeture q (0 ouvert → 1 fermé), dans le cadre de la photo."""
+    q = q24 / 24
+    fr, bk = _branches()
+    return (fr.rotate(-(ANG_MID - ANG_FRONT) * q, resample=Image.BICUBIC, center=PIVOT),
+            bk.rotate((ANG_BACK - ANG_MID) * q, resample=Image.BICUBIC, center=PIVOT))
+
+
+def _place(c, im, ax, ay, X, Y, width, rot, flip=True):
+    """Pose `im` (cadre des ciseaux) retourné, mis à la largeur `width`, tourné autour de (ax, ay) placé en (X, Y)."""
+    if flip:
+        im = im.transpose(Image.FLIP_LEFT_RIGHT)
+        ax = im.width - ax
+    k = width / im.width
+    im = im.resize((max(1, int(im.width * k)), max(1, int(im.height * k))), Image.LANCZOS)
+    ax, ay = ax * k, ay * k
+    S = int(2 * math.hypot(max(ax, im.width - ax), max(ay, im.height - ay))) + 4
+    can = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    can.alpha_composite(im, (int(S / 2 - ax), int(S / 2 - ay)))
+    can = can.rotate(rot, resample=Image.BICUBIC, center=(S / 2, S / 2))
+    c.alpha_composite(can, (int(round(X - S / 2)), int(round(Y - S / 2))))
+
+
+def scissors_cut(c, cam, X, Y, w, q, rot, root_args):
+    """Ciseaux articulés au point de coupe (X, Y) : la lame du dessous passe DERRIÈRE la racine (on voit la racine
+    posée sur elle), la lame du dessus passe devant ; q = fermeture (0 → 1)."""
+    front, back = scissors_pose(int(round(clamp(q) * 24)))
+    a = math.radians(ANG_MID)
+    ax, ay = PIVOT[0] + CUT_D * math.cos(a), PIVOT[1] + CUT_D * math.sin(a)
+    # la racine visible (devant le pot) sert de masque : là où elle passe, la lame du dessous est cachée
+    with_root = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    without = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    orchid(with_root, cam, **root_args)
+    orchid(without, cam, show_root=False)
+    d = np.abs(np.asarray(with_root, np.int16) - np.asarray(without, np.int16)).sum(2)
+    mask = np.clip((d - 20) * 6, 0, 255).astype(np.uint8)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    _place(lay, back, ax, ay, X, Y, w, rot)
+    al = np.asarray(lay.getchannel("A"), np.float32) * (1 - mask / 255.0)
+    lay.putalpha(Image.fromarray(al.astype(np.uint8)))
+    c.alpha_composite(lay)
+    _place(c, front, ax, ay, X, Y, w, rot)
+
+
 def scissors(c, X, Y, w, closed=False, rot=0.0, alpha=1.0):
     """Ciseaux arrivant de la droite (lames vers la gauche) ; (X, Y) = point de coupe entre les lames."""
     # photo ouverts : lames vers la droite (on la retourne) ; photo fermés : lames déjà vers la gauche
@@ -198,9 +270,9 @@ def s_intro(t):
         out = ease_in(clamp((t - 2.85) / 0.4))
         sx = lerp(W + 400, tx + 30 * cam.z, cin) + out * 900
         sy = ty + 10 * math.sin(t * 3)
-        snip = 1.6 < t < 2.6 and int((t - 1.6) / 0.25) % 2 == 1
+        q = 0.55 * (0.5 - 0.5 * math.cos((t - 1.6) * 2 * math.pi / 0.5)) if 1.6 < t < 2.6 else 0.0
         shake = math.sin(t * 60) * 8 if 2.6 < t < 2.85 else 0
-        scissors(w, sx + shake, sy, 400 * cam.z, closed=snip, rot=-10)
+        scissors_cut(w, cam, sx + shake, sy, 400 * cam.z, q, -34, dict())
     w.alpha_composite(shade())
     title(u, "TU COUPES LES RACINES", t, 0.05, 1.3, y=330, color=WHITE, size=110)
     title(u, "GRISES DE TON ORCHIDÉE ?", t, 1.35, 2.6, y=330, color=YEL, size=108)
@@ -360,9 +432,12 @@ def s_coupe(t):
         cin = ease_out(clamp((t - 18.4) / 0.45))
         out = ease_in(clamp((t - 19.75) / 0.45))
         sx = lerp(W + 400, cx, cin) + 900 * out
-        scissors(w, sx, cy, 370 * cam.z, closed=t >= CUT_T, rot=-12)
-        if 18.9 < t < 19.6:
-            sparkles(w, t, 18.92, sx + 160, cy, 160, 8, 7, dur=0.6)
+        sy = lerp(cy - 250, cy, cin) - 500 * out
+        # les lames s'ouvrent grand, se posent autour de la racine… et se referment d'un coup
+        q = 0.0 if t < 18.8 else ease_in(clamp((t - 18.8) / (CUT_T - 18.8)))
+        scissors_cut(w, cam, sx, sy, 370 * cam.z, q, -34, dict(root=root, root_cut=cut, fall=fall))
+        if CUT_T - 0.02 < t < CUT_T + 0.35:   # petit éclat au moment de la coupe
+            particles(w, t, CUT_T, cx, cy, 10, 5, col=(40, 30, 25), size=5, up=200, spread=220, dur=0.35)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
     for i, (lbl, tt) in enumerate((("MOLLE", 16.75), ("CREUSE", 17.1), ("NOIRE", 17.9))):
