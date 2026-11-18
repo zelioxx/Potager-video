@@ -47,9 +47,11 @@ def cue(t, name, gain=0.5):
 B = "banque/"
 POTAGER = "decor_potager_bacs_neige.png"
 CHOU, CHOU_N = B + "chou_ronge", B + "chou_nervures"
-POIREAUX = [B + "poireau_plante_a", B + "poireau_plante_b", B + "poireau_plante_c", B + "poireau_plante_d"]
-MARCHE, BIZET, RAMIER, RAMIER_F = B + "pigeon_marche", B + "pigeon_bizet", B + "pigeon_ramier", B + "pigeon_ramier_face"
-VOL_UP, VOL_DOWN = [B + "pigeon_vol_a", B + "pigeon_vol_b"], [B + "pigeon_vol_d", B + "pigeon_vol_f"]
+SAINS = [B + "chou_sain_a", B + "chou_sain_b", B + "chou_sain_c", B + "chou_sain_d"]
+POIREAUX = [B + "poireau_motte_a", B + "poireau_motte_b", B + "poireau_motte_c"]
+PIG, PIG_PK = B + "pigeon_debout", B + "pigeon_picore"          # debout (regarde à droite), picore (à gauche)
+MARCHE = BIZET = RAMIER = PIG
+VOL_UP, VOL_DOWN = [B + "pigeon_vol_haut"], [B + "pigeon_vol_bas"]
 EPOUV, CD, CD2 = B + "epouvantail", B + "cd_face", B + "cd_biais"
 ARCEAUX, CHENILLE = B + "arceaux_biais", B + "chenille"
 NET_SRC = "planche_arceaux_filet_face.webp"
@@ -161,8 +163,9 @@ def cab_pos(i, cam):
     return cam.p(x, y + 0.03 * bedw(v)), C_W * bedw(v) * cam.z
 
 
-def garden(cam, eaten=None, skip=(), extra=None):
+def garden(cam, eaten=None, skip=(), extra=None, sain=0.0):
     """Décor + poireaux + choux. eaten : {i: q} → le chou i se fait dévorer (q ∈ [0, 1]).
+    sain : 1 = choux intacts, 0 = rongés (nombre, ou {i: valeur}).
     extra(lay, i) : appelé avant de dessiner le chou i (pigeons derrière lui)."""
     w = decor(cam, POTAGER)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -170,9 +173,11 @@ def garden(cam, eaten=None, skip=(), extra=None):
     for k, (x, y, h) in enumerate(LEEKS):
         X, Y = cam.p(x, y)
         if -200 < X < W + 200 and -300 < Y < H + 300:
-            nm = POIREAUX[k % 4]
+            nm = POIREAUX[k % 3]
             im = _src(nm)
-            sp(lay, nm, X, Y, h * z * im.width / im.height, 0.5, 1.0, rot=((k * 37) % 9 - 4), flip=k % 2 == 1)
+            hh = h * 1.3
+            sp(lay, nm, X, Y + hh * 0.08 * z, hh * z * im.width / im.height, 0.5, 1.0, rot=((k * 37) % 7 - 3),
+               flip=k % 2 == 1)
     for i in range(len(CABBAGES)):
         if extra:
             extra(lay, i)
@@ -181,40 +186,55 @@ def garden(cam, eaten=None, skip=(), extra=None):
         (X, Y), cw = cab_pos(i, cam)
         ground_shadow(lay, X, Y - cw * 0.04, cw * 0.95, 60)
         q = (eaten or {}).get(i, 1.0 if i != HERO else 0.0)
-        draw_cabbage(lay, X, Y, cw, q, CABBAGES[i][3])
+        sn = sain.get(i, 0.0) if isinstance(sain, dict) else sain
+        draw_cabbage(lay, X, Y, cw, q, CABBAGES[i][3], sn, i)
     if extra:
         extra(lay, len(CABBAGES))
     w.alpha_composite(lay)
     return w
 
 
-def draw_cabbage(c, X, Y, cw, q, flip=False):
-    """Chou rongé (q = 0) → réduit aux nervures (q = 1) : fondu enchaîné, le second un peu plus petit."""
-    if q < 0.999:
-        sp(c, CHOU, X, Y, cw, 0.5, 1.0, flip=flip, alpha=1.0)
-    if q > 0.001:
-        sp(c, CHOU_N, X, Y, cw * 0.93, 0.5, 1.0, flip=flip, alpha=ease_io(q))
+def draw_cabbage(c, X, Y, cw, q, flip=False, sain=0.0, i=0):
+    """Chou intact (sain = 1) → rongé (q = 0) → réduit aux nervures (q = 1) : fondus enchaînés."""
+    if sain < 0.999:
+        if q < 0.999:
+            sp(c, CHOU, X, Y, cw, 0.5, 1.0, flip=flip, alpha=1.0)
+        if q > 0.001:
+            sp(c, CHOU_N, X, Y, cw * 0.93, 0.5, 1.0, flip=flip, alpha=ease_io(q))
+    if sain > 0.001:
+        sp(c, SAINS[i % 4], X, Y, cw * 1.02, 0.5, 1.0, flip=flip, alpha=ease_io(sain))
 
 
 # ------------------------------------------------------------ les pigeons
-# point d'appui (pattes) de chaque photo, en fraction de la boîte (mesuré sur les détourages)
-FEET = {MARCHE: (0.66, 0.96), BIZET: (0.48, 0.97), RAMIER: (0.52, 0.99), RAMIER_F: (0.5, 0.98)}
-BODY = {MARCHE: 1.0, BIZET: 1.0, RAMIER: 1.0, RAMIER_F: 0.62}       # largeur relative (de face : plus étroit)
+@lru_cache(None)
+def feet(name):
+    """Point d'appui (pattes) : milieu des pixels les plus bas de la silhouette, en fraction de la boîte."""
+    a = np.asarray(_src(name).getchannel("A")) > 100
+    h_ = a.shape[0]
+    rows = a[int(h_ * 0.93):]
+    ys, xs = np.nonzero(rows)
+    return float(xs.mean() / a.shape[1]), 0.985
 
 
 def pigeon(c, name, x, y, w, flip=False, t=0.0, peck=0.0, bob=0.0, sy=1.0, alpha=1.0):
-    """Pigeon posé, pattes en (x, y). peck ∈ [0, 1] : il plonge la tête (bascule vers l'avant)."""
-    fx, fy = FEET[name]
-    rot = -38 * peck if not flip else 38 * peck
-    rot += math.sin(t * 9) * 2.5 * bob
+    """Pigeon posé, pattes en (x, y), tourné vers la droite (flip : vers la gauche).
+    peck > 0.45 : photo du pigeon qui picore (tête au sol), sinon pigeon debout qui hoche la tête."""
     ground_shadow(c, x, y, w * 0.7, 55)
-    sp(c, name, x, y, w * BODY[name], fx, fy, rot=rot, flip=flip, alpha=alpha, sy=sy)
+    if peck > 0.45:
+        nm, fl = PIG_PK, not flip
+        ww = w * _src(PIG_PK).width / _src(PIG).width
+        rot = (-4 if not flip else 4) * (peck - 0.45) / 0.55
+    else:
+        nm, fl, ww = PIG, flip, w
+        rot = math.sin(t * 9) * 2.0 * bob + (-10 if not flip else 10) * peck
+    fx, fy = feet(nm)
+    sp(c, nm, x, y, ww, fx, fy, rot=rot, flip=fl, alpha=alpha, sy=sy, cold=5)
 
 
 def flying(c, x, y, w, t, flip=False, seed=0, alpha=1.0):
     """Pigeon en vol (alternance ailes hautes / ailes basses, ~8 battements/s)."""
     ph = (t * 8 + seed * 0.37) % 1
-    name = (VOL_UP if ph < 0.5 else VOL_DOWN)[seed % 2]
+    name = (VOL_UP if ph < 0.5 else VOL_DOWN)[0]
     sp(c, name, x, y, w, 0.5, 0.5, rot=(6 if flip else -6) * math.sin(t * 3 + seed), flip=flip, alpha=alpha, cold=5)
 
 
@@ -416,7 +436,14 @@ def day_card(n, size=300):
 def s_open(t):
     k = ease_io(clamp(t / 2.3))
     cam = Cam(lerp(1.0, 1.22, k), lerp(540, 520, k), lerp(960, 1230, k))
-    w = garden(cam)
+    order = [4, 1, 3, 0, 5, 2]
+    sain = {i: 1 - ease_io(clamp((t - 0.78 - 0.13 * order.index(i)) / 0.3)) for i in range(len(CABBAGES))}
+    w = garden(cam, sain=sain)
+    bits = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    for n_, i in enumerate(order):
+        (X, Y), cw = cab_pos(i, cam)
+        leaf_bits(bits, t, 0.85 + 0.13 * n_, X, Y - cw * 0.5, 7, seed=40 + n_, spread=cw * 0.8, size=cw * 0.06)
+    w.alpha_composite(bits)
     snowfall(w, t, 1.0)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
@@ -428,6 +455,8 @@ def s_open(t):
 
 cue(0.05, "whoosh", 0.1)
 cue(1.25, "pop", 0.16)
+for _n in range(6):
+    cue(0.85 + 0.13 * _n, "peck", 0.1)
 
 
 # ============================================================ B. PAS LES CHENILLES… LES PIGEONS ! (2.3 → 4.85)
@@ -547,9 +576,9 @@ def s_peck(t):
 
     def extra(lay, i):
         if i == HERO:            # le pigeon de droite est un peu derrière le chou
-            pigeon(lay, BIZET, X + cw * 0.62, Y - cw * 0.1, cw * 0.72, True, t + 1, peck=pk_r * 0.85, bob=0.5)
+            pigeon(lay, BIZET, X + cw * 0.52, Y - cw * 0.1, cw * 0.68, True, t + 1, peck=pk_r * 0.85, bob=0.5)
         if i == len(CABBAGES):
-            pigeon(lay, MARCHE, X - cw * 0.12, Y + cw * 0.16, cw * 0.72, False, t, peck=pk_l, bob=0.5)
+            pigeon(lay, MARCHE, X + cw * 0.02, Y + cw * 0.16, cw * 0.68, False, t, peck=pk_l, bob=0.5)
     w = garden(cam, eaten={HERO: q}, extra=extra)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     for n_, t0 in enumerate([10.05, 10.65, 11.25, 11.85]):
@@ -592,7 +621,7 @@ def s_net(t):
                 qq = (t - 14.3) / 0.9
                 x, y = cam.p(*bedp(0.52, 0.62))
                 flying(lay, lerp(x, W + 300, ease_in(qq)), lerp(y - 60, 200, ease_out(qq)), 230, t)
-    w = garden(cam, extra=extra)
+    w = garden(cam, extra=extra, sain=1.0)
     w.alpha_composite(_cold(net_layer(cam, hk, nq), 0.4))
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     # un pigeon se pose sur le filet : il ne peut pas entrer
@@ -629,10 +658,10 @@ def s_touch(t):
     (X, Y), cw = cab_pos(HERO, cam)
     pk = max(0.0, math.sin((t - 19.3) * 2 * math.pi * 1.7)) ** 0.6 if t > 19.3 else 0
     # le chou du premier plan, sain d'abord (q = 0), le filet posé dessus
-    w = garden(cam, skip=(HERO,))
+    w = garden(cam, skip=(HERO,), sain=1.0)
     cab = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     ground_shadow(cab, X, Y - cw * 0.04, cw * 0.95, 60)
-    draw_cabbage(cab, X, Y, cw, 0.0, CABBAGES[HERO][3])
+    draw_cabbage(cab, X, Y, cw, 0.0, CABBAGES[HERO][3], 1 - clamp((t - 19.6) / 1.2), HERO)
     w.alpha_composite(cab)
     netk = ease_out(clamp((t - 17.6) / 0.6))
     if netk > 0:
@@ -768,12 +797,12 @@ cue(24.9, "laugh", 0.06)
 def s_end(t):
     cam = Cam(1.12, 545, 1220)
     tx, ty = net_top(0.5, cam)
-    w = garden(cam)
+    w = garden(cam, sain=1.0)
     w.alpha_composite(_cold(net_layer(cam, [1] * 5, 1.0), 0.4))
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     pigeon(lay, BIZET, tx, ty + 6, 0.32 * bedw(0.5) * cam.z, True, t, bob=1)
     gx, gy = cam.p(150, 1330)
-    pigeon(lay, RAMIER, gx, gy, 270, True, t + 2, bob=1)
+    pigeon(lay, RAMIER, gx, gy, 270, False, t + 2, bob=1)
     w.alpha_composite(lay)
     snowfall(w, t, 0.8)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
