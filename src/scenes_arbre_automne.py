@@ -145,6 +145,11 @@ def s_garden(t):
     dry = ease_io(clamp((t - 2.7) / 1.4))
     droop = -4 * dry + math.sin(t * 2) * 0.6
     tree(w, FEUILLU, x, y, TREE_H * z, 0.0, dry, s=ease_out_back(clamp((t - 0.15) / 0.4), 1.5), sway=droop)
+    if t < 2.9:   # au printemps, quelques fleurs… qui fanent avec l'été
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        blossoms(lay, x, y, TREE_H * z, t, 0.5, z)
+        lay.putalpha(lay.getchannel("A").point(lambda v: int(v * (1 - ease_io(clamp((t - 2.4) / 0.5))))))
+        w.alpha_composite(lay)
     if q > 0.01:
         light_rays(w, 900, 0, t, q)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -166,6 +171,7 @@ cue(4.27, "alert1", 0.2)
 
 
 # ============================================================ B / C. EN COUPE : LES RACINES (5.4 → 14.8)
+ROOTS_H = 1000                                   # échelle du chevelu de racines (≈ taille d'origine de la photo : net)
 GROUND = 880                                     # ligne du sol dans la vue en coupe
 CUT_X = 540
 
@@ -241,11 +247,11 @@ def s_section(t):
     else:
         season = "hiver"
     w = section_bg(season).copy()
-    zoomk = 1.0 + 0.05 * clamp((t - 5.4) / 9.4)
+    zoomk = 1.0                                   # pas de zoom dans la coupe : les racines restent nettes
     if summer:
         soil_tone(w, dry=ease_io(clamp((t - 6.0) / 1.6)))
         roots = 0.28 + 0.04 * clamp((t - 5.6) / 2.5)
-        tree(w, FEUILLU, CUT_X, GROUND, 1500, roots, only_roots=True)
+        tree(w, FEUILLU, CUT_X, GROUND, ROOTS_H, roots, only_roots=True)
         tree(w, FEUILLU, CUT_X, GROUND, 720, 0.0, dry=0.25 * clamp((t - 7.5) / 1.5))
         light_rays(w, 900, 0, t, 1.0)
     else:
@@ -254,7 +260,7 @@ def s_section(t):
         # les racines s'installent tranquillement, tout l'hiver
         # en automne / hiver : l'arbre sans feuilles, et le même chevelu de racines qui s'étend
         roots = 0.32 + 0.68 * ease_io(clamp((t - 12.6) / 2.0))
-        tree(w, FEUILLU, CUT_X, GROUND, 1500, roots, only_roots=True)      # chevelu agrandi (vue en coupe)
+        tree(w, FEUILLU, CUT_X, GROUND, ROOTS_H, roots, only_roots=True)      # chevelu agrandi (vue en coupe)
         tree(w, NU, CUT_X, GROUND, 720, 0.0)
         if season == "automne":
             falling_leaves(w, t, fade(t, 9.4, 12.5, 0.3, 0.2), n=10)
@@ -469,6 +475,44 @@ cue(25.87, "whoosh", 0.1)
 cue(25.95, "splash", 0.16)
 
 
+@lru_cache(8)
+def blossom_spots(h_above):
+    """Points du houppier (dans l'image de l'arbre feuillu à cette taille) où poser des fleurs."""
+    im, xc, yc = tree_parts(FEUILLU, h_above, 0.0, 0.0)
+    a = np.asarray(im)
+    r = np.random.default_rng(12)
+    ys, xs = np.nonzero((a[..., 3] > 200) & (np.arange(a.shape[0])[:, None] < yc * 0.72))
+    idx = r.choice(len(xs), size=min(46, len(xs)), replace=False)
+    return [(xs[i] - xc, ys[i] - yc, r.uniform(0.75, 1.25), r.uniform(0, 0.8), r.integers(0, 3)) for i in idx]
+
+
+@lru_cache(16)
+def blossom_img(rad, kind):
+    """Petite fleur : la vraie photo d'une fleur blanche à 5 pétales (banque/fleur_fraisier), réduite, plus ou
+    moins rosée, légèrement tournée."""
+    im = _img(B + "fleur_fraisier")
+    im = im.crop(im.getbbox()).resize((rad * 2, rad * 2), Image.LANCZOS)
+    if kind:
+        a = np.asarray(im).astype(np.float32)
+        tint = np.array([255, 205, 222], np.float32) if kind == 1 else np.array([250, 180, 205], np.float32)
+        white = (a[..., :3].min(2) > 170)[..., None]
+        a[..., :3] = np.where(white, a[..., :3] * 0.55 + tint * 0.45, a[..., :3])
+        im = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA")
+    return im.rotate(kind * 23, resample=Image.BICUBIC)
+
+
+def blossoms(c, X, Y, h_above, t, t0, z):
+    """Le printemps : des fleurs qui éclosent une à une dans le houppier."""
+    if t < t0:
+        return
+    for dx, dy, sc, delay, kind in blossom_spots(int(h_above) // 2 * 2):
+        q = ease_out_back(clamp((t - t0 - delay) / 0.3), 2.0)
+        if q <= 0.02:
+            continue
+        rad = max(4, int(9 * z * sc))
+        put(c, blossom_img(rad, int(kind)), X + dx, Y + dy, q)
+
+
 # ============================================================ G. AU PRINTEMPS, IL DÉMARRE D'UN COUP (26.8 → fin)
 def s_spring(t, end=False):
     k = ease_io(clamp((t - 26.85) / 1.2))
@@ -481,7 +525,26 @@ def s_spring(t, end=False):
     if t < 28.25:
         tree(w, NU, x, y, TREE_H * z, 0.0)
     else:
-        tree(w, FEUILLU, x, y, TREE_H * z * (0.9 + 0.1 * g), 0.0)
+        h = TREE_H * z * (0.9 + 0.1 * g)
+        tree(w, FEUILLU, x, y, h, 0.0)
+        blossoms(w, x, y, h, t, 28.3, z)
+    # une mésange vient se poser dans l'arbre en fleurs
+    if t > 29.0:
+        from scenes_oiseaux_hiver import flight, bird, PROFIL
+        px, py = x + 70 * z, y - TREE_H * z * 0.55
+        if t < 29.6:
+            flight(w, W + 150, 250, px, py, (t - 29.0) / 0.6, lerp(160, 95 * z, (t - 29.0) / 0.6), t, flip=True)
+        else:
+            bird(w, PROFIL, px, py, 95 * z, flip=True, t=t, hop=0.15)
+    # des pétales qui volent dans la brise
+    if t > 28.6:
+        r = np.random.default_rng(9)
+        for i in range(12):
+            p = ((t - 28.6) * r.uniform(0.15, 0.3) + i / 12) % 1.0
+            px_ = x + r.uniform(-200, 500) * z * 0.6 - p * 300
+            py_ = y - TREE_H * z * 0.8 + p * 600 * z * 0.6 + math.sin(t * 3 + i) * 20
+            put(w, blossom_img(max(4, int(6 * z)), i % 3), px_, py_, 0.8, rot=t * 80 + i * 30,
+                alpha=fade(t, 28.6, None, 0.5) * math.sin(math.pi * p))
     light_rays(w, 900, 0, t, 1.0)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
@@ -507,6 +570,8 @@ def s_spring(t, end=False):
 cue(26.87, "bird", 0.16)
 cue(28.27, "pop_lo", 0.2)
 cue(28.3, "success", 0.2)
+cue(28.6, "sparkle", 0.14)
+cue(29.05, "bird", 0.16)
 cue(29.55, "pop_lo", 0.16)
 cue(30.88, "click", 0.3)
 cue(32.0, "sparkle", 0.16)
