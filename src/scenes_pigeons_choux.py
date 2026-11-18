@@ -446,15 +446,15 @@ def s_culprit(t):
             a = life(t, 2.6, 4.25)
             cx, cy = X + cw * 0.12, Y - cw * 0.55
             sp(lay, CHENILLE, cx + math.sin(t * 3) * 6, cy, cw * 0.5 * a, 0.5, 0.5, rot=-12, alpha=a, cold=3)
-        fly_land(lay, t, 3.95, 4.55, (W + 250, 500), (X - cw * 0.55, Y + cw * 0.05), 200, cw * 0.62, MARCHE, False,
+        fly_land(lay, t, 4.2, 4.7, (W + 250, 500), (X - cw * 0.55, Y + cw * 0.05), 200, cw * 0.62, MARCHE, False,
                  0, peck_from=None)
-        fly_land(lay, t, 4.15, 4.75, (-250, 700), (X + cw * 0.62, Y + cw * 0.12), 200, cw * 0.66, BIZET, True, 1)
+        fly_land(lay, t, 4.32, 4.82, (-250, 700), (X + cw * 0.62, Y + cw * 0.12), 200, cw * 0.66, BIZET, True, 1)
     w = garden(cam, extra=extra)
     snowfall(w, t, 0.7)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
-    if 2.6 < t < 4.3:
-        a = life(t, 2.95, 4.25)
+    if 2.6 < t < 4.2:
+        a = life(t, 2.95, 4.15)
         put(u, icon("nosign", 330), X + cw * 0.12, Y - cw * 0.55, a)
     title(u, "CE NE SONT PAS", t, 2.3, 3.6, y=300, color=WHITE, size=120)
     title(u, "LES CHENILLES…", t, 2.3, 3.6, y=440, color=YEL, size=120)
@@ -464,10 +464,10 @@ def s_culprit(t):
 
 cue(2.32, "whoosh", 0.1)
 cue(2.98, "fail", 0.16)
-cue(3.95, "flap", 0.2)
-cue(4.15, "flap", 0.16)
+cue(4.2, "flap", 0.2)
+cue(4.32, "flap", 0.16)
 cue(4.27, "thud", 0.2)
-cue(4.55, "coo", 0.22)
+cue(4.7, "coo", 0.22)
 
 
 # ============================================================ C. EN HIVER, LES CHENILLES ONT DISPARU (4.85 → 7.75)
