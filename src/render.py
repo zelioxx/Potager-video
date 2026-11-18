@@ -267,6 +267,13 @@ chaud secret banane mûre gaz accélère semaines rouges abonnez-vous astuces"""
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""coupes racines grises orchidée arrête mortes soif grise argentée sèche arroses verte test pince-la
 doucement ferme garde-la molle creuse noire coupe-la ciseaux propres abonne-toi astuces"""),
+    "arbre_automne": dict(
+        scenes="scenes_arbre_automne", dur=33.8, voice=os.path.join(AUD, "arbre_automne", "voix.wav"),
+        words=os.path.join(AUD, "arbre_automne", "voix_mots.json"), out="arbre_automne.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""arbres printemps meurent l'été normal raté bonne date racines chaleurs automne terre tiède humide
+l'hiver tranquillement anciens Sainte-Catherine bois racine plante-le maintenant grand trou arrose pleut jamais gelée
+détrempée démarre coup abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
