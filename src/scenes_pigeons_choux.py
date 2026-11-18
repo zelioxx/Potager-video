@@ -27,7 +27,7 @@ from gfx import (W, H, YEL, RED, GREEN, CREAM, DARK, WHITE, IMG, put, paste, tit
 from scenes import sparkles
 from scenes_ananas import logo_img
 from scenes_hortensia import stamp
-from scenes_citron import shade
+from scenes_citron import shade, swap
 from scenes_fumier import Cam, decor, snowfall
 from scenes_arrosage_soir import snow_badge
 
@@ -48,7 +48,7 @@ B = "banque/"
 POTAGER = "decor_potager_bacs_neige.png"
 CHOU, CHOU_N = B + "chou_ronge", B + "chou_nervures"
 SAINS = [B + "chou_sain_a", B + "chou_sain_b", B + "chou_sain_c", B + "chou_sain_d"]
-POIREAUX = [B + "poireau_motte_a", B + "poireau_motte_b", B + "poireau_motte_c"]
+POIREAUX = [B + "poireau_plante_a", B + "poireau_plante_b", B + "poireau_plante_c"]
 PIG, PIG_PK = B + "pigeon_debout", B + "pigeon_picore"          # debout (regarde à droite), picore (à gauche)
 MARCHE = BIZET = RAMIER = PIG
 VOL_UP, VOL_DOWN = [B + "pigeon_vol_haut"], [B + "pigeon_vol_bas"]
@@ -90,11 +90,32 @@ C_W = 0.40                      # largeur d'un chou (motte comprise) en largeurs
 HERO = 4                        # le chou de devant à gauche : celui qu'on regarde de près
 
 # poireaux : rangées dans les carrés du fond et sur les côtés (x, y au sol, hauteur) — photo plein écran
-LEEKS = ([(560 + i * 34, 742, 74) for i in range(6)] + [(548 + i * 36, 778, 84) for i in range(6)] +
-         [(190 + i * 40, 742, 74) for i in range(6)] + [(172 + i * 42, 778, 84) for i in range(6)] +
-         [(850 + i * 40, 745, 76) for i in range(5)] + [(872 + i * 42, 782, 86) for i in range(5)] +
-         [(40 + i * 62, 900 - i * 0, 120) for i in range(4)] + [(30 + i * 55, 1010, 140) for i in range(3)] +
-         [(990 + i * 50, 930, 128) for i in range(2)] + [(1010 + i * 50, 1060, 146) for i in range(2)])
+# terre (intérieur) des autres carrés, photo plein écran : coins haut-g, haut-d, bas-d, bas-g (mesurés sur le décor)
+OTHER_BEDS = [((527, 688), (718, 688), (753, 788), (513, 788), 3, 5, 70),        # carré du fond, au milieu
+              ((246, 688), (437, 688), (392, 782), (138, 782), 3, 5, 70),        # fond, à gauche
+              ((813, 690), (1100, 690), (1110, 793), (864, 793), 3, 5, 70),      # fond, à droite
+              ((-60, 842), (215, 842), (-5, 1170), (-300, 1170), 4, 3, 125),     # carré de gauche (loin du bord)
+              ((960, 850), (1160, 850), (1160, 1100), (1110, 1100), 3, 2, 125)]  # carré de droite
+
+
+def _leeks():
+    """Rangées de poireaux bien à l'intérieur de chaque carré (marges, léger désordre), du fond vers l'avant."""
+    r = np.random.default_rng(5)
+    out = []
+    for tl, tr, br, bl, nr, nc, h0 in OTHER_BEDS:
+        for a in range(nr):
+            v = 0.22 + 0.62 * a / max(1, nr - 1)
+            for b in range(nc):
+                u = 0.14 + 0.72 * b / max(1, nc - 1) + r.uniform(-0.03, 0.03)
+                lx, ly = lerp(tl[0], bl[0], v), lerp(tl[1], bl[1], v)
+                rx, ry = lerp(tr[0], br[0], v), lerp(tr[1], br[1], v)
+                x, y = lerp(lx, rx, u), lerp(ly, ry, u)
+                if -40 < x < W + 40:
+                    out.append((x, y, h0 * (0.92 + 0.16 * v) * r.uniform(0.9, 1.08)))
+    return sorted(out, key=lambda p: p[1])
+
+
+LEEKS = _leeks()
 
 
 # ------------------------------------------------------------ sprites (cache par taille)
@@ -175,8 +196,8 @@ def garden(cam, eaten=None, skip=(), extra=None, sain=0.0):
         if -200 < X < W + 200 and -300 < Y < H + 300:
             nm = POIREAUX[k % 3]
             im = _src(nm)
-            hh = h * 1.3
-            sp(lay, nm, X, Y + hh * 0.08 * z, hh * z * im.width / im.height, 0.5, 1.0, rot=((k * 37) % 7 - 3),
+            ground_shadow(lay, X, Y, h * z * 0.32, 70, 0.22)
+            sp(lay, nm, X, Y + 2 * z, h * z * im.width / im.height, feet(nm)[0], 1.0, rot=((k * 37) % 7 - 3),
                flip=k % 2 == 1)
     for i in range(len(CABBAGES)):
         if extra:
@@ -195,14 +216,20 @@ def garden(cam, eaten=None, skip=(), extra=None, sain=0.0):
 
 
 def draw_cabbage(c, X, Y, cw, q, flip=False, sain=0.0, i=0):
-    """Chou intact (sain = 1) → rongé (q = 0) → réduit aux nervures (q = 1) : fondus enchaînés."""
-    if sain < 0.999:
-        if q < 0.999:
-            sp(c, CHOU, X, Y, cw, 0.5, 1.0, flip=flip, alpha=1.0)
-        if q > 0.001:
-            sp(c, CHOU_N, X, Y, cw * 0.93, 0.5, 1.0, flip=flip, alpha=ease_io(q))
+    """Chou intact (sain = 1) → rongé → réduit aux nervures (q = 1).
+    Jamais deux images superposées : le chou se tasse, on change d'image au plus petit, il rebondit."""
     if sain > 0.001:
-        sp(c, SAINS[i % 4], X, Y, cw * 1.02, 0.5, 1.0, flip=flip, alpha=ease_io(sain))
+        k, s_ = swap(1 - sain)
+        if k == 0:
+            sp(c, SAINS[i % 4], X, Y, cw * 1.02 * s_, 0.5, 1.0, flip=flip, sy=1.0)
+            return
+        sp(c, CHOU, X, Y, cw * s_, 0.5, 1.0, flip=flip)
+        return
+    k, s_ = swap(q)
+    if k == 0:
+        sp(c, CHOU, X, Y, cw * s_, 0.5, 1.0, flip=flip)
+    else:
+        sp(c, CHOU_N, X, Y, cw * 0.93 * s_, 0.5, 1.0, flip=flip)
 
 
 # ------------------------------------------------------------ les pigeons
@@ -437,7 +464,7 @@ def s_open(t):
     k = ease_io(clamp(t / 2.3))
     cam = Cam(lerp(1.0, 1.22, k), lerp(540, 520, k), lerp(960, 1230, k))
     order = [4, 1, 3, 0, 5, 2]
-    sain = {i: 1 - ease_io(clamp((t - 0.78 - 0.13 * order.index(i)) / 0.3)) for i in range(len(CABBAGES))}
+    sain = {i: 1 - clamp((t - 0.78 - 0.13 * order.index(i)) / 0.26) for i in range(len(CABBAGES))}
     w = garden(cam, sain=sain)
     bits = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     for n_, i in enumerate(order):
@@ -493,10 +520,10 @@ def s_culprit(t):
 
 cue(2.32, "whoosh", 0.1)
 cue(2.98, "fail", 0.16)
-cue(4.2, "flap", 0.2)
-cue(4.32, "flap", 0.16)
+cue(4.2, "flap", 0.14)
+cue(4.32, "flap", 0.11)
 cue(4.27, "thud", 0.2)
-cue(4.7, "coo", 0.22)
+cue(4.75, "coo", 0.13)
 
 
 # ============================================================ C. EN HIVER, LES CHENILLES ONT DISPARU (4.85 → 7.75)
@@ -559,9 +586,8 @@ def s_hungry(t):
 
 
 cue(7.8, "whoosh", 0.1)
-cue(8.2, "coo", 0.2)
 cue(9.05, "thud", 0.18)
-cue(9.3, "coo_lo", 0.18)
+cue(9.35, "coo_lo", 0.12)
 
 
 # ============================================================ E. ILS PICORENT JUSQU'AUX NERVURES (9.8 → 12.95)
@@ -570,7 +596,7 @@ def s_peck(t):
     cwo = C_W * bedw(CABBAGES[HERO][1])
     cam = Cam(lerp(2.0, 2.2, clamp((t - 9.8) / 3.1)), hx + cwo * 0.18, hy - cwo * 0.45)
     (X, Y), cw = cab_pos(HERO, cam)
-    q = ease_io(clamp((t - 10.3) / 2.1))
+    q = clamp((t - 12.05) / 0.3)
     pk_l = max(0.0, math.sin((t - 10.0) * 2 * math.pi * 1.7)) ** 0.6 if t > 10.0 else 0
     pk_r = max(0.0, math.sin((t - 10.25) * 2 * math.pi * 1.5)) ** 0.6 if t > 10.25 else 0
 
@@ -581,7 +607,7 @@ def s_peck(t):
             pigeon(lay, MARCHE, X + cw * 0.02, Y + cw * 0.16, cw * 0.68, False, t, peck=pk_l, bob=0.5)
     w = garden(cam, eaten={HERO: q}, extra=extra)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    for n_, t0 in enumerate([10.05, 10.65, 11.25, 11.85]):
+    for n_, t0 in enumerate([10.05, 10.65, 11.25, 12.0]):
         leaf_bits(lay, t, t0 + 0.18, X - cw * 0.2, Y - cw * 0.45, 7, seed=n_ + 3, spread=220, size=18)
     for n_, t0 in enumerate([10.35, 11.0, 11.65]):
         leaf_bits(lay, t, t0 + 0.2, X + cw * 0.22, Y - cw * 0.5, 6, seed=n_ + 11, spread=200, size=16)
@@ -597,7 +623,6 @@ def s_peck(t):
 cue(9.83, "whoosh", 0.1)
 for _t in (10.2, 10.85, 11.45, 12.0):
     cue(_t, "peck", 0.22)
-cue(10.6, "coo", 0.16)
 cue(12.32, "pop", 0.18)
 
 
@@ -646,7 +671,7 @@ cue(12.98, "whoosh", 0.1)
 for _t in HOOP_T:
     cue(_t, "pop_lo", 0.14)
 cue(14.35, "whoosh_up", 0.16)
-cue(15.55, "flap", 0.18)
+cue(15.55, "flap", 0.13)
 cue(16.15, "ding", 0.16)
 cue(16.3, "pop", 0.14)
 
@@ -661,7 +686,7 @@ def s_touch(t):
     w = garden(cam, skip=(HERO,), sain=1.0)
     cab = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     ground_shadow(cab, X, Y - cw * 0.04, cw * 0.95, 60)
-    draw_cabbage(cab, X, Y, cw, 0.0, CABBAGES[HERO][3], 1 - clamp((t - 19.6) / 1.2), HERO)
+    draw_cabbage(cab, X, Y, cw, 0.0, CABBAGES[HERO][3], 1 - clamp((t - 20.15) / 0.3), HERO)
     w.alpha_composite(cab)
     netk = ease_out(clamp((t - 17.6) / 0.6))
     if netk > 0:
@@ -693,7 +718,7 @@ def s_touch(t):
 cue(16.86, "thud", 0.2)
 cue(16.9, "alert1", 0.14)
 cue(17.62, "whoosh", 0.12)
-cue(18.6, "flap", 0.18)
+cue(18.6, "flap", 0.13)
 for _t in (19.45, 20.05, 20.65):
     cue(_t, "peck", 0.22)
 cue(19.8, "fail", 0.14)
@@ -785,12 +810,10 @@ cue(21.67, "fail", 0.12)
 cue(22.17, "pop_lo", 0.18)
 for _n in range(4):
     cue(23.05 + _n * 0.28, "tick", 0.2)
-cue(24.0, "flap", 0.18)
-cue(24.3, "flap", 0.14)
-cue(24.5, "coo", 0.2)
+cue(24.0, "flap", 0.13)
+cue(24.3, "flap", 0.1)
 for _t in (24.8, 25.1):
     cue(_t, "peck", 0.2)
-cue(24.9, "laugh", 0.06)
 
 
 # ============================================================ I. ABONNE-TOI (25.15 → fin)
@@ -821,7 +844,6 @@ def s_end(t):
 
 
 cue(25.25, "pop_lo", 0.18)
-cue(25.6, "coo_lo", 0.14)
 cue(26.73, "click", 0.3)
 cue(27.75, "sparkle", 0.16)
 

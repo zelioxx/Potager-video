@@ -131,3 +131,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `chou_sain_a` … `_d` | Choux pommés intacts avec leur motte poudrée de neige (planche fournie, agrandie ×4) |
 | `poireau_motte_a` / `_b` / `_c` / `poireaux_rang` | Poireaux plantés avec leur motte (un seul ; rang de trois) |
 | `pigeon_debout` / `pigeon_picore` / `pigeon_vol_haut` / `pigeon_vol_bas` | Pigeon biset : debout (regarde à droite), qui picore (tête au sol, regarde à gauche), en vol ailes hautes (pattes sorties, atterrissage), ailes basses |
+| `poireau_plante_a` / `_b` / `_c` | Poireaux plantés sans butte de terre (le fût sort directement du sol), tirés de `poireau_motte_*` |

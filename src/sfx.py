@@ -385,36 +385,54 @@ def laugh_crowd():
     return x
 
 
-def coo(d=1.25, f0=1.0):
-    """Roucoulement de pigeon : « rrou-rouou-rou » grave, voix de gorge qui roule (modulation ~28 Hz)."""
+def coo(d=1.35, f0=1.0):
+    """Roucoulement de pigeon biset « hou… rrrouou… hou » : son presque pur, grave et feutré (bec fermé,
+    jabot gonflé), début roulé (« rrr »), petites irrégularités de hauteur, souffle léger, un peu d'écho."""
+    r = np.random.default_rng(int(f0 * 1000))
     out = np.zeros(int(d * SR), np.float32)
-    syl = [(0.0, 0.22, 330, 420, 0.7), (0.26, 0.55, 300, 470, 1.0), (0.86, 0.32, 420, 280, 0.75)]
-    for s, dd, fa, fb, g in syl:
+    syl = [(0.0, 0.17, (400, 450, 440), 0.55, 0.0), (0.24, 0.62, (440, 545, 470), 1.0, 0.2),
+           (0.92, 0.3, (500, 470, 390), 0.6, 0.0)]
+    for s0, dd, (fa, fm, fb), g, roll in syl:
         t = _t(dd)
         q = t / dd
-        f = (fa + (fb - fa) * np.sin(np.pi * 0.5 * q) ** 1.3) * f0 + 6 * np.sin(2 * np.pi * 7 * t)
-        ph = 2 * np.pi * np.cumsum(f) / SR
-        x = sum(np.sin(ph * h) / h ** 1.6 for h in range(1, 7))
-        purr = 0.55 + 0.45 * np.sin(2 * np.pi * 28 * t) ** 2
-        env = np.sin(np.pi * np.clip(q, 0, 1)) ** 0.8
-        x = _lp(x * purr * env, 1400) * g
-        o = int(s * SR)
+        f = np.where(q < 0.45, fa + (fm - fa) * np.sin(np.pi / 2 * q / 0.45),
+                     fm + (fb - fm) * np.sin(np.pi / 2 * (q - 0.45) / 0.55)) * f0
+        jit = np.interp(np.arange(len(t)), np.linspace(0, len(t), 12), r.normal(0, 4, 12))
+        ph = 2 * np.pi * np.cumsum(f + jit) / SR
+        x = np.sin(ph) + 0.22 * np.sin(2 * ph + 0.4) + 0.06 * np.sin(3 * ph)
+        if roll > 0:
+            am = 1 - 0.75 * (0.5 + 0.5 * np.sin(2 * np.pi * 26 * t)) * np.clip(1 - t / roll, 0, 1)
+            x = x * am
+        env = np.clip(q / 0.12, 0, 1) ** 1.5 * np.clip((1 - q) / 0.3, 0, 1) ** 1.2
+        br = _bp(r.standard_normal(len(t)), 300 * f0, 900 * f0) * 0.12
+        x = (x + br) * env * g
+        o = int(s0 * SR)
         e = min(len(out), o + len(x))
         out[o:e] += x[: e - o]
-    breath = _bp(rng.standard_normal(len(out)), 200, 900) * 0.04
-    return norm(out + breath * (np.abs(out) > 0.01), 0.8)
+    out = _lp(out, 1600)
+    wet = np.zeros_like(out)
+    for dl, gg in ((0.023, 0.28), (0.041, 0.2), (0.067, 0.12), (0.095, 0.07)):
+        n = int(dl * SR)
+        wet[n:] += out[:-n] * gg
+    return norm(out + _lp(wet, 1100), 0.75)
 
 
-def flap(d=0.6):
-    """Envol de pigeon : claquements d'ailes rapides (~11 Hz) qui s'éloignent."""
+def flap(d=0.7):
+    """Envol de pigeon : premiers coups d'ailes qui claquent (bruit sec + souffle grave), de plus en plus
+    espacés et lointains."""
+    r = np.random.default_rng(11)
     out = np.zeros(int(d * SR), np.float32)
-    n = int(d * 11)
-    for k in range(n):
-        t = _t(0.06)
-        x = _bp(rng.standard_normal(len(t)), 300, 2600) * np.exp(-t * 70)
-        o = int(k / 11 * SR)
-        e = min(len(out), o + len(x))
-        out[o:e] += x[: e - o] * (1 - 0.7 * k / n)
+    tt, k = 0.0, 0
+    while tt < d - 0.08:
+        t = _t(0.09)
+        clap = _bp(r.standard_normal(len(t)), 250, 3200) * np.exp(-t * 55)
+        whoof = _lp(r.standard_normal(len(t)), 260) * np.exp(-t * 30) * 2.2
+        g = (1 - tt / d) ** 1.3 * r.uniform(0.75, 1.0)
+        o = int(tt * SR)
+        e = min(len(out), o + len(t))
+        out[o:e] += ((clap + whoof) * g)[: e - o]
+        tt += 1 / (10.5 - 3 * tt / d) * r.uniform(0.9, 1.1)
+        k += 1
     return norm(out, 0.8)
 
 
