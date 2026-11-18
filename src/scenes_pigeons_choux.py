@@ -49,7 +49,7 @@ POTAGER = "decor_potager_bacs_neige.png"
 CHOU, CHOU_N = B + "chou_ronge", B + "chou_nervures"
 POIREAUX = [B + "poireau_plante_a", B + "poireau_plante_b", B + "poireau_plante_c", B + "poireau_plante_d"]
 MARCHE, BIZET, RAMIER, RAMIER_F = B + "pigeon_marche", B + "pigeon_bizet", B + "pigeon_ramier", B + "pigeon_ramier_face"
-VOL_UP, VOL_DOWN = [B + "pigeon_vol_a", B + "pigeon_vol_c"], [B + "pigeon_vol_d", B + "pigeon_vol_f"]
+VOL_UP, VOL_DOWN = [B + "pigeon_vol_a", B + "pigeon_vol_b"], [B + "pigeon_vol_d", B + "pigeon_vol_f"]
 EPOUV, CD, CD2 = B + "epouvantail", B + "cd_face", B + "cd_biais"
 ARCEAUX, CHENILLE = B + "arceaux_biais", B + "chenille"
 NET_SRC = "planche_arceaux_filet_face.webp"
@@ -63,7 +63,7 @@ _HM = cv2.getPerspectiveTransform(np.float32([(0, 0), (1, 0), (1, 1), (0, 1)]), 
 def bedp(u, v):
     """(u : gauche → droite, v : devant → fond) ∈ [0, 1]² → point du grand carré (photo plein écran)."""
     p = _HM @ np.array([u, v, 1.0])
-    return p[0] / p[2], p[1] / p[2]
+    return float(p[0] / p[2]), float(p[1] / p[2])
 
 
 def bedw(v):
@@ -198,7 +198,7 @@ def draw_cabbage(c, X, Y, cw, q, flip=False):
 
 # ------------------------------------------------------------ les pigeons
 # point d'appui (pattes) de chaque photo, en fraction de la boîte (mesuré sur les détourages)
-FEET = {MARCHE: (0.56, 0.97), BIZET: (0.48, 0.97), RAMIER: (0.52, 0.99), RAMIER_F: (0.5, 0.98)}
+FEET = {MARCHE: (0.66, 0.96), BIZET: (0.48, 0.97), RAMIER: (0.52, 0.99), RAMIER_F: (0.5, 0.98)}
 BODY = {MARCHE: 1.0, BIZET: 1.0, RAMIER: 1.0, RAMIER_F: 0.62}       # largeur relative (de face : plus étroit)
 
 
@@ -294,18 +294,18 @@ def net_layer(cam, hoops_k, net_q, front_cap=1.0):
         for j in range(nv):
             va, vb = lerp(vmin, NET_V1, j / nv), lerp(vmin, NET_V1, (j + 1) / nv)
             poly = arch(va, 30) + arch(vb, 30)[::-1]
-            dv.polygon([(cam.p(*p)[0] * ss, cam.p(*p)[1] * ss) for p in poly], fill=46)
+            dv.polygon([(cam.p(*p)[0] * ss, cam.p(*p)[1] * ss) for p in poly], fill=70)
         cap = arch(NET_V1, 30)
-        dv.polygon([(cam.p(*p)[0] * ss, cam.p(*p)[1] * ss) for p in cap], fill=30)
+        dv.polygon([(cam.p(*p)[0] * ss, cam.p(*p)[1] * ss) for p in cap], fill=50)
         if net_q > 0.98 and front_cap > 0:
             dv.polygon([(cam.p(*p)[0] * ss, cam.p(*p)[1] * ss) for p in arch(NET_V0, 30)],
-                       fill=int(30 * front_cap))
+                       fill=int(50 * front_cap))
         tint = Image.new("RGBA", (W * ss, H * ss), (215, 222, 220, 0))
         tint.putalpha(veil)
         big.alpha_composite(tint)
         # les mailles : lignes le long du tunnel (θ constant) et parallèles aux arceaux (v constant)
-        col = (30, 44, 38, 150)
-        lw = 1
+        col = (26, 38, 32, 215)
+        lw = 2
         nth = 46
         for i in range(1, nth):
             th = math.pi * i / nth
@@ -344,35 +344,36 @@ def net_top(v, cam):
     return cam.p(*up(0.5, v, NET_H))
 
 
-# ------------------------------------------------------------ le filet posé directement sur le chou (vraie maille)
-@lru_cache(None)
-def net_texture():
-    from scenes_citron import SRC
-    im = Image.open(os.path.join(SRC, NET_SRC)).convert("L").crop((1150, 250, 1500, 500))
-    a = np.asarray(im).astype(np.float32)
-    bg = cv2.GaussianBlur(a, (0, 0), 9)
-    al = np.clip((bg - a) * 4.0, 0, 255)
-    tex = Image.new("RGBA", im.size, (28, 40, 34, 0))
-    tex.putalpha(Image.fromarray(al.astype(np.uint8)))
-    return tex
-
-
-def net_on(c, cab_layer, k, alpha=1.0):
-    """Maille réelle plaquée sur la silhouette du chou (le filet touche les feuilles)."""
-    m = cab_layer.getchannel("A").point(lambda v: 255 if v > 40 else 0).filter(ImageFilter.MaxFilter(9))
+# ------------------------------------------------------------ le filet posé directement sur le chou
+def net_on(c, cab_layer, cell, alpha=1.0, seed=0):
+    """Filet plaqué sur les feuilles : maille souple (lignes ondulées) limitée à la silhouette du chou."""
+    m = cab_layer.getchannel("A").point(lambda v: 255 if v > 40 else 0).filter(ImageFilter.MaxFilter(15))
     bb = m.getbbox()
-    if not bb:
+    if not bb or alpha <= 0.01:
         return
-    tex = net_texture()
-    tw = max(8, int(tex.width * k))
-    th = max(8, int(tex.height * k))
-    tex = tex.resize((tw, th), Image.LANCZOS)
+    ss = 2
+    x0, y0, x1, y1 = bb[0] - 20, bb[1] - 20, bb[2] + 20, bb[3] + 20
+    big = Image.new("RGBA", ((x1 - x0) * ss, (y1 - y0) * ss), (0, 0, 0, 0))
+    d = ImageDraw.Draw(big)
+    col = (24, 36, 30, 235)
+    lw = max(2, int(cell * 0.09 * ss))
+    n_x = int((x1 - x0) / cell) + 2
+    n_y = int((y1 - y0) / cell) + 2
+    for i in range(n_x):
+        pts = [((i * cell + 5 * math.sin(yy / 37.0 + i * 0.7)) * ss, yy * ss) for yy in range(0, y1 - y0 + 8, 8)]
+        d.line(pts, fill=col, width=lw)
+    for j in range(n_y):
+        pts = [(xx * ss, (j * cell + 5 * math.sin(xx / 41.0 + j * 0.9)) * ss) for xx in range(0, x1 - x0 + 8, 8)]
+        d.line(pts, fill=col, width=lw)
+    net = big.resize((x1 - x0, y1 - y0), Image.LANCZOS)
     full = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    for yy in range(bb[1] - th, bb[3] + th, th):
-        for xx in range(bb[0] - tw, bb[2] + tw, tw):
-            paste(full, tex, xx, yy)
+    paste(full, net, x0, y0)
     a = np.asarray(full.getchannel("A")).astype(np.float32) * (np.asarray(m).astype(np.float32) / 255) * alpha
     full.putalpha(Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)))
+    # léger voile gris (le filet aplatit les couleurs des feuilles)
+    veil = Image.new("RGBA", (W, H), (200, 208, 205, 0))
+    veil.putalpha(m.point(lambda v: int(v * 0.16 * alpha)))
+    c.alpha_composite(veil)
     c.alpha_composite(full)
 
 
@@ -444,7 +445,7 @@ def s_culprit(t):
         if 2.6 < t < 4.3:
             a = life(t, 2.6, 4.25)
             cx, cy = X + cw * 0.12, Y - cw * 0.55
-            sp(lay, CHENILLE, cx + math.sin(t * 3) * 6, cy, cw * 0.32 * a, 0.5, 0.5, rot=-12, alpha=a, cold=3)
+            sp(lay, CHENILLE, cx + math.sin(t * 3) * 6, cy, cw * 0.5 * a, 0.5, 0.5, rot=-12, alpha=a, cold=3)
         fly_land(lay, t, 3.95, 4.55, (W + 250, 500), (X - cw * 0.55, Y + cw * 0.05), 200, cw * 0.62, MARCHE, False,
                  0, peck_from=None)
         fly_land(lay, t, 4.15, 4.75, (-250, 700), (X + cw * 0.62, Y + cw * 0.12), 200, cw * 0.66, BIZET, True, 1)
@@ -454,7 +455,7 @@ def s_culprit(t):
     w.alpha_composite(shade())
     if 2.6 < t < 4.3:
         a = life(t, 2.95, 4.25)
-        put(u, icon("nosign", 230), X + cw * 0.12, Y - cw * 0.55, a)
+        put(u, icon("nosign", 330), X + cw * 0.12, Y - cw * 0.55, a)
     title(u, "CE NE SONT PAS", t, 2.3, 3.6, y=300, color=WHITE, size=120)
     title(u, "LES CHENILLES…", t, 2.3, 3.6, y=440, color=YEL, size=120)
     stamp(u, "CE SONT LES PIGEONS !", 540, 350, t, 4.27, None, RED, 100, -6)
@@ -497,8 +498,8 @@ cue(6.6, "fail", 0.14)
 
 
 # ============================================================ D. MAIS LES PIGEONS, EUX, ONT FAIM (7.75 → 9.8)
-WALK = [((0.5, 0.62), (0.52, 0.66), MARCHE, False, 0.30), ((0.5, 0.33), (0.47, 0.30), BIZET, True, 0.32),
-        ((0.12, 0.30), (0.17, 0.32), RAMIER, False, 0.36)]
+WALK = [((0.36, 0.30), (0.50, 0.31), MARCHE, False, 0.36), ((0.68, 0.05), (0.56, 0.05), BIZET, True, 0.38),
+        ((0.5, 0.64), (0.47, 0.62), RAMIER, True, 0.40)]
 
 
 def s_hungry(t):
@@ -537,7 +538,8 @@ cue(9.3, "coo_lo", 0.18)
 # ============================================================ E. ILS PICORENT JUSQU'AUX NERVURES (9.8 → 12.95)
 def s_peck(t):
     hx, hy = bedp(*CABBAGES[HERO][:2])
-    cam = Cam(lerp(2.15, 2.35, clamp((t - 9.8) / 3.1)), hx + 30, hy - 150)
+    cwo = C_W * bedw(CABBAGES[HERO][1])
+    cam = Cam(lerp(2.0, 2.2, clamp((t - 9.8) / 3.1)), hx + cwo * 0.18, hy - cwo * 0.45)
     (X, Y), cw = cab_pos(HERO, cam)
     q = ease_io(clamp((t - 10.3) / 2.1))
     pk_l = max(0.0, math.sin((t - 10.0) * 2 * math.pi * 1.7)) ** 0.6 if t > 10.0 else 0
@@ -545,9 +547,9 @@ def s_peck(t):
 
     def extra(lay, i):
         if i == HERO:            # le pigeon de droite est un peu derrière le chou
-            pigeon(lay, BIZET, X + cw * 0.5, Y - cw * 0.06, cw * 0.62, True, t + 1, peck=pk_r * 0.85, bob=0.5)
+            pigeon(lay, BIZET, X + cw * 0.62, Y - cw * 0.1, cw * 0.72, True, t + 1, peck=pk_r * 0.85, bob=0.5)
         if i == len(CABBAGES):
-            pigeon(lay, MARCHE, X - cw * 0.52, Y + cw * 0.06, cw * 0.62, False, t, peck=pk_l, bob=0.5)
+            pigeon(lay, MARCHE, X - cw * 0.12, Y + cw * 0.16, cw * 0.72, False, t, peck=pk_l, bob=0.5)
     w = garden(cam, eaten={HERO: q}, extra=extra)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     for n_, t0 in enumerate([10.05, 10.65, 11.25, 11.85]):
@@ -634,7 +636,7 @@ def s_touch(t):
     w.alpha_composite(cab)
     netk = ease_out(clamp((t - 17.6) / 0.6))
     if netk > 0:
-        net_on(w, cab, 0.55 * cam.z / 2, alpha=netk)
+        net_on(w, cab, 30, alpha=netk)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     fly_land(lay, t, 18.6, 19.2, (W + 250, 420), (X + cw * 0.2, Y - cw * 0.62), 230, cw * 0.58, MARCHE, True, 0)
     if t > 19.2:
@@ -669,13 +671,13 @@ cue(19.8, "fail", 0.14)
 
 
 # ============================================================ H. OUBLIE LES CD ET LES ÉPOUVANTAILS (20.95 → 25.15)
-SCARE = (0.5, 0.40)               # l'épouvantail planté au milieu du carré
-CD_SPOTS = [(0.08, 0.30), (0.92, 0.30)]
+SCARE = (0.5, 0.10)               # l'épouvantail planté au milieu du carré
+CD_SPOTS = [(0.12, 0.30), (0.88, 0.30)]
 
 
 def scarecrow_geom(cam):
     x, y = cam.p(*bedp(*SCARE))
-    h = 1.25 * bedw(SCARE[1]) * cam.z
+    h = 0.8 * bedw(SCARE[1]) * cam.z
     im = _src(EPOUV)
     wd = h * im.width / im.height
     return x, y, wd, h
@@ -683,7 +685,7 @@ def scarecrow_geom(cam):
 
 def s_scare(t):
     k = ease_io(clamp((t - 20.95) / 1.0))
-    cam = Cam(lerp(1.15, 1.3, k), 545, lerp(1150, 1130, k))
+    cam = Cam(lerp(1.15, 1.28, k), 545, lerp(1180, 1240, k))
     z = cam.z
     ex, ey, ew, eh = scarecrow_geom(cam)
     ks = ease_out_back(clamp((t - 22.15) / 0.45), 1.5)
@@ -696,7 +698,7 @@ def s_scare(t):
                 if cds[j] <= 0.01:
                     continue
                 bx, by = cam.p(*bedp(cu, cv))
-                ph = bedw(cv) * z * 0.62 * cds[j]
+                ph = bedw(cv) * z * 0.7 * cds[j]
                 d = ImageDraw.Draw(lay)
                 pw = max(3, int(9 * z))
                 d.line([(bx, by), (bx, by - ph)], fill=(118, 92, 60, 255), width=pw)
@@ -706,10 +708,12 @@ def s_scare(t):
                 hx_ = bx + 0.12 * ph * (1 if j else -1)
                 sw = math.sin(t * 2.2 + j) * 10
                 spin = abs(math.cos(t * 2.6 + j * 1.3))
-                cw_ = ph * 0.42
-                sp(lay, CD if spin > 0.5 else CD2, hx_, by - ph * 0.95, cw_ * (0.35 + 0.65 * spin), 0.5, 0.0, rot=sw,
-                   cold=2)
-        if i == 4 and ks > 0.01:
+                cw_ = ph * 0.27
+                d.line([(hx_, by - ph * 0.95), (hx_ + math.sin(math.radians(sw)) * ph * 0.12, by - ph * 0.83)],
+                       fill=(196, 170, 120, 255), width=max(1, pw // 3))
+                sp(lay, CD if spin > 0.5 else CD2, hx_ + math.sin(math.radians(sw)) * ph * 0.12, by - ph * 0.84,
+                   cw_ * (0.35 + 0.65 * spin), 0.5, 0.0, rot=sw, cold=2)
+        if i == len(CABBAGES) and ks > 0.01:
             sp(lay, EPOUV, ex, ey, ew * ks, 0.5, 1.0, cold=5)
         if i == len(CABBAGES):
             # au bout de quelques jours, les pigeons se posent sur l'épouvantail et le picorent
@@ -726,14 +730,14 @@ def s_scare(t):
     w.alpha_composite(shade())
     for j, (cu, cv) in enumerate(CD_SPOTS):
         bx, by = cam.p(*bedp(cu, cv))
-        ph = bedw(cv) * z * 0.62
-        sparkles(u, t, 21.4 + 0.3 * j, bx + 0.12 * ph * (1 if j else -1), by - ph * 0.75, 90, 6, 5 + j, 0.8)
+        ph = bedw(cv) * z * 0.7
+        sparkles(u, t, 21.4 + 0.3 * j, bx + 0.12 * ph * (1 if j else -1), by - ph * 0.72, 70, 6, 5 + j, 0.8)
     if 21.65 < t < 23.0:
         a = life(t, 21.67, 22.95)
         bx, by = cam.p(*bedp(*CD_SPOTS[0]))
-        put(u, icon("nosign", 170), bx - 0.07 * bedw(0.3) * z, by - bedw(0.3) * z * 0.5, a)
+        put(u, icon("nosign", 130), bx - 0.084 * bedw(0.3) * z, by - bedw(0.3) * z * 0.5, a)
         bx, by = cam.p(*bedp(*CD_SPOTS[1]))
-        put(u, icon("nosign", 170), bx + 0.07 * bedw(0.3) * z, by - bedw(0.3) * z * 0.5, a)
+        put(u, icon("nosign", 130), bx + 0.084 * bedw(0.3) * z, by - bedw(0.3) * z * 0.5, a)
     title(u, "OUBLIE LES CD…", t, 20.97, 22.15, y=330, color=WHITE, size=130)
     title(u, "ET LES ÉPOUVANTAILS !", t, 22.17, 23.0, y=330, color=YEL, size=105)
     # quelques jours passent
@@ -767,9 +771,9 @@ def s_end(t):
     w = garden(cam)
     w.alpha_composite(_cold(net_layer(cam, [1] * 5, 1.0), 0.4))
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    pigeon(lay, BIZET, tx, ty + 6, 0.28 * bedw(0.5) * cam.z, True, t, bob=1)
-    gx, gy = cam.p(1040, 1820)
-    pigeon(lay, RAMIER, 880, 1790, 300, True, t + 2, bob=1)
+    pigeon(lay, BIZET, tx, ty + 6, 0.32 * bedw(0.5) * cam.z, True, t, bob=1)
+    gx, gy = cam.p(150, 1330)
+    pigeon(lay, RAMIER, gx, gy, 270, True, t + 2, bob=1)
     w.alpha_composite(lay)
     snowfall(w, t, 0.8)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))

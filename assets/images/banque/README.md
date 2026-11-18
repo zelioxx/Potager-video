@@ -125,3 +125,9 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `arbre_feuillu_racines.png` / `arbre_nu_racines.png` | Jeune arbre avec ses racines : en feuilles / sans feuilles (collet détecté automatiquement dans scenes_arbre_automne.py) |
 | `pelle_droite.png` / `pelle_penchee.png` / `tas_terre.png` | Pelle droite, pelle penchée, tas de terre |
 | `cure_dent_h.png` | Cure-dent en bois, horizontal (photo fournie, détourée) |
+| `chou_ronge.png` / `chou_nervures.png` | Chou rongé par les oiseaux / réduit aux nervures, avec sa motte de terre poudrée de neige (planche fournie, agrandie ×4) |
+| `poireau_plante_a` … `_d` | Poireaux redressés, bas du fût et racines coupés (comme plantés en terre) |
+| `epouvantail.png` / `epouvantail2.png` / `cd_face.png` / `cd_biais.png` | Épouvantails (face, 3/4) ; CD suspendus (face, de biais) |
+| `arceaux_biais.png` / `arceaux_face.png` | Arceaux de tunnel galvanisés (3/4 et de face) |
+| `pigeon_marche` / `pigeon_bizet` / `pigeon_ramier` / `pigeon_ramier_face` | Pigeons posés (photos Open Images, CC BY 2.0 : Charles Thompson, Alick Sung, Lauren Manning, Chris — Flickr) |
+| `pigeon_vol_a` / `_b` (ailes hautes), `_d` / `_f` (ailes basses) | Pigeons en vol (photo « Loose formation fly-by », mill56, Flickr, CC BY 2.0) |
