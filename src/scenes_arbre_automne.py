@@ -472,9 +472,13 @@ cue(25.87, "whoosh", 0.1)
 cue(25.95, "splash", 0.16)
 
 
-@lru_cache(8)
-def blossom_spots(h_above):
-    """Points du houppier (dans l'image de l'arbre feuillu à cette taille) où poser des fleurs."""
+BLOSSOM_REF = 600                                # taille de référence : les fleurs restent aux mêmes branches
+
+
+@lru_cache(1)
+def blossom_spots_ref():
+    """Points du houppier (calculés une seule fois, à une taille de référence) où poser des fleurs."""
+    h_above = BLOSSOM_REF
     im, xc, yc = tree_parts(FEUILLU, h_above, 0.0, 0.0)
     a = np.asarray(im)
     r = np.random.default_rng(12)
@@ -505,7 +509,9 @@ def blossoms(c, X, Y, h_above, t, t0, z, spread=2.0, t_off=None, off_spread=1.4)
     if t < t0:
         return
     r = np.random.default_rng(31)
-    for i, (dx, dy, sc, delay, kind) in enumerate(blossom_spots(int(h_above) // 2 * 2)):
+    kk = h_above / BLOSSOM_REF                   # même fleurs, mêmes places, quelle que soit la taille de l'arbre
+    for i, (dx, dy, sc, delay, kind) in enumerate(blossom_spots_ref()):
+        dx, dy = dx * kk, dy * kk
         d_on = delay / 0.8 * spread                      # ordre d'éclosion propre à chaque fleur
         q = ease_out_back(clamp((t - t0 - d_on) / 0.45), 1.6)
         if q <= 0.02:
