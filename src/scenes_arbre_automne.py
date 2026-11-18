@@ -145,11 +145,8 @@ def s_garden(t):
     dry = ease_io(clamp((t - 2.7) / 1.4))
     droop = -4 * dry + math.sin(t * 2) * 0.6
     tree(w, FEUILLU, x, y, TREE_H * z, 0.0, dry, s=ease_out_back(clamp((t - 0.15) / 0.4), 1.5), sway=droop)
-    if t < 2.9:   # au printemps, quelques fleurs… qui fanent avec l'été
-        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        blossoms(lay, x, y, TREE_H * z, t, 0.5, z)
-        lay.putalpha(lay.getchannel("A").point(lambda v: int(v * (1 - ease_io(clamp((t - 2.4) / 0.5))))))
-        w.alpha_composite(lay)
+    if t < 4.6:   # au printemps, les fleurs éclosent… puis fanent une à une avec l'été
+        blossoms(w, x, y, TREE_H * z, t, 0.4, z, spread=1.6, t_off=2.5, off_spread=1.5)
     if q > 0.01:
         light_rays(w, 900, 0, t, q)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -501,16 +498,28 @@ def blossom_img(rad, kind):
     return im.rotate(kind * 23, resample=Image.BICUBIC)
 
 
-def blossoms(c, X, Y, h_above, t, t0, z):
-    """Le printemps : des fleurs qui éclosent une à une dans le houppier."""
+def blossoms(c, X, Y, h_above, t, t0, z, spread=2.0, t_off=None, off_spread=1.4):
+    """Le printemps : des fleurs qui éclosent tranquillement, une à une, étalées sur `spread` secondes.
+    Si t_off est donné, elles fanent aussi une à une (chacune à son moment) : elles se détachent, glissent un peu
+    vers le bas en tournant et s'effacent."""
     if t < t0:
         return
-    for dx, dy, sc, delay, kind in blossom_spots(int(h_above) // 2 * 2):
-        q = ease_out_back(clamp((t - t0 - delay) / 0.3), 2.0)
+    r = np.random.default_rng(31)
+    for i, (dx, dy, sc, delay, kind) in enumerate(blossom_spots(int(h_above) // 2 * 2)):
+        d_on = delay / 0.8 * spread                      # ordre d'éclosion propre à chaque fleur
+        q = ease_out_back(clamp((t - t0 - d_on) / 0.45), 1.6)
         if q <= 0.02:
             continue
         rad = max(4, int(9 * z * sc))
-        put(c, blossom_img(rad, int(kind)), X + dx, Y + dy, q)
+        a, fy, rot = 1.0, 0.0, kind * 23
+        if t_off is not None:
+            d_off = t_off + r.uniform(0, off_spread)
+            f = clamp((t - d_off) / 0.6)
+            if f >= 1:
+                continue
+            a, fy, rot = 1 - f, 90 * z * f * f, rot + 140 * f
+        put(c, blossom_img(rad, int(kind)), X + dx + 15 * z * math.sin(i) * (fy > 0) * fy / (90 * z + 1e-6),
+            Y + dy + fy, q, rot=rot - kind * 23, alpha=a)
 
 
 # ============================================================ G. AU PRINTEMPS, IL DÉMARRE D'UN COUP (26.8 → fin)
@@ -527,7 +536,7 @@ def s_spring(t, end=False):
     else:
         h = TREE_H * z * (0.9 + 0.1 * g)
         tree(w, FEUILLU, x, y, h, 0.0)
-        blossoms(w, x, y, h, t, 28.3, z)
+        blossoms(w, x, y, h, t, 28.3, z, spread=1.8)
     # une mésange vient se poser dans l'arbre en fleurs
     if t > 29.0:
         from scenes_oiseaux_hiver import flight, bird, PROFIL
