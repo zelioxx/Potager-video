@@ -399,7 +399,7 @@ def coo(d=1.35, f0=1.0):
                      fm + (fb - fm) * np.sin(np.pi / 2 * (q - 0.45) / 0.55)) * f0
         jit = np.interp(np.arange(len(t)), np.linspace(0, len(t), 12), r.normal(0, 4, 12))
         ph = 2 * np.pi * np.cumsum(f + jit) / SR
-        x = np.sin(ph) + 0.22 * np.sin(2 * ph + 0.4) + 0.06 * np.sin(3 * ph)
+        x = np.sin(ph) + 0.38 * np.sin(2 * ph + 0.4) + 0.14 * np.sin(3 * ph) + 0.05 * np.sin(4 * ph)
         if roll > 0:
             am = 1 - 0.75 * (0.5 + 0.5 * np.sin(2 * np.pi * 26 * t)) * np.clip(1 - t / roll, 0, 1)
             x = x * am
@@ -409,7 +409,7 @@ def coo(d=1.35, f0=1.0):
         o = int(s0 * SR)
         e = min(len(out), o + len(x))
         out[o:e] += x[: e - o]
-    out = _lp(out, 1600)
+    out = _lp(out, 2600)
     wet = np.zeros_like(out)
     for dl, gg in ((0.023, 0.28), (0.041, 0.2), (0.067, 0.12), (0.095, 0.07)):
         n = int(dl * SR)

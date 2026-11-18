@@ -464,12 +464,12 @@ def s_open(t):
     k = ease_io(clamp(t / 2.3))
     cam = Cam(lerp(1.0, 1.22, k), lerp(540, 520, k), lerp(960, 1230, k))
     order = [4, 1, 3, 0, 5, 2]
-    sain = {i: 1 - clamp((t - 0.78 - 0.13 * order.index(i)) / 0.26) for i in range(len(CABBAGES))}
+    sain = {i: 1 - clamp((t - 0.75 - 0.2 * order.index(i)) / 0.55) for i in range(len(CABBAGES))}
     w = garden(cam, sain=sain)
     bits = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     for n_, i in enumerate(order):
         (X, Y), cw = cab_pos(i, cam)
-        leaf_bits(bits, t, 0.85 + 0.13 * n_, X, Y - cw * 0.5, 7, seed=40 + n_, spread=cw * 0.8, size=cw * 0.06)
+        leaf_bits(bits, t, 0.9 + 0.2 * n_, X, Y - cw * 0.5, 7, seed=40 + n_, spread=cw * 0.8, size=cw * 0.06, dur=0.9)
     w.alpha_composite(bits)
     snowfall(w, t, 1.0)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -483,7 +483,7 @@ def s_open(t):
 cue(0.05, "whoosh", 0.1)
 cue(1.25, "pop", 0.16)
 for _n in range(6):
-    cue(0.85 + 0.13 * _n, "peck", 0.1)
+    cue(0.9 + 0.2 * _n, "peck", 0.1)
 
 
 # ============================================================ B. PAS LES CHENILLES… LES PIGEONS ! (2.3 → 4.85)
@@ -523,7 +523,7 @@ cue(2.98, "fail", 0.16)
 cue(4.2, "flap", 0.14)
 cue(4.32, "flap", 0.11)
 cue(4.27, "thud", 0.2)
-cue(4.75, "coo", 0.13)
+cue(4.6, "coo", 1.35)
 
 
 # ============================================================ C. EN HIVER, LES CHENILLES ONT DISPARU (4.85 → 7.75)
@@ -587,7 +587,7 @@ def s_hungry(t):
 
 cue(7.8, "whoosh", 0.1)
 cue(9.05, "thud", 0.18)
-cue(9.35, "coo_lo", 0.12)
+cue(9.72, "coo_lo", 1.35)
 
 
 # ============================================================ E. ILS PICORENT JUSQU'AUX NERVURES (9.8 → 12.95)
@@ -596,7 +596,7 @@ def s_peck(t):
     cwo = C_W * bedw(CABBAGES[HERO][1])
     cam = Cam(lerp(2.0, 2.2, clamp((t - 9.8) / 3.1)), hx + cwo * 0.18, hy - cwo * 0.45)
     (X, Y), cw = cab_pos(HERO, cam)
-    q = clamp((t - 12.05) / 0.3)
+    q = clamp((t - 11.75) / 0.75)
     pk_l = max(0.0, math.sin((t - 10.0) * 2 * math.pi * 1.7)) ** 0.6 if t > 10.0 else 0
     pk_r = max(0.0, math.sin((t - 10.25) * 2 * math.pi * 1.5)) ** 0.6 if t > 10.25 else 0
 
@@ -686,7 +686,7 @@ def s_touch(t):
     w = garden(cam, skip=(HERO,), sain=1.0)
     cab = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     ground_shadow(cab, X, Y - cw * 0.04, cw * 0.95, 60)
-    draw_cabbage(cab, X, Y, cw, 0.0, CABBAGES[HERO][3], 1 - clamp((t - 20.15) / 0.3), HERO)
+    draw_cabbage(cab, X, Y, cw, 0.0, CABBAGES[HERO][3], 1 - clamp((t - 19.95) / 0.75), HERO)
     w.alpha_composite(cab)
     netk = ease_out(clamp((t - 17.6) / 0.6))
     if netk > 0:
@@ -811,6 +811,7 @@ cue(22.17, "pop_lo", 0.18)
 for _n in range(4):
     cue(23.05 + _n * 0.28, "tick", 0.2)
 cue(24.0, "flap", 0.13)
+cue(24.92, "coo", 1.3)
 cue(24.3, "flap", 0.1)
 for _t in (24.8, 25.1):
     cue(_t, "peck", 0.2)
@@ -845,6 +846,7 @@ def s_end(t):
 
 cue(25.25, "pop_lo", 0.18)
 cue(26.73, "click", 0.3)
+cue(27.98, "coo_lo", 1.1)
 cue(27.75, "sparkle", 0.16)
 
 
