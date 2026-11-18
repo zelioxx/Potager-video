@@ -385,6 +385,39 @@ def laugh_crowd():
     return x
 
 
+def coo(d=1.25, f0=1.0):
+    """Roucoulement de pigeon : « rrou-rouou-rou » grave, voix de gorge qui roule (modulation ~28 Hz)."""
+    out = np.zeros(int(d * SR), np.float32)
+    syl = [(0.0, 0.22, 330, 420, 0.7), (0.26, 0.55, 300, 470, 1.0), (0.86, 0.32, 420, 280, 0.75)]
+    for s, dd, fa, fb, g in syl:
+        t = _t(dd)
+        q = t / dd
+        f = (fa + (fb - fa) * np.sin(np.pi * 0.5 * q) ** 1.3) * f0 + 6 * np.sin(2 * np.pi * 7 * t)
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        x = sum(np.sin(ph * h) / h ** 1.6 for h in range(1, 7))
+        purr = 0.55 + 0.45 * np.sin(2 * np.pi * 28 * t) ** 2
+        env = np.sin(np.pi * np.clip(q, 0, 1)) ** 0.8
+        x = _lp(x * purr * env, 1400) * g
+        o = int(s * SR)
+        e = min(len(out), o + len(x))
+        out[o:e] += x[: e - o]
+    breath = _bp(rng.standard_normal(len(out)), 200, 900) * 0.04
+    return norm(out + breath * (np.abs(out) > 0.01), 0.8)
+
+
+def flap(d=0.6):
+    """Envol de pigeon : claquements d'ailes rapides (~11 Hz) qui s'éloignent."""
+    out = np.zeros(int(d * SR), np.float32)
+    n = int(d * 11)
+    for k in range(n):
+        t = _t(0.06)
+        x = _bp(rng.standard_normal(len(t)), 300, 2600) * np.exp(-t * 70)
+        o = int(k / 11 * SR)
+        e = min(len(out), o + len(x))
+        out[o:e] += x[: e - o] * (1 - 0.7 * k / n)
+    return norm(out, 0.8)
+
+
 BANK = {
     "whoosh": lambda: whoosh(0.42),
     "whoosh_up": lambda: whoosh(0.38, up=True),
@@ -421,6 +454,9 @@ BANK = {
     "stir": stir,
     "laugh": laugh,
     "laugh_crowd": laugh_crowd,
+    "coo": coo,
+    "coo_lo": lambda: coo(1.3, 0.85),
+    "flap": flap,
 }
 
 

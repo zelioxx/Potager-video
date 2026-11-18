@@ -274,6 +274,12 @@ doucement ferme garde-la molle creuse noire coupe-la ciseaux propres abonne-toi 
         highlight="""arbres printemps meurent l'été normal raté bonne date racines chaleurs automne terre tiède humide
 l'hiver tranquillement anciens Sainte-Catherine bois racine plante-le maintenant grand trou arrose pleut jamais gelée
 détrempée démarre coup abonne-toi astuces"""),
+    "pigeons_choux": dict(
+        scenes="scenes_pigeons_choux", dur=29.4, voice=os.path.join(AUD, "pigeons_choux", "voix.wav"),
+        words=os.path.join(AUD, "pigeons_choux", "voix_mots.json"), out="pigeons_choux.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""choux dévorés hiver chenilles pigeons disparu faim picorent nervures solution filet anti-oiseaux
+arceaux attention toucher feuilles travers oublie CD épouvantails jours peur abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
