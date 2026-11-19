@@ -132,3 +132,7 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `poireau_motte_a` / `_b` / `_c` / `poireaux_rang` | Poireaux plantés avec leur motte (un seul ; rang de trois) |
 | `pigeon_debout` / `pigeon_picore` / `pigeon_vol_haut` / `pigeon_vol_bas` | Pigeon biset : debout (regarde à droite), qui picore (tête au sol, regarde à gauche), en vol ailes hautes (pattes sorties, atterrissage), ailes basses |
 | `poireau_plante_a` / `_b` / `_c` | Poireaux plantés sans butte de terre (le fût sort directement du sol), tirés de `poireau_motte_*` |
+| `pothos_pot_sain` / `pothos_pot_jaune` | Pothos en pot terre cuite : sain ; feuilles qui jaunissent (planche fournie, agrandie ×4) |
+| `pothos_coupe_saine` / `pothos_coupe_pourrie` | Pot en coupe : racines blanches saines ; racines pourries dans l'eau qui stagne au fond (dessus de la terre ≈ 0,53 de la hauteur) |
+| `feuille_pothos_verte` / `_jaune` / `_noire` | Feuille de pothos : saine, jaunie, noircie |
+| `main_pointe_droite` / `_bas` / `_face` / `_face2` | Main qui pointe : vers la droite, vers le bas (bout du doigt ≈ 0,835 ; 1), vers toi (deux poses) |

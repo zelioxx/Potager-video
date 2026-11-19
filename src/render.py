@@ -280,6 +280,12 @@ détrempée démarre coup abonne-toi astuces"""),
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""choux dévorés hiver chenilles pigeons disparu faim picorent nervures solution filet anti-oiseaux
 arceaux attention toucher feuilles travers oublie CD épouvantails jours peur abonne-toi astuces"""),
+    "pothos_lumiere": dict(
+        scenes="scenes_pothos_lumiere", dur=28.6, voice=os.path.join(AUD, "pothos", "voix.wav"),
+        words=os.path.join(AUD, "pothos", "voix_mots.json"), out="pothos_lumiere.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""plante jaunit l'eau lumière hiver jours raccourcissent moins pousse boit toi arroser pareil
+stagne feuilles jaunissent fenêtre vitre espace arrosages sèche 2 cm abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
