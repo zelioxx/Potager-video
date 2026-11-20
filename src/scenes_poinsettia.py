@@ -154,6 +154,15 @@ def s_carry(t):
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     bob = abs(math.sin(t * 6.5)) * 14 * q
     poins(lay, SAIN, X, Y - bob, hh * cam.z, rot=math.sin(t * 6.5) * 3)
+    # à chaque pas, une petite bulle de neige qui s'écarte sous le pot
+    d = ImageDraw.Draw(lay)
+    for k_ in range(2, 10):
+        dt = t - k_ * math.pi / 6.5
+        if 0 < dt < 0.3:
+            r = 6 + 40 * dt / 0.3 * hh / 400
+            al = int(200 * (1 - dt / 0.3))
+            d.ellipse([X - r * 1.6, Y - r * 0.45, X + r * 1.6, Y + r * 0.45], outline=(240, 246, 255, al),
+                      width=3)
     w.alpha_composite(lay)
     w = cold(w, 0.55 + 0.25 * clamp((t - 3.3) / 1.5))
     snowfall(w, t, 0.8)
@@ -167,6 +176,9 @@ def s_carry(t):
 
 
 cue(0.06, "whoosh", 0.1)
+# une petite bulle à chaque pas (quand le balancement repose le pot : sin(6,5 t) = 0)
+for _k in range(2, 10):
+    cue(_k * math.pi / 6.5, "pop_hi" if _k % 2 else "pop", 0.13)
 cue(2.42, "whoosh_up", 0.1)
 cue(4.67, "thud", 0.2)
 cue(4.75, "alert1", 0.16)
