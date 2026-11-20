@@ -286,6 +286,12 @@ arceaux attention toucher feuilles travers oublie CD épouvantails jours peur ab
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""plante jaunit l'eau lumière hiver jours raccourcissent moins pousse boit toi arroser pareil
 stagne feuilles jaunissent fenêtre vitre espace arrosages sèche 2 cm abonne-toi astuces"""),
+    "poinsettia": dict(
+        scenes="scenes_poinsettia", dur=28.8, voice=os.path.join(AUD, "poinsettia", "voix.wav"),
+        words=os.path.join(AUD, "poinsettia", "voix_mots.json"), out="poinsettia.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""Noël magasin voiture tuer fêtes poinsettia Mexique déteste froid minutes parking glacé choc pire
+rien jours feuilles emballer papier chauffer avant maison courants d'air peu d'eau abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

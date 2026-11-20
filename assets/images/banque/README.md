@@ -136,3 +136,5 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `pothos_coupe_saine` / `pothos_coupe_pourrie` | Pot en coupe : racines blanches saines ; racines pourries dans l'eau qui stagne au fond (dessus de la terre ≈ 0,53 de la hauteur) |
 | `feuille_pothos_verte` / `_jaune` / `_noire` | Feuille de pothos : saine, jaunie, noircie |
 | `main_pointe_droite` / `_bas` / `_face` / `_face2` | Main qui pointe : vers la droite, vers le bas (bout du doigt ≈ 0,835 ; 1), vers toi (deux poses) |
+| `poinsettia_sain` / `_fane` / `_nu` | Poinsettia en pot (papier métallisé rouge) : en forme, qui fane (feuilles tombées à droite), nu (bas du pot ≈ 0,996 / 0,967 / 0,995 ; milieu du pot ≈ 0,5 / 0,44 / 0,52 ; même échelle sur la planche) |
+| `poinsettia_emballe.png` | Poinsettia dans sa housse plastique transparente (le plastique est rendu translucide : plis et reflets seulement) |
