@@ -67,17 +67,21 @@ def s_salon(t):
     ex, ey = lerp(540, 850, side), lerp(980, 1180, side)
     es = lerp(560, 260, side) * pop
     if es > 2:
-        rot = math.sin(t * 2 * math.pi * 4.2) * 9 * laugh
-        hop = abs(math.sin(t * 2 * math.pi * 4.2)) * 22 * laugh * (1 - side)
+        rot = math.sin(t * 2 * math.pi * 3.2) * 3.5 * laugh
+        hop = abs(math.sin(t * 2 * math.pi * 3.2)) * 8 * laugh * (1 - side)
         sp(u, EMOJI, ex, ey - hop, es * 0.89, 0.5, 0.5, rot=rot)
     sparkles(u, t, 0.35, 540, 980, 360, 8, 3, 0.9)
     # la bêche, barrée : pas une jardinière
     b = ease_out_back(clamp((t - 3.85) / 0.4), 1.5)
+    brot = -8 + 3 * math.sin(t * 3)
     if b > 0.01:
         soft_shadow(u, 470, 1500, 260, 90)
-        sp(u, BECHE, 470, 1500, 860 * b, 0.5, 1.0, rot=-8 + 3 * math.sin(t * 3))
-    if t > 4.3:
-        put(u, icon("cross", 250), 640, 820, ease_out_back(clamp((t - 4.3) / 0.3), 1.7))
+        sp(u, BECHE, 470, 1500, 860 * b, 0.5, 1.0, rot=brot)
+    if t > 4.3:     # la croix au milieu de la bêche (elle suit son balancement)
+        r = math.radians(brot)
+        d = 860 * b * 0.5
+        put(u, icon("cross", 250), 470 - d * math.sin(r), 1500 - d * math.cos(r),
+            ease_out_back(clamp((t - 4.3) / 0.3), 1.7))
     title(u, "JOSIANE…", t, 1.3, 2.05, y=330, color=WHITE, size=170)
     title(u, "SUPER HUMORISTE !", t, 2.08, 3.8, y=330, color=YEL, size=130)
     stamp(u, "PAS JARDINIÈRE !", 540, 340, t, 3.85, None, RED, 125, -6)
@@ -113,10 +117,9 @@ def s_serious(t):
     return w, u
 
 
-cue(5.25, "whoosh", 0.12)
 cue(5.6, "rustle", 0.12)
 cue(6.75, "pop", 0.16)
-cue(8.45, "sparkle", 0.16)
+cue(8.15, "rise", 0.14)
 
 
 # ============================================================ la suite : scènes des tomates vertes, recalées
@@ -124,9 +127,11 @@ def _old(fn):
     return lambda t: fn(to_old(t + SHIFT))
 
 
+_CUTS = (5.85, 9.45, 14.1, 19.8, 22.5)       # changements de scène (voix des tomates vertes)
 for _t, _n, _g in TV.CUES:
     _to = _t + TV.SHIFT
-    if _to >= 5.85:
+    # pas de second « whoosh » juste après celui de la transition : ça se répète
+    if _to >= 5.85 and not (_n.startswith("whoosh") and any(0 <= _to - c < 0.45 for c in _CUTS)):
         cue(to_new(_to), _n, _g)
 
 
