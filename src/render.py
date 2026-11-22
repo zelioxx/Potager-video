@@ -292,6 +292,12 @@ stagne feuilles jaunissent fenêtre vitre espace arrosages sèche 2 cm abonne-to
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""Noël magasin voiture tuer fêtes poinsettia Mexique déteste froid minutes parking glacé choc pire
 rien jours feuilles emballer papier chauffer avant maison courants d'air peu d'eau abonne-toi astuces"""),
+    "josiane": dict(
+        scenes="scenes_josiane", dur=30.2, voice=os.path.join(AUD, "josiane", "voix.wav"),
+        words=os.path.join(AUD, "josiane", "voix_mots.json"), out="josiane.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""Josiane humoriste jardinière sérieusement rougir tomates vertes gel belles journal boîte chaud
+secret banane mûre gaz accélère semaines rouges abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

@@ -138,3 +138,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `main_pointe_droite` / `_bas` / `_face` / `_face2` | Main qui pointe : vers la droite, vers le bas (bout du doigt ≈ 0,835 ; 1), vers toi (deux poses) |
 | `poinsettia_sain` / `_fane` / `_nu` | Poinsettia en pot (papier métallisé rouge) : en forme, qui fane (feuilles tombées à droite), nu (bas du pot ≈ 0,996 / 0,967 / 0,995 ; milieu du pot ≈ 0,5 / 0,44 / 0,52 ; même échelle sur la planche) |
 | `poinsettia_emballe.png` | Poinsettia dans sa housse plastique transparente (le plastique est rendu translucide : plis et reflets seulement) |
+| `emoji_rire.png` | Émoji « mort de rire » 😂 (Noto Color Emoji, agrandi ×4 EDSR) |
