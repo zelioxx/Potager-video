@@ -110,6 +110,38 @@ def stages(c, nm, x, y, w, q, dry=0.0):
     plant(c, f"banque/{nm}_{idx}", x, y, w, dry=dry, s=s)
 
 
+# ------------------------------------------------------------ pied de tomate : sain (stades) ou malade (vraie photo)
+SICK = "banque/pied_tomate"         # vraie photo : feuilles jaunies et tachées, motte de terre
+
+
+@lru_cache(None)
+def _bbox_h(name):
+    a = np.asarray(_img(name))[..., 3] > 100
+    ys = np.nonzero(a.any(1))[0]
+    return float(ys.max() - ys.min())
+
+
+def tomato(c, x, y, ww, state, s=1.0, alpha=1.0):
+    """state : « tomate_1…4 » (pied qui pousse, sain) ou SICK ; même hauteur à l'écran qu'un tomate_4 de largeur ww."""
+    if state != SICK:
+        plant(c, "banque/" + state, x, y, ww, alpha=alpha, s=s)
+        return
+    h = _bbox_h("banque/tomate_4") * ww / _img("banque/tomate_4").width * s * 0.95
+    k = h / _bbox_h(SICK)
+    im = _img(SICK)
+    fx, fy = _foot(SICK)
+    im = im.resize((max(1, int(im.width * k)), max(1, int(im.height * k))), Image.LANCZOS)
+    if alpha < 1:
+        im.putalpha(im.getchannel("A").point(lambda v: int(v * alpha)))
+    paste(c, im, x - fx * k, y - fy * k)
+
+
+def tomato_swap(c, x, y, ww, a, b, q, alpha=1.0):
+    """Passe de l'image a à l'image b sans superposition (on tasse, on change, on rebondit)."""
+    k, s = swap(q)
+    tomato(c, x, y, ww, a if k == 0 else b, s=s, alpha=alpha)
+
+
 # ------------------------------------------------------------ fond beige et feuille de papier
 @lru_cache(None)
 def beige():
@@ -265,7 +297,7 @@ def bar_img(p100, lbl, w=560):
 
 
 # ============================================================ A. TON POTAGER RATE CHAQUE ANNÉE ? (0 → 4.45)
-ROW = [(0.3, 0.3), (0.7, 0.32), (0.32, 0.62), (0.68, 0.6)]
+ROW = [(0.27, 0.1), (0.73, 0.12), (0.3, 0.72), (0.7, 0.75)]
 
 
 def s_fail(t):
@@ -273,14 +305,17 @@ def s_fail(t):
     cam = Cam(lerp(1.15, 1.25, clamp(t / 4.4)), 545, 1180)
     w = decor(cam, ETE, HIVER, winter)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    dry = ease_io(clamp((t - 0.9) / 1.2))
-    if winter < 0.999:
+    if winter < 0.999:      # les pieds sains deviennent, un à un, des pieds malades (vraie photo)
         for j, (u, v) in sorted(enumerate(ROW), key=lambda p: p[1][1], reverse=True):
             x, y = bed_soil_pt(cam, u, v)
             ww = bedw(v) * cam.z * 0.62
             soft_shadow(lay, x, y, ww * 0.45, 70)
-            plant(lay, "banque/tomate_4", x, y, ww, alpha=1 - winter, dry=dry * 0.85,
-                  s=ease_out_back(clamp((t - 0.1 - j * 0.08) / 0.35), 1.4))
+            pop = ease_out_back(clamp((t - 0.1 - j * 0.08) / 0.35), 1.4)
+            q = clamp((t - 0.95 - j * 0.18) / 0.45)
+            if q <= 0:
+                tomato(lay, x, y, ww, "tomate_4", s=pop, alpha=1 - winter)
+            else:
+                tomato_swap(lay, x, y, ww, "tomate_4", SICK, q, alpha=1 - winter)
     w.alpha_composite(lay)
     if winter > 0.01:
         snowfall(w, t, winter)
@@ -296,6 +331,7 @@ def s_fail(t):
 
 
 cue(0.12, "pop_lo", 0.14)
+cue(1.0, "crunch", 0.12)
 cue(1.35, "fail", 0.16)
 cue(2.3, "whoosh_up", 0.12)
 cue(3.77, "thud", 0.2)
@@ -315,11 +351,18 @@ def s_same(t):
     disease(w, cam, sick)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     # chaque année, la tomate repousse au même endroit… un peu moins belle
+    # année 1 : un beau pied ; année 2 : un pied plus maigre ; année 3 : la terre est épuisée, il tombe malade
     yr = 0 if t < 5.6 else (1 if t < 6.7 else 2)
     tq = [4.6, 5.6, 6.7][yr]
-    q = clamp((t - tq) / 0.7) * 3
+    last = 3 if yr == 0 else 2
+    q = clamp((t - tq) / 0.7) * last
     soft_shadow(lay, x, y, ww * 0.45, 80)
-    stages(lay, "tomate", x, y, ww, q, dry=min(0.9, 0.25 * yr + 0.5 * (1 - nut) + 0.3 * sick))
+    if yr == 2 and t > 8.3:
+        tomato_swap(lay, x, y, ww, "tomate_3", SICK, clamp((t - 8.3) / 0.6))
+    else:
+        i = int(min(last - 1, math.floor(q)))
+        k, sc = swap(q - i) if q < last else (1, 1.0)
+        tomato(lay, x, y, ww, f"tomate_{i + k + 1 if q < last else last + 1}", s=sc)
     w.alpha_composite(lay)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
@@ -342,7 +385,8 @@ cue(4.5, "whoosh", 0.12)
 for _t in (4.65, 5.65, 6.75):
     cue(_t, "pop", 0.14)
 cue(5.85, "tick", 0.16)
-cue(7.45, "fail", 0.14)
+cue(7.45, "fail", 0.12)
+cue(8.35, "crunch", 0.12)
 cue(9.55, "alert2", 0.16)
 
 
