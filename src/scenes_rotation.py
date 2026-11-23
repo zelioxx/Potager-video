@@ -351,18 +351,17 @@ def s_same(t):
     disease(w, cam, sick)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     # chaque année, la tomate repousse au même endroit… un peu moins belle
-    # année 1 : un beau pied ; année 2 : un pied plus maigre ; année 3 : la terre est épuisée, il tombe malade
+    # une seule croissance sur les 3 années : petit (année 1), moyen (année 2), grand (année 3)… puis il tombe malade
     yr = 0 if t < 5.6 else (1 if t < 6.7 else 2)
-    tq = [4.6, 5.6, 6.7][yr]
-    last = 3 if yr == 0 else 2
-    q = clamp((t - tq) / 0.7) * last
     soft_shadow(lay, x, y, ww * 0.45, 80)
-    if yr == 2 and t > 8.3:
-        tomato_swap(lay, x, y, ww, "tomate_3", SICK, clamp((t - 8.3) / 0.6))
+    if t < 5.6:
+        tomato(lay, x, y, ww, "tomate_1", s=ease_out_back(clamp((t - 4.6) / 0.35), 1.5))
+    elif t < 6.7:
+        tomato_swap(lay, x, y, ww, "tomate_1", "tomate_2", clamp((t - 5.6) / 0.5))
+    elif t < 8.3:
+        tomato_swap(lay, x, y, ww, "tomate_2", "tomate_4", clamp((t - 6.7) / 0.5))
     else:
-        i = int(min(last - 1, math.floor(q)))
-        k, sc = swap(q - i) if q < last else (1, 1.0)
-        tomato(lay, x, y, ww, f"tomate_{i + k + 1 if q < last else last + 1}", s=sc)
+        tomato_swap(lay, x, y, ww, "tomate_4", SICK, clamp((t - 8.3) / 0.6))
     w.alpha_composite(lay)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
