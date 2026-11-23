@@ -298,6 +298,12 @@ rien jours feuilles emballer papier chauffer avant maison courants d'air peu d'e
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""Josiane humoriste jardinière sérieusement rougir tomates vertes gel belles journal boîte chaud
 secret banane mûre gaz accélère semaines rouges abonne-toi astuces"""),
+    "rotation": dict(
+        scenes="scenes_rotation", dur=31.4, voice=os.path.join(AUD, "rotation", "voix.wav"),
+        words=os.path.join(AUD, "rotation", "voix_mots.json"), out="rotation.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""potager rate hiver tomates même endroit nutriments maladies terre feuille quatre zones feuilles
+fruits racines haricots pois tournes case Bonus enrichissent suivants abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

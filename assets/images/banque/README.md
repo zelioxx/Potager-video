@@ -139,3 +139,6 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `poinsettia_sain` / `_fane` / `_nu` | Poinsettia en pot (papier métallisé rouge) : en forme, qui fane (feuilles tombées à droite), nu (bas du pot ≈ 0,996 / 0,967 / 0,995 ; milieu du pot ≈ 0,5 / 0,44 / 0,52 ; même échelle sur la planche) |
 | `poinsettia_emballe.png` | Poinsettia dans sa housse plastique transparente (le plastique est rendu translucide : plis et reflets seulement) |
 | `emoji_rire.png` | Émoji « mort de rire » 😂 (Noto Color Emoji, agrandi ×4 EDSR) |
+| `feuille_papier` / `feuille_papier_4cases` | Feuille de papier crème vierge / partagée en 4 cases au crayon (le plan de rotation) |
+| `dessin_chou` / `dessin_tomate` / `dessin_carotte` / `dessin_pois` | Dessins au crayon : alpha = intensité du trait, à poser sur la feuille comme du graphite |
+| `pois_1…4` / `haricot_1…4` / `carotte_1…4` / `tomate_1…4` | Stades de croissance avec leur motte (planches fournies, agrandies ×2) : chaque image garde le cadre entier du quart de planche, même échelle pour les 4 stades |
