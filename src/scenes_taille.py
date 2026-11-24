@@ -52,9 +52,9 @@ TREE_W = 640                                     # largeur du quart de planche �
 
 
 # le verger : rangées de pommiers derrière (du fond vers l'avant) ; (x, y du pied, largeur du cadre)
-ORCHARD = [(90, 1150, 230), (300, 1140, 220), (520, 1135, 215), (740, 1140, 225), (960, 1150, 235),
-           (190, 1260, 320), (480, 1250, 300), (980, 1265, 330),
-           (60, 1400, 440), (560, 1380, 420)]
+ORCHARD = [(280, 1175, 190), (420, 1172, 185), (560, 1170, 185), (700, 1172, 190),     # fond (dans l'herbe,
+           (300, 1260, 260), (500, 1255, 255), (700, 1262, 260),                        # entre les haies)
+           (560, 1380, 360)]
 
 
 def orchard(c, cam, state, s=1.0, pruned=None):
@@ -214,7 +214,7 @@ def s_prune(t):
     cam = Cam(lerp(1.15, 1.25, clamp((t - 12.0) / 4.4)), P_SPOT[0] + 80, P_SPOT[1] - 520)
     w = decor(cam, GRIS)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    orchard(lay, cam, 3, pruned={5, 8, 9} if t > 13.6 else None)
+    orchard(lay, cam, 3, pruned={4, 6, 7} if t > 13.6 else None)
     tree_swap(lay, cam, POM[2], POM[3], P_SPOT, clamp((t - 13.0) / 0.6))
     w.alpha_composite(lay)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
