@@ -2,7 +2,7 @@
 
 Décor fourni : la prairie (été) ; versions dérivées : la même prairie givrée (gel) et un jour d'hiver sans gel.
 Images fournies (planches agrandies ×2 puis détourées) : un cerisier aux 4 saisons (fleurs, cerises, automne, nu),
-un pommier (feuilles, pommes, nu, taillé), une branche (coupe arrachée, coupe nette, nette givrée, éclatée par le gel).
+un verger de pommiers (feuilles, pommes, nu, taillé) et un cerisier à droite, une branche (coupe arrachée, coupe nette, nette givrée, éclatée par le gel).
 0–4.4     la prairie gelée, les deux arbres nus : tu tailles en plein gel ? ARRÊTE ! tu les abîmes.
 4.4–7.3   (fond beige) la branche gèle : le bois devient cassant.
 7.3–12.0  la coupe éclate, cicatrise mal, le froid entre dans la plaie.
@@ -51,6 +51,19 @@ P_SPOT, C_SPOT = (330, 1580), (775, 1540)       # pieds du pommier et du cerisie
 TREE_W = 640                                     # largeur du quart de planche à l'écran (zoom 1)
 
 
+# le verger : rangées de pommiers derrière (du fond vers l'avant) ; (x, y du pied, largeur du cadre)
+ORCHARD = [(90, 1150, 230), (300, 1140, 220), (520, 1135, 215), (740, 1140, 225), (960, 1150, 235),
+           (190, 1260, 320), (480, 1250, 300), (980, 1265, 330),
+           (60, 1400, 440), (560, 1380, 420)]
+
+
+def orchard(c, cam, state, s=1.0, pruned=None):
+    """Les pommiers du fond, tous au même stade (state : 1 feuilles, 2 pommes, 3 nu, 4 taillé)."""
+    for i, (x, y, w) in enumerate(ORCHARD):
+        st = state if pruned is None or i not in pruned else 4
+        tree(c, cam, POM[st - 1], (x, y), w, s=s)
+
+
 def tree(c, cam, name, spot, w=TREE_W, s=1.0, alpha=1.0):
     x, y = cam.p(*spot)
     soft_shadow(c, x, y, w * cam.z * 0.55, 80)
@@ -85,6 +98,7 @@ def s_frost(t):
     cam = Cam(lerp(1.0, 1.12, ease_io(clamp(t / 4.4))), 540, 1150)
     w = decor(cam, GIVRE)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    orchard(lay, cam, 3, s=ease_out_back(clamp((t - 0.05) / 0.4), 1.3))
     tree(lay, cam, POM[2], P_SPOT, s=ease_out_back(clamp((t - 0.1) / 0.4), 1.4))
     tree(lay, cam, CER[3], C_SPOT, s=ease_out_back(clamp((t - 0.25) / 0.4), 1.4))
     w.alpha_composite(lay)
@@ -200,6 +214,7 @@ def s_prune(t):
     cam = Cam(lerp(1.15, 1.25, clamp((t - 12.0) / 4.4)), P_SPOT[0] + 80, P_SPOT[1] - 520)
     w = decor(cam, GRIS)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    orchard(lay, cam, 3, pruned={5, 8, 9} if t > 13.6 else None)
     tree_swap(lay, cam, POM[2], POM[3], P_SPOT, clamp((t - 13.0) / 0.6))
     w.alpha_composite(lay)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -235,6 +250,10 @@ def s_cherry(t):
     cam = Cam(lerp(1.15, 1.22, clamp((t - 16.4) / 5.8)), C_SPOT[0] - 80, C_SPOT[1] - 520)
     w = decor(cam, GRIS, ETE, summer)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    if t < 21.0:
+        orchard(lay, cam, 4)
+    else:
+        orchard(lay, cam, 1)
     tree_swap(lay, cam, CER[3], CER[1], C_SPOT, clamp((t - 21.0) / 0.6))
     w.alpha_composite(lay)
     if summer > 0.01:
@@ -297,6 +316,7 @@ def s_end(t):
     cam = Cam(1.0, 540, 1100)
     w = decor(cam, ETE)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    orchard(lay, cam, 2)
     tree(lay, cam, POM[1], P_SPOT)
     tree(lay, cam, CER[1], C_SPOT)
     w.alpha_composite(lay)
