@@ -304,6 +304,12 @@ secret banane mûre gaz accélère semaines rouges abonne-toi astuces"""),
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""potager rate hiver tomates même endroit nutriments maladies terre feuille quatre zones feuilles
 fruits racines haricots pois tournes case Bonus enrichissent suivants abonne-toi astuces"""),
+    "taille": dict(
+        scenes="scenes_taille", dur=29.2, voice=os.path.join(AUD, "taille", "voix.wav"),
+        words=os.path.join(AUD, "taille", "voix_mots.json"), out="taille.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""fruitiers gel Arrête abîmes gèlent cassant éclatent cicatrisent froid plaie pommiers poiriers
+hiver oui sans attention cerisiers pruniers jamais l'été sécateur propre aiguisé abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]

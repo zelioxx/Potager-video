@@ -142,3 +142,6 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `feuille_papier` / `feuille_papier_4cases` | Feuille de papier crème vierge / partagée en 4 cases au crayon (le plan de rotation) |
 | `dessin_chou` / `dessin_tomate` / `dessin_carotte` / `dessin_pois` | Dessins au crayon : alpha = intensité du trait, à poser sur la feuille comme du graphite |
 | `pois_1…4` / `haricot_1…4` / `carotte_1…4` / `tomate_1…4` | Stades de croissance avec leur motte (planches fournies, agrandies ×2) : chaque image garde le cadre entier du quart de planche, même échelle pour les 4 stades |
+| `cerisier_1…4` | Jeune cerisier aux 4 saisons : en fleurs, avec cerises, en automne, nu (même cadre pour les 4 ; rameaux fins gardés) |
+| `pommier_1…4` | Jeune pommier : en feuilles, avec pommes, nu, taillé (même cadre pour les 4) |
+| `branche_1…4` | Branche avec bourgeons, bout à droite : coupe arrachée (sécateur émoussé), coupe nette, coupe nette givrée, coupe éclatée par le gel |
