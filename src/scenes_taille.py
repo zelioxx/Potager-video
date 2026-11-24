@@ -42,7 +42,7 @@ def cue(t, name, gain=0.5):
 
 
 B = "banque/"
-ETE, GIVRE, GRIS = "decor_prairie.webp", "decor_prairie_givre.jpg", "decor_prairie_hiver.jpg"
+ETE, GIVRE, GRIS = "decor_prairie.webp", "decor_prairie_givree.webp", "decor_prairie_hiver.jpg"
 CER = [B + f"cerisier_{k}" for k in range(1, 5)]      # fleurs, cerises, automne, nu
 POM = [B + f"pommier_{k}" for k in range(1, 5)]       # feuilles, pommes, nu, taillé
 BR = [B + f"branche_{k}" for k in range(1, 5)]        # arrachée, nette, nette givrée, éclatée givrée
