@@ -96,9 +96,9 @@ def cut_pt(x, y, w, name=BR[3]):
 
 # ============================================================ A. EN PLEIN GEL ? ARRÊTE ! (0 → 4.4)
 # les coupes sur le pommier nu (cadre du quart de planche de pommier_3) et leurs instants
-SNIP_PTS = [(210, 780), (375, 440), (503, 420), (590, 420), (757, 495), (808, 840)]
-SNIP_T = [0.6 + 0.27 * i for i in range(len(SNIP_PTS))]
-PRUNED_T = 2.15                        # le pommier taillé apparaît et reste ainsi
+SNIP_PTS = [(210, 780), (503, 420), (757, 495), (808, 840)]
+SNIP_T = [0.6, 1.05, 1.5, 1.95]
+PRUNED_T = 2.35                        # le pommier taillé apparaît et reste ainsi
 
 
 def on_tree(cam, px, py, name=None, spot=P_SPOT, w=TREE_W):
@@ -144,16 +144,16 @@ def scissor_anim(c, cam, t):
         e = ease_in(clamp((t - SNIP_T[-1] - 0.12) / 0.3))
         X, Y, q = lerp(pts[-1][0], W + 600, e), lerp(pts[-1][1], pts[-1][1] + 200, e), 0.0
     else:
-        i = max(j for j, ts in enumerate(SNIP_T) if ts - 0.15 <= t)
+        i = max(j for j, ts in enumerate(SNIP_T) if ts - 0.2 <= t)
         ts = SNIP_T[i]
         nxt = min(i + 1, len(pts) - 1)
         if t <= ts:                                 # se ferme sur la branche
             X, Y = pts[i]
-            q = ease_in(clamp((t - (ts - 0.15)) / 0.15))
+            q = ease_in(clamp((t - (ts - 0.2)) / 0.2))
         else:                                       # se rouvre et file vers la branche suivante
-            e = ease_io(clamp((t - ts - 0.03) / 0.09))
+            e = ease_io(clamp((t - ts - 0.06) / 0.16))
             X, Y = lerp(pts[i][0], pts[nxt][0], e), lerp(pts[i][1], pts[nxt][1], e)
-            q = 1 - ease_out(clamp((t - ts) / 0.08))
+            q = 1 - ease_out(clamp((t - ts) / 0.1))
     secateur(c, X, Y, q, 560 * cam.z, rot=-20)
 
 
