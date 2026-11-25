@@ -25,7 +25,8 @@ from scenes_hortensia import stamp
 from scenes_citron import shade, swap
 from scenes_fumier import Cam, decor, snowfall
 from scenes_arrosage_soir import thermo_cold
-from scenes_rotation import plant, beige, _img
+from scenes_rotation import plant, beige, _img, _foot
+from scenes_orchidee_racines import scissors_pose, _place, PIVOT, CUT_D, ANG_MID
 from scenes_pothos_lumiere import soft_shadow, sp, _src
 
 CUES = []
@@ -94,13 +95,88 @@ def cut_pt(x, y, w, name=BR[3]):
 
 
 # ============================================================ A. EN PLEIN GEL ? ARRÊTE ! (0 → 4.4)
+# les coupes sur le pommier nu (cadre du quart de planche de pommier_3) et leurs instants
+SNIP_PTS = [(210, 780), (375, 440), (503, 420), (590, 420), (757, 495), (808, 840)]
+SNIP_T = [0.6 + 0.27 * i for i in range(len(SNIP_PTS))]
+PRUNED_T, BACK_T = 2.15, 2.88          # le pommier taillé apparaît… puis, sur « Arrête ! », on revient en arrière
+
+
+def on_tree(cam, px, py, name=None, spot=P_SPOT, w=TREE_W):
+    name = name or POM[2]
+    fx, fy = _foot(name)
+    k = w * cam.z / _img(name).width
+    x, y = cam.p(*spot)
+    return x + (px - fx) * k, y + (py - fy) * k
+
+
+def scissor_anim(c, cam, t):
+    """Les ciseaux passent de branche en branche et se ferment à chaque coupe ; un rameau tombe."""
+    pts = [on_tree(cam, *p) for p in SNIP_PTS]
+    if not (0.3 < t < PRUNED_T + 0.25):
+        return
+    if t < SNIP_T[0] - 0.15:                       # arrivée par la droite
+        e = ease_out(clamp((t - 0.3) / (SNIP_T[0] - 0.45)))
+        X, Y, q = lerp(W + 250, pts[0][0], e), lerp(pts[0][1] - 200, pts[0][1], e), 0.0
+    elif t > SNIP_T[-1] + 0.12:                    # départ
+        e = ease_in(clamp((t - SNIP_T[-1] - 0.12) / 0.3))
+        X, Y, q = lerp(pts[-1][0], W + 300, e), lerp(pts[-1][1], pts[-1][1] - 300, e), 0.0
+    else:
+        i = max(j for j, ts in enumerate(SNIP_T) if ts - 0.15 <= t) if t >= SNIP_T[0] - 0.15 else 0
+        ts = SNIP_T[i]
+        if t < ts - 0.15 + 0.0 and i > 0:
+            i -= 1
+        nxt = min(i + 1, len(pts) - 1)
+        if t <= ts:                                 # se ferme sur la branche
+            X, Y = pts[i]
+            q = ease_in(clamp((t - (ts - 0.15)) / 0.15))
+        else:                                       # se rouvre et file vers la branche suivante
+            e = ease_io(clamp((t - ts - 0.03) / 0.09))
+            X, Y = lerp(pts[i][0], pts[nxt][0], e), lerp(pts[i][1], pts[nxt][1], e)
+            q = 1 - ease_out(clamp((t - ts) / 0.08))
+    front, back = scissors_pose(int(round(clamp(q) * 24)))
+    a = math.radians(ANG_MID)
+    ax, ay = PIVOT[0] + CUT_D * math.cos(a), PIVOT[1] + CUT_D * math.sin(a)
+    sw = 370 * cam.z
+    _place(c, back, ax, ay, X, Y, sw, -18)
+    _place(c, front, ax, ay, X, Y, sw, -18)
+
+
+def twigs(c, cam, t):
+    """Le bout de rameau coupé tombe en tournoyant."""
+    d = ImageDraw.Draw(c)
+    for i, ts in enumerate(SNIP_T):
+        q = (t - ts) / 0.55
+        if not 0 < q < 1:
+            continue
+        x, y = on_tree(cam, *SNIP_PTS[i])
+        yy = y - 30 * cam.z + 420 * cam.z * q * q
+        xx = x + (20 + 15 * i) * cam.z * q * (1 if i % 2 else -1)
+        ang = math.radians(60 + 400 * q * (1 if i % 2 else -1))
+        L = 70 * cam.z
+        p0 = (xx - math.cos(ang) * L / 2, yy - math.sin(ang) * L / 2)
+        p1 = (xx + math.cos(ang) * L / 2, yy + math.sin(ang) * L / 2)
+        al = int(255 * (1 - q ** 3))
+        d.line([p0, p1], fill=(120, 98, 74, al), width=max(3, int(6 * cam.z)))
+        d.line([p0, ((p0[0] + p1[0]) / 2 + 10 * cam.z, (p0[1] + p1[1]) / 2 - 18 * cam.z)],
+               fill=(120, 98, 74, al), width=max(2, int(4 * cam.z)))
+
+
 def s_frost(t):
     cam = Cam(lerp(1.0, 1.12, ease_io(clamp(t / 4.4))), 540, 1150)
     w = decor(cam, GIVRE)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     orchard(lay, cam, 3, s=ease_out_back(clamp((t - 0.05) / 0.4), 1.3))
-    tree(lay, cam, POM[2], P_SPOT, s=ease_out_back(clamp((t - 0.1) / 0.4), 1.4))
+    if t < PRUNED_T:
+        tree(lay, cam, POM[2], P_SPOT, s=ease_out_back(clamp((t - 0.1) / 0.4), 1.4))
+    elif t < BACK_T:
+        tree_swap(lay, cam, POM[2], POM[3], P_SPOT, clamp((t - PRUNED_T) / 0.4))
+    else:
+        tree_swap(lay, cam, POM[3], POM[2], P_SPOT, clamp((t - BACK_T) / 0.4))
     tree(lay, cam, CER[3], C_SPOT, s=ease_out_back(clamp((t - 0.25) / 0.4), 1.4))
+    twigs(lay, cam, t)
+    scissor_anim(lay, cam, t)
+    for i, ts in enumerate(SNIP_T):
+        sparkles(lay, t, ts, *on_tree(cam, *SNIP_PTS[i]), 60, 5, 20 + i, 0.35)
     w.alpha_composite(lay)
     snowfall(w, t, 0.6, 80)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -119,7 +195,10 @@ def s_frost(t):
 
 
 cue(0.12, "pop_lo", 0.14)
-cue(0.85, "crunch", 0.1)
+for _t in SNIP_T:
+    cue(_t - 0.02, "snip", 0.2)
+cue(PRUNED_T, "pop", 0.12)
+cue(BACK_T + 0.05, "whoosh_up", 0.1)
 cue(2.92, "thud", 0.22)
 cue(2.95, "alert1", 0.16)
 cue(3.52, "fail", 0.16)

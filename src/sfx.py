@@ -436,6 +436,18 @@ def flap(d=0.7):
     return norm(out, 0.8)
 
 
+def snip():
+    """Coup de sécateur : claquement métallique bref (lames qui se croisent) puis petit « tic » du ressort."""
+    out = np.zeros(int(0.22 * SR), np.float32)
+    for k, (s0, f, g) in enumerate(((0.0, 4200, 1.0), (0.012, 6100, 0.6), (0.11, 2600, 0.35))):
+        t = _t(0.06)
+        x = (np.sin(2 * np.pi * f * t) + 0.5 * np.sin(2 * np.pi * f * 1.48 * t)) * np.exp(-t * 90)
+        x += _bp(rng.standard_normal(len(t)), 2500, 9000) * np.exp(-t * 160) * 0.8
+        o = int(s0 * SR)
+        out[o:o + len(x)] += x * g
+    return norm(out, 0.8)
+
+
 BANK = {
     "whoosh": lambda: whoosh(0.42),
     "whoosh_up": lambda: whoosh(0.38, up=True),
@@ -475,6 +487,7 @@ BANK = {
     "coo": coo,
     "coo_lo": lambda: coo(1.3, 0.85),
     "flap": flap,
+    "snip": snip,
 }
 
 
