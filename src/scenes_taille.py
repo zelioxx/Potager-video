@@ -13,11 +13,12 @@ un verger de pommiers (feuilles, pommes, nu, taillé) et un cerisier à droite, 
 """
 import math
 import os
+from functools import lru_cache
 
 import numpy as np
 from PIL import Image, ImageDraw
 
-from gfx import (W, H, YEL, RED, GREEN, CREAM, DARK, WHITE, BLUE, put, title, life, fade, ease_out, ease_io, ease_in,
+from gfx import (W, H, paste, YEL, RED, GREEN, CREAM, DARK, WHITE, BLUE, put, title, life, fade, ease_out, ease_io, ease_in,
                  ease_out_back, clamp, lerp, icon, tag, button_img, text_img, F_TITLE, light_rays, particles)
 from scenes import sparkles
 from scenes_ananas import logo_img
@@ -26,7 +27,6 @@ from scenes_citron import shade, swap
 from scenes_fumier import Cam, decor, snowfall
 from scenes_arrosage_soir import thermo_cold
 from scenes_rotation import plant, beige, _img, _foot
-from scenes_orchidee_racines import scissors_pose, _place, PIVOT, CUT_D, ANG_MID
 from scenes_pothos_lumiere import soft_shadow, sp, _src
 
 CUES = []
@@ -98,7 +98,7 @@ def cut_pt(x, y, w, name=BR[3]):
 # les coupes sur le pommier nu (cadre du quart de planche de pommier_3) et leurs instants
 SNIP_PTS = [(210, 780), (375, 440), (503, 420), (590, 420), (757, 495), (808, 840)]
 SNIP_T = [0.6 + 0.27 * i for i in range(len(SNIP_PTS))]
-PRUNED_T, BACK_T = 2.15, 2.88          # le pommier taillé apparaît… puis, sur « Arrête ! », on revient en arrière
+PRUNED_T = 2.15                        # le pommier taillé apparaît et reste ainsi
 
 
 def on_tree(cam, px, py, name=None, spot=P_SPOT, w=TREE_W):
@@ -109,22 +109,60 @@ def on_tree(cam, px, py, name=None, spot=P_SPOT, w=TREE_W):
     return x + (px - fx) * k, y + (py - fy) * k
 
 
+SEC = B + "secateur_main"         # sécateur tenu en main (photo Open Images, CC BY), lames vers la gauche
+SEC_PV = (474, 234)              # l'axe du sécateur (cadre de secateur_main)
+SEC_CUT = (290, 232)             # entre les lames, là où passe la branche
+
+
+@lru_cache(None)
+def _sec_parts():
+    a = np.asarray(_img(SEC))
+    hh, ww = a.shape[:2]
+    yy, xx = np.mgrid[:hh, :ww]
+    upper = (xx < 470) & (yy < 220 + (xx - 40) * (16 / 410))
+    up, rest = a.copy(), a.copy()
+    up[..., 3] = np.where(upper, a[..., 3], 0)
+    rest[..., 3] = np.where(upper & (xx < 380), 0, a[..., 3])
+    fade = np.clip((ww * 0.97 - xx) / (ww * 0.25), 0, 1)        # l'avant-bras s'estompe vers la droite
+    rest[..., 3] = (rest[..., 3] * fade).astype(np.uint8)
+    return Image.fromarray(up, "RGBA"), Image.fromarray(rest, "RGBA")
+
+
+@lru_cache(64)
+def sec_pose(q24, wpx):
+    """Le sécateur pour une fermeture q (0 ouvert → 1 fermé), mis à la largeur wpx."""
+    up, rest = _sec_parts()
+    im = rest.copy()
+    im.alpha_composite(up.rotate(11 * q24 / 24, resample=Image.BICUBIC, center=SEC_PV))
+    k = wpx / im.width
+    return im.resize((wpx, max(1, int(im.height * k))), Image.LANCZOS), k
+
+
+def secateur(c, X, Y, q, wpx, rot=0.0):
+    im, k = sec_pose(int(round(clamp(q) * 24)), int(wpx))
+    ax, ay = SEC_CUT[0] * k, SEC_CUT[1] * k
+    R = int(math.hypot(max(ax, im.width - ax), max(ay, im.height - ay))) + 2
+    can = Image.new("RGBA", (2 * R, 2 * R), (0, 0, 0, 0))
+    can.alpha_composite(im, (int(R - ax), int(R - ay)))
+    if abs(rot) > 0.05:
+        can = can.rotate(rot, resample=Image.BICUBIC)
+    paste(c, can, X - R, Y - R)
+
+
 def scissor_anim(c, cam, t):
-    """Les ciseaux passent de branche en branche et se ferment à chaque coupe ; un rameau tombe."""
+    """Le sécateur (tenu en main) passe de branche en branche et se ferme à chaque coupe."""
     pts = [on_tree(cam, *p) for p in SNIP_PTS]
     if not (0.3 < t < PRUNED_T + 0.25):
         return
     if t < SNIP_T[0] - 0.15:                       # arrivée par la droite
         e = ease_out(clamp((t - 0.3) / (SNIP_T[0] - 0.45)))
-        X, Y, q = lerp(W + 250, pts[0][0], e), lerp(pts[0][1] - 200, pts[0][1], e), 0.0
+        X, Y, q = lerp(W + 500, pts[0][0], e), lerp(pts[0][1] + 150, pts[0][1], e), 0.0
     elif t > SNIP_T[-1] + 0.12:                    # départ
         e = ease_in(clamp((t - SNIP_T[-1] - 0.12) / 0.3))
-        X, Y, q = lerp(pts[-1][0], W + 300, e), lerp(pts[-1][1], pts[-1][1] - 300, e), 0.0
+        X, Y, q = lerp(pts[-1][0], W + 600, e), lerp(pts[-1][1], pts[-1][1] + 200, e), 0.0
     else:
-        i = max(j for j, ts in enumerate(SNIP_T) if ts - 0.15 <= t) if t >= SNIP_T[0] - 0.15 else 0
+        i = max(j for j, ts in enumerate(SNIP_T) if ts - 0.15 <= t)
         ts = SNIP_T[i]
-        if t < ts - 0.15 + 0.0 and i > 0:
-            i -= 1
         nxt = min(i + 1, len(pts) - 1)
         if t <= ts:                                 # se ferme sur la branche
             X, Y = pts[i]
@@ -133,12 +171,7 @@ def scissor_anim(c, cam, t):
             e = ease_io(clamp((t - ts - 0.03) / 0.09))
             X, Y = lerp(pts[i][0], pts[nxt][0], e), lerp(pts[i][1], pts[nxt][1], e)
             q = 1 - ease_out(clamp((t - ts) / 0.08))
-    front, back = scissors_pose(int(round(clamp(q) * 24)))
-    a = math.radians(ANG_MID)
-    ax, ay = PIVOT[0] + CUT_D * math.cos(a), PIVOT[1] + CUT_D * math.sin(a)
-    sw = 370 * cam.z
-    _place(c, back, ax, ay, X, Y, sw, -18)
-    _place(c, front, ax, ay, X, Y, sw, -18)
+    secateur(c, X, Y, q, 820 * cam.z, rot=-22)
 
 
 def twigs(c, cam, t):
@@ -168,10 +201,8 @@ def s_frost(t):
     orchard(lay, cam, 3, s=ease_out_back(clamp((t - 0.05) / 0.4), 1.3))
     if t < PRUNED_T:
         tree(lay, cam, POM[2], P_SPOT, s=ease_out_back(clamp((t - 0.1) / 0.4), 1.4))
-    elif t < BACK_T:
+    else:                    # il reste taillé (abîmé par la taille en plein gel)
         tree_swap(lay, cam, POM[2], POM[3], P_SPOT, clamp((t - PRUNED_T) / 0.4))
-    else:
-        tree_swap(lay, cam, POM[3], POM[2], P_SPOT, clamp((t - BACK_T) / 0.4))
     tree(lay, cam, CER[3], C_SPOT, s=ease_out_back(clamp((t - 0.25) / 0.4), 1.4))
     twigs(lay, cam, t)
     scissor_anim(lay, cam, t)
@@ -198,7 +229,6 @@ cue(0.12, "pop_lo", 0.14)
 for _t in SNIP_T:
     cue(_t - 0.02, "snip", 0.2)
 cue(PRUNED_T, "pop", 0.12)
-cue(BACK_T + 0.05, "whoosh_up", 0.1)
 cue(2.92, "thud", 0.22)
 cue(2.95, "alert1", 0.16)
 cue(3.52, "fail", 0.16)

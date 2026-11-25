@@ -145,3 +145,4 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `cerisier_1…4` | Jeune cerisier aux 4 saisons : en fleurs, avec cerises, en automne, nu (même cadre pour les 4 ; rameaux fins gardés) |
 | `pommier_1…4` | Jeune pommier : en feuilles, avec pommes, nu, taillé (même cadre pour les 4) |
 | `branche_1…4` | Branche avec bourgeons, bout à droite : coupe arrachée (sécateur émoussé), coupe nette, coupe nette givrée, coupe éclatée par le gel |
+| `secateur_main.png` | Sécateur tenu en main, lames vers la gauche (photo Open Images, CC BY 2.0 ; marque effacée ; axe ≈ 474, 234 ; entre les lames ≈ 290, 232) |
