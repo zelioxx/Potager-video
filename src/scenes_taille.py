@@ -109,37 +109,20 @@ def on_tree(cam, px, py, name=None, spot=P_SPOT, w=TREE_W):
     return x + (px - fx) * k, y + (py - fy) * k
 
 
-SEC = B + "secateur_main"         # sécateur tenu en main (photo Open Images, CC BY), lames vers la gauche
-SEC_PV = (474, 234)              # l'axe du sécateur (cadre de secateur_main)
-SEC_CUT = (290, 232)             # entre les lames, là où passe la branche
-
-
-@lru_cache(None)
-def _sec_parts():
-    a = np.asarray(_img(SEC))
-    hh, ww = a.shape[:2]
-    yy, xx = np.mgrid[:hh, :ww]
-    upper = (xx < 470) & (yy < 220 + (xx - 40) * (16 / 410))
-    up, rest = a.copy(), a.copy()
-    up[..., 3] = np.where(upper, a[..., 3], 0)
-    rest[..., 3] = np.where(upper & (xx < 380), 0, a[..., 3])
-    fade = np.clip((ww * 0.97 - xx) / (ww * 0.25), 0, 1)        # l'avant-bras s'estompe vers la droite
-    rest[..., 3] = (rest[..., 3] * fade).astype(np.uint8)
-    return Image.fromarray(up, "RGBA"), Image.fromarray(rest, "RGBA")
+SEC_O, SEC_F = "chrysantheme/secateur_ouvert", "chrysantheme/secateur_ferme"   # sécateur fourni (cadre 1024)
+SEC_CUT = (250, 520)             # entre les lames, là où passe la branche (les deux photos sont alignées sur l'axe)
 
 
 @lru_cache(64)
-def sec_pose(q24, wpx):
-    """Le sécateur pour une fermeture q (0 ouvert → 1 fermé), mis à la largeur wpx."""
-    up, rest = _sec_parts()
-    im = rest.copy()
-    im.alpha_composite(up.rotate(11 * q24 / 24, resample=Image.BICUBIC, center=SEC_PV))
-    k = wpx / im.width
-    return im.resize((wpx, max(1, int(im.height * k))), Image.LANCZOS), k
+def _sec_sized(closed, wpx):
+    im = _img(SEC_F if closed else SEC_O)
+    return im.resize((wpx, wpx), Image.LANCZOS)
 
 
 def secateur(c, X, Y, q, wpx, rot=0.0):
-    im, k = sec_pose(int(round(clamp(q) * 24)), int(wpx))
+    """Le sécateur ouvert (q < 0,5) ou fermé, la branche entre les lames en (X, Y)."""
+    im = _sec_sized(q >= 0.5, int(wpx))
+    k = int(wpx) / 1024
     ax, ay = SEC_CUT[0] * k, SEC_CUT[1] * k
     R = int(math.hypot(max(ax, im.width - ax), max(ay, im.height - ay))) + 2
     can = Image.new("RGBA", (2 * R, 2 * R), (0, 0, 0, 0))
@@ -150,7 +133,7 @@ def secateur(c, X, Y, q, wpx, rot=0.0):
 
 
 def scissor_anim(c, cam, t):
-    """Le sécateur (tenu en main) passe de branche en branche et se ferme à chaque coupe."""
+    """Le sécateur passe de branche en branche et se ferme à chaque coupe."""
     pts = [on_tree(cam, *p) for p in SNIP_PTS]
     if not (0.3 < t < PRUNED_T + 0.25):
         return
@@ -171,7 +154,7 @@ def scissor_anim(c, cam, t):
             e = ease_io(clamp((t - ts - 0.03) / 0.09))
             X, Y = lerp(pts[i][0], pts[nxt][0], e), lerp(pts[i][1], pts[nxt][1], e)
             q = 1 - ease_out(clamp((t - ts) / 0.08))
-    secateur(c, X, Y, q, 820 * cam.z, rot=-22)
+    secateur(c, X, Y, q, 560 * cam.z, rot=-20)
 
 
 def twigs(c, cam, t):
