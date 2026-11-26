@@ -145,3 +145,6 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `cerisier_1…4` | Jeune cerisier aux 4 saisons : en fleurs, avec cerises, en automne, nu (même cadre pour les 4 ; rameaux fins gardés) |
 | `pommier_1…4` | Jeune pommier : en feuilles, avec pommes, nu, taillé (même cadre pour les 4) |
 | `branche_1…4` | Branche avec bourgeons, bout à droite : coupe arrachée (sécateur émoussé), coupe nette, coupe nette givrée, coupe éclatée par le gel |
+| `maranta_1…4` | Maranta en pot plastique noir, du plus beau au mourant (feuille tombée au sol à l'étape 4) ; même cadre pour les 4, bas du pot détecté automatiquement |
+| `pot_terre_cuite` / `arrosoir_inox` / `radiateur_panneau` | Pot en terre cuite vide ; petit arrosoir inox à long bec ; radiateur panneau blanc |
+| `calendrier_fr.png` | Calendrier mural « AVRIL » traduit en français (LUN…DIM), grille des cases ≈ (0,08 ; 0,32) → (0,92 ; 0,84) |
