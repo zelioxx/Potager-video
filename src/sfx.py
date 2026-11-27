@@ -448,6 +448,50 @@ def snip():
     return norm(out, 0.8)
 
 
+def room(d=32.0):
+    """Ambiance de pièce (jamais de vrai silence) : souffle grave et doux, léger ronronnement, très calme."""
+    r = np.random.default_rng(21)
+    n = int(d * SR)
+    x = r.standard_normal(n).astype(np.float32)
+    lo = _lp(_lp(x, 380), 380)
+    t = np.arange(n) / SR
+    hum = 0.08 * np.sin(2 * np.pi * 100 * t) + 0.04 * np.sin(2 * np.pi * 150 * t + 1)
+    swell = 0.85 + 0.15 * np.sin(2 * np.pi * t / 7.3)
+    out = (lo * 6 + hum) * swell
+    f = int(0.6 * SR)
+    out[:f] *= np.linspace(0, 1, f)
+    out[-f:] *= np.linspace(1, 0, f)
+    return norm(out, 0.9)
+
+
+def saw(d=1.2, strokes=4):
+    """Scie égoïne : allers-retours râpeux (bruit filtré qui monte et descend)."""
+    r = np.random.default_rng(5)
+    out = np.zeros(int(d * SR), np.float32)
+    L = d / strokes
+    for k in range(strokes):
+        t = _t(L * 0.92)
+        q = t / (L * 0.92)
+        x = _bp(r.standard_normal(len(t)), 1200 + 900 * (k % 2), 6000) * np.sin(np.pi * q) ** 0.7
+        x *= 0.7 + 0.3 * np.sin(2 * np.pi * 85 * t) ** 2
+        o = int(k * L * SR)
+        out[o:o + len(x)] += x[: len(out) - o]
+    return norm(out, 0.8)
+
+
+def needles(d=1.4):
+    """Aiguilles de sapin qui tombent : pluie de minuscules cliquetis secs."""
+    r = np.random.default_rng(9)
+    out = np.zeros(int(d * SR), np.float32)
+    for _ in range(int(140 * d)):
+        o = int(r.uniform(0, d - 0.02) * SR)
+        t = _t(0.012)
+        x = _bp(r.standard_normal(len(t)), 3000, 9000) * np.exp(-t * 400) * r.uniform(0.3, 1.0)
+        out[o:o + len(x)] += x
+    env = np.sin(np.pi * np.linspace(0, 1, len(out))) ** 0.5
+    return norm(out * env, 0.7)
+
+
 BANK = {
     "whoosh": lambda: whoosh(0.42),
     "whoosh_up": lambda: whoosh(0.38, up=True),
@@ -488,6 +532,9 @@ BANK = {
     "coo_lo": lambda: coo(1.3, 0.85),
     "flap": flap,
     "snip": snip,
+    "room": room,
+    "saw": saw,
+    "needles": needles,
 }
 
 

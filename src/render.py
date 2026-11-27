@@ -316,6 +316,12 @@ hiver oui sans attention cerisiers pruniers jamais l'été sécateur propre aigu
         af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
         highlight="""nouvelle plante meurt semaines faute jardinerie serre lumière chaleur l'humidité sombre sec
 chauffage choc feuilles fenêtre lumineuse radiateur surtout rempote attends trois s'habitue repart abonne-toi astuces"""),
+    "sapin": dict(
+        scenes="scenes_sapin", dur=27.9, voice=os.path.join(AUD, "sapin", "voix.wav"),
+        words=os.path.join(AUD, "sapin", "voix_mots.json"), out="sapin.mp4",
+        af="alimiter=limit=0.995:attack=1:release=50:level=false",      # volume de la voix gardé tel qu'envoyé
+        highlight="""sapin aiguilles Noël mauvais endroit bouquet fleurs d'eau radiateur cheminée dessèche vitesse
+poignées recoupe pied cm réserve chaque jour surtout loin chaleur abonne-toi astuces"""),
 }
 PROJECT = next((a for a in sys.argv[1:] if a in PROJECTS), "ail")
 CFG = PROJECTS[PROJECT]
