@@ -107,6 +107,12 @@ def maranta_q(c, q, x, y, w, rot=0.0):
     maranta(c, i + k, x, y, w, s=s, rot=rot)
 
 
+def maranta_ab(c, a, b, q, x, y, w, rot=0.0):
+    """Un seul passage, lent, de l'étape a à l'étape b (sans superposition)."""
+    k, sc = swap(clamp(q))
+    maranta(c, a if k == 0 else b, x, y, w, s=sc, rot=rot)
+
+
 def maranta_back(c, q, x, y, w):
     """Remonte de l'étape 3 à l'étape 1 (elle repart)."""
     q = clamp(q, 0, 2)
@@ -199,11 +205,11 @@ def leaves_fall(c, t, t0, x, y, w, n=6, seed=2):
 
 # ============================================================ A. TA NOUVELLE PLANTE MEURT EN 2 SEMAINES ? (0 → 3.65)
 def s_intro(t):
-    cam = Cam(lerp(1.15, 1.32, ease_io(clamp(t / 3.6))), FLOOR[0] + 80, FLOOR[1] - 300)
+    cam = Cam(lerp(1.2, 1.35, ease_io(clamp(t / 3.6))), TABLE[0] - 40, TABLE[1] - 330)
     w = decor(cam, SALON)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    q = 1 + ease_io(clamp((t - 0.9) / 1.4)) * 2.3
-    plant_at(lay, cam, lambda c, x, y, ww: maranta_q(c, q, x, y, ww), FLOOR)
+    q = clamp((t - 1.3) / 1.0)                    # du très bel état à l'état abîmé, une seule fois
+    plant_at(lay, cam, lambda c, x, y, ww: maranta_ab(c, 1, 4, q, x, y, ww), TABLE)
     w.alpha_composite(lay)
     w = dim(w, 0.35)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -217,7 +223,7 @@ def s_intro(t):
 
 
 cue(0.08, "pop_lo", 0.14)
-cue(1.05, "pop", 0.12)
+cue(1.3, "pop", 0.12)
 cue(1.6, "tick", 0.16)
 cue(1.8, "fail", 0.12)
 cue(2.6, "thud", 0.2)
@@ -290,10 +296,10 @@ def s_shock(t):
     w = decor(cam, SALON)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     shake = math.sin(t * 60) * 10 * clamp((t - 13.62) / 0.05) * (1 - clamp((t - 13.7) / 0.4))
-    q = 1 + ease_io(clamp((t - 14.4) / 0.95)) * 3
+    q = clamp((t - 14.45) / 0.9)
     x, y = cam.p(*FLOOR)
     soft_shadow(lay, x, y, FRAME_W * cam.z * 0.42, 90)
-    maranta_q(lay, q, x + shake, y, FRAME_W * cam.z, rot=shake * 0.3)
+    maranta_ab(lay, 1, 4, q, x + shake, y, FRAME_W * cam.z, rot=shake * 0.3)
     leaves_fall(lay, t, 14.5, x, y, FRAME_W * cam.z, 7, 4)
     w.alpha_composite(lay)
     w = dim(w, 0.85)
@@ -319,7 +325,7 @@ def s_window(t):
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     m = ease_io(clamp((t - 16.0) / 1.1))
     gx, gy = lerp(FLOOR[0], TABLE[0], m), lerp(FLOOR[1], TABLE[1], m) - math.sin(math.pi * m) * 160
-    plant_at(lay, cam, lambda c, x, y, ww: maranta(c, 3, x, y, ww, rot=math.sin(math.pi * m) * 6), (gx, gy))
+    plant_at(lay, cam, lambda c, x, y, ww: maranta(c, 4, x, y, ww, rot=math.sin(math.pi * m) * 6), (gx, gy))
     w.alpha_composite(lay)
     w = dim(w, 0.85 * (1 - ease_io(clamp((t - 16.6) / 0.8))))
     w = bright(w, ease_io(clamp((t - 16.8) / 0.8)) * 0.6)
@@ -358,7 +364,7 @@ def s_repot(t):
     if part1:
         s = ease_out_back(clamp((t - 19.3) / 0.4), 1.4)
         soft_shadow(lay, 330, 1450, 260, 90)
-        maranta(lay, 3, 330, 1450, 560, s=s)
+        maranta(lay, 4, 330, 1450, 560, s=s)
         s2 = ease_out_back(clamp((t - 19.9) / 0.4), 1.4)
         if s2 > 0.01:
             soft_shadow(lay, 790, 1450, 300, 90)
@@ -441,8 +447,8 @@ def s_back(t):
     cam = Cam(lerp(1.25, 1.35, clamp((t - 23.0) / 2.85)), TABLE[0] - 40, TABLE[1] - 300)
     w = decor(cam, SALON)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    q = ease_io(clamp((t - 23.7) / 1.6)) * 2
-    plant_at(lay, cam, lambda c, x, y, ww: maranta_back(c, q, x, y, ww), TABLE)
+    q = clamp((t - 24.0) / 1.0)                   # de l'état abîmé au très bel état, une seule fois
+    plant_at(lay, cam, lambda c, x, y, ww: maranta_ab(c, 4, 1, q, x, y, ww), TABLE)
     w.alpha_composite(lay)
     w = bright(w, 0.5)
     light_rays(w, 900, 250, t, 0.9)
