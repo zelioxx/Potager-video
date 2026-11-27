@@ -51,8 +51,8 @@ FILET, SAPIN, SEC, DECO = B + "sapin_1", B + "sapin_2", B + "sapin_3", B + "sapi
 PIED, SCIE, RONDELLE, CARAFE, RADIATEUR = (B + "pied_sapin", B + "scie", B + "rondelle_bois", B + "carafe_eau",
                                            B + "radiateur_panneau")
 
-TREE_B = (600, 1045)            # pied du sapin à côté du radiateur (salon vue table, plein écran)
-RAD_B = (780, 965)              # bas-milieu du radiateur, contre le mur
+TREE_B = (520, 1050)            # pied du sapin à côté du radiateur (salon vue table, plein écran)
+RAD_B = (765, 950)              # bas-milieu du radiateur, contre le mur
 TREE_A = (770, 965)             # coin au soleil, loin de toute chaleur (salon vue canapé)
 TREE_H = 600                    # hauteur du sapin à l'écran (zoom 1)
 
@@ -196,7 +196,7 @@ def salon_b(cam, t, stage_fn, needles_t0=None, rate=0, heat_a=0.0):
     w = decor(cam, SALON_B)
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     rx, ry = cam.p(*RAD_B)
-    sp(lay, RADIATEUR, rx, ry, 250 * cam.z, 0.5, 1.0)
+    sp(lay, RADIATEUR, rx, ry, 215 * cam.z, 0.5, 1.0)
     x, y = cam.p(*TREE_B)
     soft_shadow(lay, x, y, 260 * cam.z, 90)
     if needles_t0 is not None:
@@ -208,7 +208,8 @@ def salon_b(cam, t, stage_fn, needles_t0=None, rate=0, heat_a=0.0):
 
 
 def s_open(t):
-    cam = Cam(lerp(1.0, 1.12, ease_io(clamp(t / 4.2))), 600, 900)
+    k = ease_io(clamp((t - 1.0) / 1.6))
+    cam = Cam(lerp(1.0, 1.75, k), lerp(600, TREE_B[0] + 20, k), lerp(900, TREE_B[1] - 230, k))
     w = salon_b(cam, t, lambda c, x, y, h: tree(c, SAPIN, x, y, h, rot=math.sin(t * 0.8) * 0.4), 0.6, 45, 0.6)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     w.alpha_composite(shade())
@@ -283,7 +284,7 @@ cue(13.3, "rustle", 0.1)
 
 
 # ============================================================ D. ① RECOUPE LE PIED DE 2 CM (14.1 → 17.0)
-CUT_Y = 1520                     # bas du tronc sur le gros plan
+CUT_Y = 1240                     # bas du tronc sur le gros plan
 
 
 def s_cut(t):
@@ -296,25 +297,25 @@ def s_cut(t):
     sx = 540 + 120 + math.sin((t - 15.0) * 2 * math.pi * 2.2) * 120 if 15.0 < t < 16.05 else 820
     a_saw = fade(t, 14.7, 16.3, 0.25, 0.25)
     if a_saw > 0.01:
-        sp(w, SCIE, sx + 120, CUT_Y - 68, 520 * 0.45 / 0.45 * 0.5, 0.15, 0.62, rot=0, alpha=a_saw)
+        sp(w, SCIE, sx - 120, CUT_Y - 32, 150, 0.35, 0.86, rot=0, alpha=a_saw)
     if 15.1 < t < 16.1:      # sciure
         d = ImageDraw.Draw(w)
         r = np.random.default_rng(int(t * 30))
         for _ in range(14):
-            px, py = 540 + r.uniform(-60, 60), CUT_Y - 40 + r.uniform(0, 160)
+            px, py = 540 + r.uniform(-50, 50), CUT_Y - 25 + r.uniform(0, 140)
             d.ellipse([px - 4, py - 3, px + 4, py + 3], fill=(205, 165, 110, 230))
     if t > 16.05:            # la rondelle de 2 cm tombe et roule
         q = clamp((t - 16.05) / 0.5)
-        sp(w, RONDELLE, 540 + 160 * q, lerp(CUT_Y - 30, 1700, ease_in(q)), 260, 0.5, 0.5, rot=-40 * q)
+        sp(w, RONDELLE, 540 + 120 * q, lerp(CUT_Y - 10, 1420, ease_in(q)), 70, 0.5, 0.5, rot=-30 * q)
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     steps(u, t, 1)
     if t > 15.6:
         d = ImageDraw.Draw(u)
-        x0 = 340
-        d.line([(x0, CUT_Y - 70), (x0, CUT_Y)], fill=WHITE, width=8)
-        d.line([(x0 - 20, CUT_Y - 70), (x0 + 20, CUT_Y - 70)], fill=WHITE, width=8)
+        x0 = 430
+        d.line([(x0, CUT_Y - 45), (x0, CUT_Y)], fill=WHITE, width=8)
+        d.line([(x0 - 20, CUT_Y - 45), (x0 + 20, CUT_Y - 45)], fill=WHITE, width=8)
         d.line([(x0 - 20, CUT_Y), (x0 + 20, CUT_Y)], fill=WHITE, width=8)
-        put(u, text_img("2 CM", F_TITLE, 90, YEL, 8, DARK), x0 - 120, CUT_Y - 40, life(t, 15.65, None))
+        put(u, text_img("2 CM", F_TITLE, 90, YEL, 8, DARK), x0 - 150, CUT_Y - 25, life(t, 15.65, None))
     w = whip(w, (t - 14.1) / 0.3)
     keyword(u, "RECOUPE LE PIED", t, 14.2, None, color=WHITE, size=125)
     return w, u
@@ -327,7 +328,7 @@ cue(16.08, "toc", 0.2)
 
 
 # ============================================================ E. ② UN PIED AVEC RÉSERVE D'EAU (17.0 → 20.9)
-BASE_Y = 1480
+BASE_Y = 1430
 
 
 def s_stand(t):
@@ -344,14 +345,14 @@ def s_stand(t):
     u = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     # la carafe remplit la réserve, chaque jour
     if t > 19.5:
-        tilt = -55 * ease_io(clamp((t - 19.5) / 0.3))
-        cx, cy = 860, BASE_Y - 330
-        sp(w, CARAFE, cx, cy, 330, 0.5, 0.25, rot=tilt)
+        tilt = 62 * ease_io(clamp((t - 19.5) / 0.3))
+        mx, my = 700, BASE_Y - 300          # le goulot, au-dessus du bord du pied
+        sp(w, CARAFE, mx, my, 330, 0.5, 0.03, rot=tilt)
         if t > 19.75:
             d = ImageDraw.Draw(w)
-            mx, my = cx - 150, cy - 30
-            d.line([(mx, my), (mx - 30, my + 90), (680, BASE_Y - 150)], fill=(170, 210, 240, 200), width=10,
-                   joint="curve")
+            pts = [(mx - 8 - 40 * (k / 10) ** 2 * 1.5, my + 12 + k * 13) for k in range(11)]
+            d.line(pts, fill=(160, 205, 240, 210), width=11, joint="curve")
+            d.line([(p[0] - 3, p[1]) for p in pts], fill=(235, 248, 255, 200), width=3)
         for i, t0 in enumerate((19.75, 20.05, 20.35)):
             s = life(t, t0, None if i == 2 else t0 + 0.3, dur=0.1, out=0.08)
             if s > 0.01:

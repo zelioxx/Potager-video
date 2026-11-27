@@ -148,3 +148,5 @@ Originaux dans `assets/images/source_utilisateur/`, versions détourées (fond t
 | `maranta_1…4` | Maranta en pot plastique noir, du plus beau au mourant (feuille tombée au sol à l'étape 4) ; même cadre pour les 4, bas du pot détecté automatiquement |
 | `pot_terre_cuite` / `arrosoir_inox` / `radiateur_panneau` | Pot en terre cuite vide ; petit arrosoir inox à long bec ; radiateur panneau blanc |
 | `calendrier_fr.png` | Calendrier mural « AVRIL » traduit en français (LUN…DIM), grille des cases ≈ (0,08 ; 0,32) → (0,92 ; 0,84) |
+| `sapin_1…4` | Sapin : emballé dans son filet, dans son pied (vert), desséché, décoré (même échelle ; pied détecté en bas de la silhouette) |
+| `pied_sapin` / `scie` / `rondelle_bois` / `carafe_eau` | Pied de sapin à réserve d'eau ; scie égoïne ; rondelle de bois ; carafe d'eau |
