@@ -53,7 +53,7 @@ PIED, SCIE, RONDELLE, CARAFE, RADIATEUR = (B + "pied_sapin", B + "scie", B + "ro
 
 TREE_B = (520, 1050)            # pied du sapin à côté du radiateur (salon vue table, plein écran)
 RAD_B = (765, 950)              # bas-milieu du radiateur, contre le mur
-TREE_A = (770, 965)             # coin au soleil, loin de toute chaleur (salon vue canapé)
+TREE_A = (630, 990)             # coin au soleil, loin de toute chaleur (salon vue canapé)
 TREE_H = 600                    # hauteur du sapin à l'écran (zoom 1)
 
 
